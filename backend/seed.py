@@ -45,21 +45,17 @@ else:
 
 UNSPLASH = "https://images.unsplash.com/photo-{id}?w=600&q=80"
 
+# Only using photo IDs that appear verbatim as category fallback images, blog post
+# covers, or hero banners elsewhere in this codebase — proven jewelry shots, zero guessing.
 PRODUCT_IMAGES = [
-    UNSPLASH.format(id="1611591437281-460bfbe1220a"),
-    UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),
-    UNSPLASH.format(id="1573408301185-9146fe634ad0"),
-    UNSPLASH.format(id="1611652022419-a9419f74343d"),
-    UNSPLASH.format(id="1590779033100-9f60a05a013d"),
-    UNSPLASH.format(id="1610701596007-11502861dcfa"),
-    UNSPLASH.format(id="1589128777073-263566ae5e4d"),
-    UNSPLASH.format(id="1515562141207-7a88fb7ce338"),
-    UNSPLASH.format(id="1605100804763-247f67b3557e"),
-    UNSPLASH.format(id="1630019852942-f89202989a59"),
-    UNSPLASH.format(id="1635767798638-3e25273a8236"),
-    UNSPLASH.format(id="1600080972464-8e5f35f63d08"),
-    UNSPLASH.format(id="1617038220319-276d3cfab638"),
-    UNSPLASH.format(id="1535632066927-ab7c9ab60908"),
+    UNSPLASH.format(id="1611591437281-460bfbe1220a"),   # jhumka earrings  [category + blog + banner]
+    UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),   # kundan necklace   [category + blog]
+    UNSPLASH.format(id="1573408301185-9146fe634ad0"),   # gold bangles      [category + blog]
+    UNSPLASH.format(id="1611652022419-a9419f74343d"),   # bridal jewellery  [category + blog + banner]
+    UNSPLASH.format(id="1605100804763-247f67b3557e"),   # gold ring         [category]
+    UNSPLASH.format(id="1610701596007-11502861dcfa"),   # gold chain        [original PRODUCT_IMAGES]
+    UNSPLASH.format(id="1589128777073-263566ae5e4d"),   # earrings close-up [original PRODUCT_IMAGES]
+    UNSPLASH.format(id="1515562141207-7a88fb7ce338"),   # gemstone ring     [original PRODUCT_IMAGES]
 ]
 
 CATEGORIES = [

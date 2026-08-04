@@ -41,15 +41,15 @@ function InlineEditorialBanner() {
   return (
     <div
       className="col-span-2 sm:col-span-3 lg:col-span-5 overflow-hidden flex flex-col sm:flex-row items-center gap-0"
-      style={{ backgroundColor: '#1A1A1A', minHeight: '160px' }}
+      style={{ backgroundColor: '#1A1A1A', minHeight: '180px' }}
     >
       <img
-        src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&h=300&fit=crop&crop=center&q=80"
+        src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=300&fit=crop&crop=center&q=80"
         alt=""
-        className="w-full sm:w-64 h-40 sm:h-full object-cover shrink-0"
+        className="w-full sm:w-64 h-44 sm:h-full object-cover shrink-0"
         loading="lazy"
       />
-      <div className="px-6 py-6 sm:py-8 flex flex-col justify-center gap-2">
+      <div className="px-8 sm:px-10 py-10 flex flex-col justify-center gap-2">
         <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E]">Craftsmanship</p>
         <p
           className="text-xl sm:text-2xl text-[#F9F8F6] leading-snug"
@@ -57,7 +57,7 @@ function InlineEditorialBanner() {
         >
           Sustainably sourced,<br />hand-selected.
         </p>
-        <p className="text-[12px] text-[#F9F8F6]/50 font-body leading-relaxed max-w-sm">
+        <p className="text-[12px] text-[#F9F8F6]/50 font-body leading-relaxed max-w-sm mt-1">
           Every piece begins with ethically chosen materials and ends with hands that care.
         </p>
       </div>
@@ -312,9 +312,12 @@ export default function ProductsPage() {
         </div>
 
         <div className="flex gap-8 lg:gap-10">
-          {/* Desktop sidebar — sticky */}
+          {/* Desktop sidebar — sticky with scroll containment */}
           <aside className="hidden lg:block w-[220px] xl:w-[250px] shrink-0">
-            <div className="sticky top-24">
+            <div
+              className="sticky overflow-y-auto scrollbar-none"
+              style={{ top: '100px', maxHeight: 'calc(100vh - 120px)' }}
+            >
               <FiltersSidebar {...filterProps} />
             </div>
           </aside>

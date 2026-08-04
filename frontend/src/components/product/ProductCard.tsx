@@ -49,29 +49,31 @@ export default function ProductCard({ product }: { product: Product }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image — 3:4 aspect ratio */}
+      {/* Image — strict 3:4 aspect ratio, object-fit:cover */}
       <div className="relative overflow-hidden bg-[#EFECE6]" style={{ aspectRatio: '3/4' }}>
         {/* Primary image */}
         <img
-          src={product.images?.[0] || 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop&q=80'}
+          src={product.images?.[0] || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=800&fit=crop&q=80'}
           alt={product.name}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${hovered && secondaryImage ? 'opacity-0' : 'opacity-100'}`}
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered && secondaryImage ? 'opacity-0' : 'opacity-100'}`}
           loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=800&fit=crop&q=80'; }}
         />
         {/* Secondary (hover) image */}
         {secondaryImage && (
           <img
             src={secondaryImage}
             alt={`${product.name} — alternate view`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${hovered ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered ? 'opacity-100' : 'opacity-0'}`}
             loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
 
-        {/* Discount badge */}
+        {/* Discount badge — refined pill style */}
         {discount !== null && discount > 0 && (
-          <span className="absolute top-0 left-0 bg-[#1A1A1A] text-[#F9F8F6] text-[9px] font-bold px-2.5 py-1.5 tracking-wider uppercase z-10">
-            {discount}% off
+          <span className="absolute top-2 left-2 border border-[#1A1A1A]/80 bg-[#F9F8F6]/90 backdrop-blur-sm text-[#1A1A1A] text-[8px] font-bold px-1.5 py-0.5 tracking-[0.12em] uppercase z-10 rounded-sm">
+            −{discount}%
           </span>
         )}
 
@@ -118,9 +120,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Text content */}
       <div className="pt-3 pb-1 px-0.5 flex flex-col gap-1">
-        {/* Sub-label (material/finish) */}
+        {/* Sub-label (category/finish) */}
         {product.tags?.length > 0 && (
-          <p className="text-[10px] text-[#767676] tracking-wide uppercase font-body leading-none">
+          <p
+            className="text-[#767676] uppercase leading-none font-body"
+            style={{ fontSize: '9px', letterSpacing: '0.1em', fontWeight: 600 }}
+          >
             {product.tags.slice(0, 2).map((t) =>
               t.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
             ).join(' · ')}

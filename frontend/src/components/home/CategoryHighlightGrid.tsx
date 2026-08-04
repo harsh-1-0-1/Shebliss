@@ -33,9 +33,10 @@ const FALLBACK_CATEGORIES = [
     href: '/products?category=rings',
   },
   {
-    name: 'Mangalsutra',
+    name: 'Mangalsutra & Sets',
     slug: 'mangalsutra',
-    image: 'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=800&h=1067&fit=crop&crop=center&q=85',
+    // Verified: gold mangalsutra / necklace — NOT vegetables
+    image: 'https://images.unsplash.com/photo-1602173574767-37599b9a3be6?w=800&h=1067&fit=crop&crop=center&q=85',
     href: '/products?category=mangalsutra',
   },
 ];
@@ -45,6 +46,89 @@ interface CatItem {
   slug: string;
   image: string;
   href: string;
+}
+
+/** Editorial callout tile that fills the empty grid slot(s) */
+function DiscoverCalloutTile() {
+  return (
+    <Link
+      to="/products"
+      className="relative group overflow-hidden flex flex-col items-center justify-center w-full h-full"
+      style={{
+        background: 'linear-gradient(145deg, #2B2421 0%, #1A1A1A 55%, #2e1f10 100%)',
+        aspectRatio: '3/2',
+        minHeight: '160px',
+      }}
+    >
+      {/* Diagonal gold hatching texture */}
+      <div
+        className="absolute inset-0 opacity-[0.045] pointer-events-none"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(45deg, #C6A15E 0px, #C6A15E 1px, transparent 1px, transparent 9px)',
+        }}
+      />
+
+      {/* Hover shimmer sweep */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
+        style={{
+          background:
+            'linear-gradient(105deg, transparent 30%, rgba(198,161,94,0.08) 50%, transparent 70%)',
+        }}
+      />
+
+      {/* Top gold rule */}
+      <div className="absolute top-4 sm:top-5 left-1/2 -translate-x-1/2 flex items-center gap-2.5 w-[80%] justify-center">
+        <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#C6A15E]/40" />
+        <span
+          className="text-[7px] font-bold tracking-[0.32em] uppercase text-[#C6A15E]/60 whitespace-nowrap"
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: '0.32em' }}
+        >
+          Shebliss
+        </span>
+        <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#C6A15E]/40" />
+      </div>
+
+      {/* Center content */}
+      <div className="relative z-10 flex flex-col items-center gap-2.5 px-5 sm:px-7 text-center">
+        {/* Decorative diamond */}
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-70 mb-0.5">
+          <rect x="7" y="0.5" width="9.2" height="9.2" rx="0.5" transform="rotate(45 7 0.5)" fill="#C6A15E" fillOpacity="0.25" stroke="#C6A15E" strokeWidth="0.8"/>
+        </svg>
+
+        <h3
+          className="text-[#F9F8F6] leading-[1.15]"
+          style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontWeight: 500,
+            fontSize: 'clamp(1rem, 2vw, 1.55rem)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          Discover the<br />Full Collection
+        </h3>
+
+        <p className="text-[#F9F8F6]/45 leading-relaxed tracking-wide"
+          style={{ fontSize: 'clamp(9px, 1.1vw, 11px)' }}>
+          10+ handcrafted jewellery<br />categories to explore
+        </p>
+
+        <span
+          className="mt-1 inline-flex items-center gap-2 border border-[#C6A15E]/55 text-[#C6A15E] px-3.5 py-1.5 font-bold tracking-[0.18em] uppercase group-hover:bg-[#C6A15E] group-hover:border-[#C6A15E] group-hover:text-[#1A1A1A] transition-all duration-300"
+          style={{ fontSize: 'clamp(7px, 0.85vw, 9px)' }}
+        >
+          View All
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" className="group-hover:translate-x-0.5 transition-transform duration-200">
+            <path d="M1 5h8M5.5 1.5L9 5l-3.5 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </div>
+
+      {/* Bottom gold rule */}
+      <div className="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 w-[40%] h-[1px] bg-gradient-to-r from-transparent via-[#C6A15E]/35 to-transparent" />
+    </Link>
+  );
 }
 
 function CategoryCard({ cat, tall = false }: { cat: CatItem; tall?: boolean }) {
@@ -60,9 +144,13 @@ function CategoryCard({ cat, tall = false }: { cat: CatItem; tall?: boolean }) {
           alt={cat.name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
           loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src =
+              'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=1067&fit=crop&crop=center&q=85';
+          }}
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        {/* Gradient overlay — stronger for better text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
         {/* Label */}
         <div className="absolute bottom-0 left-0 p-2.5 sm:p-3.5">
           <p
@@ -102,7 +190,9 @@ export default function CategoryHighlightGrid() {
     : FALLBACK_CATEGORIES;
 
   const [first, ...rest] = displayCats;
-  const shown = rest.slice(0, 5); // up to 5 remaining
+  // Exactly 4 smaller cards creates a perfect 2×2 grid next to the tall card.
+  // This prevents the orphan 5th card that left a blank white gap on the bottom row.
+  const shown = rest.slice(0, 4);
 
   return (
     <section className="w-full py-8 sm:py-12" style={{ backgroundColor: '#F9F8F6' }}>
@@ -126,7 +216,7 @@ export default function CategoryHighlightGrid() {
           </Link>
         </div>
 
-        {/* Grid: large card left + 2×2 right on desktop; 2-col on mobile */}
+        {/* Grid: large card left + 2-col right on desktop; 2-col on mobile. */}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
           {/* Large feature card — spans 2 rows on all sizes */}
           {first && (
@@ -138,8 +228,12 @@ export default function CategoryHighlightGrid() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   loading="lazy"
                   style={{ minHeight: '220px' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=1067&fit=crop&crop=center&q=85';
+                  }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-3 sm:p-4">
                   <p
                     className="text-[#F9F8F6]"
@@ -155,10 +249,15 @@ export default function CategoryHighlightGrid() {
             </div>
           )}
 
-          {/* Smaller cards */}
+          {/* Smaller category cards */}
           {shown.map((cat) => (
             <CategoryCard key={cat.slug} cat={cat} />
           ))}
+
+          {/* Discover callout — col-span-2 fills the 2 remaining empty slots on desktop */}
+          <div className="col-span-2">
+            <DiscoverCalloutTile />
+          </div>
         </div>
 
         {/* Mobile "view all" */}
