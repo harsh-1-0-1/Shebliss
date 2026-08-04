@@ -1,0 +1,139 @@
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
+import { useAuthStore } from '@/store/authStore';
+import { useCartStore } from '@/store/cartStore';
+
+import Layout from '@/components/layout/Layout';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
+
+import HomePage from '@/pages/HomePage';
+import ProductsPage from '@/pages/ProductsPage';
+import ProductDetailPage from '@/pages/ProductDetailPage';
+import CartPage from '@/pages/CartPage';
+import CheckoutPage from '@/pages/CheckoutPage';
+import OrdersPage from '@/pages/OrdersPage';
+import OrderDetailPage from '@/pages/OrderDetailPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import WishlistPage from '@/pages/WishlistPage';
+import BlogListPage from '@/pages/BlogListPage';
+import BlogDetailPage from '@/pages/BlogDetailPage';
+import CorporateGiftingPage from '@/pages/CorporateGiftingPage';
+import DamageReplacementPage from '@/pages/DamageReplacementPage';
+import MyDamageClaimsPage from '@/pages/MyDamageClaimsPage';
+import FaqPage from '@/pages/FaqPage';
+
+import AdminLayout from '@/components/admin/AdminLayout';
+import DashboardPage from '@/pages/admin/DashboardPage';
+import ProductsAdminPage from '@/pages/admin/ProductsAdminPage';
+import CategoriesAdminPage from '@/pages/admin/CategoriesAdminPage';
+import OrdersAdminPage from '@/pages/admin/OrdersAdminPage';
+import UsersAdminPage from '@/pages/admin/UsersAdminPage';
+import BannersAdminPage from '@/pages/admin/BannersAdminPage';
+import BlogAdminPage from '@/pages/admin/BlogAdminPage';
+import StoriesAdminPage from '@/pages/admin/StoriesAdminPage';
+import CorporateAdminPage from '@/pages/admin/CorporateAdminPage';
+import CouponsAdminPage from '@/pages/admin/CouponsAdminPage';
+import DamageClaimsAdminPage from '@/pages/admin/DamageClaimsAdminPage';
+import SettingsAdminPage from '@/pages/admin/SettingsAdminPage';
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    // Don't override scroll when navigating to a hash anchor
+    if (!hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
+
+  return null;
+}
+
+function ScrollToHashElement() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const element = document.getElementById(hash.replace('#', ''));
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    }
+  }, [hash]);
+
+  return null;
+}
+
+function AppInit() {
+  const hydrateFromStorage = useAuthStore((s) => s.hydrateFromStorage);
+  const fetchCart = useCartStore((s) => s.fetchCart);
+
+  useEffect(() => {
+    hydrateFromStorage();
+    fetchCart();
+  }, [hydrateFromStorage, fetchCart]);
+
+  return null;
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppInit />
+        <ScrollToTop />
+        <ScrollToHashElement />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: { borderRadius: '12px', fontSize: '14px' },
+            success: { iconTheme: { primary: '#0e4d3a', secondary: '#fff' } },
+          }}
+        />
+        <ErrorBoundary>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/:slug" element={<ProductDetailPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/blog" element={<BlogListPage />} />
+              <Route path="/blog/:slug" element={<BlogDetailPage />} />
+              <Route path="/corporate-gifting" element={<CorporateGiftingPage />} />
+              <Route path="/damage-replacement" element={<DamageReplacementPage />} />
+              <Route path="/damage-claims" element={<MyDamageClaimsPage />} />
+              <Route path="/faqs" element={<FaqPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+            <Route element={<Layout />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<DashboardPage />} />
+                <Route path="products" element={<ProductsAdminPage />} />
+                <Route path="categories" element={<CategoriesAdminPage />} />
+                <Route path="orders" element={<OrdersAdminPage />} />
+                <Route path="users" element={<UsersAdminPage />} />
+                <Route path="banners" element={<BannersAdminPage />} />
+                <Route path="stories" element={<StoriesAdminPage />} />
+                <Route path="blog" element={<BlogAdminPage />} />
+                <Route path="corporate" element={<CorporateAdminPage />} />
+                <Route path="coupons" element={<CouponsAdminPage />} />
+                <Route path="damage-claims" element={<DamageClaimsAdminPage />} />
+                <Route path="settings" element={<SettingsAdminPage />} />
+              </Route>
+            </Route>
+          </Routes>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}

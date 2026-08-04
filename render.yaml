@@ -1,0 +1,7 @@
+services:
+  - type: web
+    runtime: docker
+    name: my-store-api
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/v1/health
