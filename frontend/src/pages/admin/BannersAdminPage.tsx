@@ -728,7 +728,7 @@ function BannerDrawer({
             <input
               {...register('subtitle')}
               className={inputClass}
-              placeholder="e.g. Up to 40% off on all indoor ferns and air-purifiers."
+              placeholder="e.g. Up to 40% off on all festive jewellery collections."
             />
             <p className="text-[10px] text-gray-400 mt-0.5">Subtext displayed under the main heading.</p>
           </div>
@@ -750,7 +750,7 @@ function BannerDrawer({
               </label>
               <input
                 {...register('cta_link')}
-                placeholder="e.g. /products?category=ferns"
+                placeholder="e.g. /products?category=earrings"
                 className={inputClass}
               />
             </div>

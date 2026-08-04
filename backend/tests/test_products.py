@@ -112,7 +112,7 @@ async def test_get_product_by_slug(client: AsyncClient, admin_token: str):
 
 @pytest.mark.asyncio
 async def test_get_product_not_found(client: AsyncClient):
-    resp = await client.get(f"{PROD_URL}/no-such-plant")
+    resp = await client.get(f"{PROD_URL}/no-such-item")
     assert resp.status_code == 404
 
 
@@ -150,7 +150,7 @@ async def test_delete_product_requires_admin(client: AsyncClient):
 async def test_variant_image_upload_requires_admin(client: AsyncClient):
     resp = await client.post(
         f"{PROD_URL}/variant-image",
-        files={"image": ("pot.png", b"fake-image", "image/png")},
+        files={"image": ("item.png", b"fake-image", "image/png")},
     )
     assert resp.status_code == 401
 
@@ -172,7 +172,7 @@ async def test_variant_image_upload_rejects_unsupported_file(
 async def test_create_product_uses_shared_image_storage(
     client: AsyncClient, admin_token: str, monkeypatch,
 ):
-    category = await _seed_category(client, admin_token, "Upload Test Plants")
+    category = await _seed_category(client, admin_token, "Upload Test Jewellery")
     uploaded_filenames: list[str] = []
 
     async def fake_upload_image_file(image, folder: str, entity_id=None):
@@ -187,18 +187,18 @@ async def test_create_product_uses_shared_image_storage(
     resp = await client.post(
         PROD_URL,
         data={
-            "name": "Uploaded Plant",
+            "name": "Uploaded Earring",
             "price": "499",
             "category_id": str(category["id"]),
         },
-        files={"images": ("plant.webp", b"fake-image", "image/webp")},
+        files={"images": ("earring.webp", b"fake-image", "image/webp")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
 
     assert resp.status_code == 201, resp.text
-    assert uploaded_filenames == ["plant.webp"]
+    assert uploaded_filenames == ["earring.webp"]
     assert resp.json()["images"] == [
-        f"http://localhost:8000/static/store/products/{resp.json()['id']}/plant.webp"
+        f"http://localhost:8000/static/store/products/{resp.json()['id']}/earring.webp"
     ]
 
 
@@ -206,20 +206,20 @@ async def test_create_product_uses_shared_image_storage(
 async def test_create_product_keeps_submitted_image_urls(
     client: AsyncClient, admin_token: str,
 ):
-    category = await _seed_category(client, admin_token, "URL Test Plants")
+    category = await _seed_category(client, admin_token, "URL Test Jewellery")
     resp = await client.post(
         PROD_URL,
         data={
-            "name": "Linked Plant",
+            "name": "Linked Earring",
             "price": "299",
             "category_id": str(category["id"]),
-            "image_urls": '["https://example.com/plant.jpg"]',
+            "image_urls": '["https://example.com/earring.jpg"]',
         },
         headers={"Authorization": f"Bearer {admin_token}"},
     )
 
     assert resp.status_code == 201, resp.text
-    assert resp.json()["images"] == ["https://example.com/plant.jpg"]
+    assert resp.json()["images"] == ["https://example.com/earring.jpg"]
 
 
 # ---- Soft delete -------------------------------------------------------
@@ -252,7 +252,7 @@ async def test_soft_delete(client: AsyncClient, admin_token: str):
 async def test_upload_product_image_success(client: AsyncClient, admin_token: str):
     resp = await client.post(
         f"{PROD_URL}/upload-image",
-        files={"image": ("plant.png", b"fake-image", "image/png")},
+        files={"image": ("earring.png", b"fake-image", "image/png")},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code == 200, resp.text
@@ -308,8 +308,8 @@ async def test_update_product_null_variants_does_not_wipe(client: AsyncClient, a
     async with test_session_factory() as db:
         from app.db.models import Product
         p = Product(
-            name="Variant Plant",
-            slug="variant-plant",
+            name="Variant Earring",
+            slug="variant-earring",
             description="desc",
             price=50.0,
             stock_qty=10,

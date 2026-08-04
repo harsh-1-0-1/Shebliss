@@ -58,8 +58,8 @@ async def test_full_damage_claim_flow(client: AsyncClient):
         "/api/v1/damage-claims",
         data={
             "order_id": str(order_id),
-            "issue_type": "broken_pot",
-            "description": "The ceramic pot shattered in transit and the plant roots were exposed.",
+            "issue_type": "damaged_packaging",
+            "description": "The packaging was crushed in transit and the item inside was damaged.",
         },
         files=_photo_file(),
         headers={"Authorization": f"Bearer {token}"},
@@ -82,7 +82,7 @@ async def test_full_damage_claim_flow(client: AsyncClient):
         "/api/v1/damage-claims",
         data={
             "order_id": str(order_id),
-            "issue_type": "broken_pot",
+            "issue_type": "damaged_packaging",
             "description": "Attempting to file a second claim for the same order.",
         },
         files=_photo_file(),
@@ -144,19 +144,19 @@ async def test_full_damage_claim_flow(client: AsyncClient):
     # 8. Admin approves with notes
     resp = await client.patch(
         f"/api/v1/damage-claims/admin/{claim_id}",
-        json={"status": "approved", "admin_notes": "Replacement plant will ship within 2 days."},
+        json={"status": "approved", "admin_notes": "Replacement item will ship within 2 days."},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code == 200, resp.text
     assert resp.json()["status"] == "approved"
-    assert resp.json()["admin_notes"] == "Replacement plant will ship within 2 days."
+    assert resp.json()["admin_notes"] == "Replacement item will ship within 2 days."
 
     # 9. Customer sees the updated status + notes
     resp = await client.get("/api/v1/damage-claims/my", headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == 200, resp.text
     updated = resp.json()["items"][0]
     assert updated["status"] == "approved"
-    assert updated["admin_notes"] == "Replacement plant will ship within 2 days."
+    assert updated["admin_notes"] == "Replacement item will ship within 2 days."
 
     # 10. Admin status filter works
     resp = await client.get(
@@ -205,8 +205,8 @@ async def test_damage_claim_requires_delivered_order(client: AsyncClient):
         "/api/v1/damage-claims",
         data={
             "order_id": str(order_id),
-            "issue_type": "withered_plant",
-            "description": "The plant arrived completely withered and dry.",
+            "issue_type": "missing_item",
+            "description": "The item arrived completely damaged and unusable.",
         },
         files=_photo_file(),
         headers={"Authorization": f"Bearer {token}"},
@@ -236,7 +236,7 @@ async def test_damage_claim_order_ownership_enforced(client: AsyncClient):
         data={
             "order_id": str(order_id),
             "issue_type": "missing_item",
-            "description": "One of the plants was missing from the box.",
+            "description": "One of the items was missing from the box.",
         },
         files=_photo_file(),
         headers={"Authorization": f"Bearer {other_token}"},
@@ -247,7 +247,7 @@ async def test_damage_claim_order_ownership_enforced(client: AsyncClient):
 
 async def test_damage_claim_requires_auth_and_photo(client: AsyncClient):
     """Anonymous submit is rejected; claim without photos is rejected."""
-    resp = await client.post("/api/v1/damage-claims", data={"order_id": "1", "issue_type": "broken_pot", "description": "a" * 20})
+    resp = await client.post("/api/v1/damage-claims", data={"order_id": "1", "issue_type": "damaged_packaging", "description": "a" * 20})
     assert resp.status_code == 401
 
     admin_token = await _register_and_make_admin(client)
@@ -258,8 +258,8 @@ async def test_damage_claim_requires_auth_and_photo(client: AsyncClient):
         "/api/v1/damage-claims",
         data={
             "order_id": str(order_id),
-            "issue_type": "broken_pot",
-            "description": "The pot arrived cracked down the side.",
+            "issue_type": "damaged_packaging",
+            "description": "The box arrived cracked down the side.",
         },
         headers={"Authorization": f"Bearer {token}"},
     )

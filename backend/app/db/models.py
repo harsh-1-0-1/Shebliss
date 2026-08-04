@@ -231,11 +231,10 @@ class Address(Base):
 
 
 class BlogCategory(str, enum.Enum):
-    GROW = "GROW"
-    CARE = "CARE"
-    DIY = "DIY"
-    TIPS = "TIPS"
     NEWS = "NEWS"
+    GUIDES = "GUIDES"
+    TIPS = "TIPS"
+    STORIES = "STORIES"
 
 
 class BlogPost(Base):

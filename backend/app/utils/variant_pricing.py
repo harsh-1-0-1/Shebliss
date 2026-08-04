@@ -213,7 +213,7 @@ def calculate_variant_price(
 
 def _get_primary_image(product: Product) -> str:
     """Get primary product image or placeholder."""
-    return (product.images or [None])[0] or "https://placehold.co/600x600?text=Plant"
+    return (product.images or [None])[0] or "https://placehold.co/600x600?text=Product"
 
 
 def _convert_to_old_format(selected_options: List[str], variants: dict) -> Optional[dict]:

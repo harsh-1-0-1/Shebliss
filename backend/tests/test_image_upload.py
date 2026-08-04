@@ -11,8 +11,8 @@ from app.utils import image_upload
 
 
 def test_generate_image_key_uses_entity_and_unique_uuid():
-    first = image_upload.generate_image_key("products", 42, "plant.WEBP")
-    second = image_upload.generate_image_key("store/products", 42, "plant.WEBP")
+    first = image_upload.generate_image_key("products", 42, "earring.WEBP")
+    second = image_upload.generate_image_key("store/products", 42, "earring.WEBP")
 
     pattern = r"^store/products/42/[0-9a-f-]{36}\.webp$"
     assert re.match(pattern, first)
@@ -22,9 +22,9 @@ def test_generate_image_key_uses_entity_and_unique_uuid():
 
 def test_generate_image_key_rejects_unsafe_namespaces():
     with pytest.raises(ValueError):
-        image_upload.generate_image_key("../outside", 1, "plant.jpg")
+        image_upload.generate_image_key("../outside", 1, "earring.jpg")
     with pytest.raises(ValueError):
-        image_upload.generate_image_key("products", "../1", "plant.jpg")
+        image_upload.generate_image_key("products", "../1", "earring.jpg")
 
 
 def test_url_resolution_and_extraction_round_trip(monkeypatch):
@@ -64,7 +64,7 @@ async def test_local_upload_and_delete(tmp_path: Path, monkeypatch):
     monkeypatch.setattr(settings, "AWS_ACCESS_KEY_ID", "")
     monkeypatch.setattr(settings, "AWS_SECRET_ACCESS_KEY", "")
     monkeypatch.setattr(settings, "AWS_S3_BUCKET", "")
-    upload = UploadFile(filename="plant.png", file=__import__("io").BytesIO(b"image"))
+    upload = UploadFile(filename="earring.png", file=__import__("io").BytesIO(b"image"))
 
     key = await image_upload.upload_image_file(upload, "products", 9)
     assert (tmp_path / key).read_bytes() == b"image"
@@ -78,7 +78,7 @@ async def test_production_without_s3_fails(monkeypatch):
     monkeypatch.setattr(settings, "AWS_ACCESS_KEY_ID", "")
     monkeypatch.setattr(settings, "AWS_SECRET_ACCESS_KEY", "")
     monkeypatch.setattr(settings, "AWS_S3_BUCKET", "")
-    upload = UploadFile(filename="plant.png", file=__import__("io").BytesIO(b"image"))
+    upload = UploadFile(filename="earring.png", file=__import__("io").BytesIO(b"image"))
 
     with pytest.raises(
         image_upload.ImageStorageUnavailableError,

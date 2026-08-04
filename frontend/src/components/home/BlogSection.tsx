@@ -8,21 +8,21 @@ const FALLBACK_POSTS = [
     title: 'How to Style Statement Earrings for Every Occasion',
     excerpt: 'From boardroom to brunch — a guide to wearing bold jewellery with confidence.',
     cover_image_url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=400&fit=crop&q=80',
-    category: 'Style Guide', published_at: '2026-07-15',
+    category: 'GUIDES', published_at: '2026-07-15',
   },
   {
     id: 2, slug: 'care-guide-gold-plated-jewellery',
     title: 'The Ultimate Care Guide for Gold Plated Jewellery',
     excerpt: 'Keep your pieces looking pristine with these simple care rituals.',
     cover_image_url: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=400&fit=crop&q=80',
-    category: 'Care Guide', published_at: '2026-07-01',
+    category: 'GUIDES', published_at: '2026-07-01',
   },
   {
     id: 3, slug: 'bridal-jewellery-trends-2026',
     title: 'Bridal Jewellery Trends to Watch in 2026',
     excerpt: 'Kundan revival, layered sets and minimalist mangalsutras are taking centre stage.',
     cover_image_url: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=400&fit=crop&q=80',
-    category: 'Trends', published_at: '2026-06-20',
+    category: 'TIPS', published_at: '2026-06-20',
   },
 ];
 

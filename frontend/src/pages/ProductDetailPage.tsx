@@ -10,7 +10,7 @@ import ProductCard from '@/components/product/ProductCard';
 import ProductTagBadges from '@/components/product/ProductTagBadges';
 import ProductReviews, { ProductRatingInline } from '@/components/product/ProductReviews';
 import ProductSpecification from '@/components/product/ProductSpecification';
-import CustomerPhotos from '@/components/product/HappyPlanters';
+import CustomerPhotos from '@/components/product/CustomerPhotos';
 import ProductFaq from '@/components/product/ProductFaq';
 import { useBanners } from '@/hooks/useBanners';
 import { STORE_LEGAL } from '@/lib/branding';
@@ -205,7 +205,7 @@ function MobileGallery({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const list = images.length ? images : ['https://placehold.co/600x600?text=Plant'];
+  const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
 
   const EASING = 'transform 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
@@ -416,7 +416,7 @@ function DesktopGallery({
   activeIndex: number;
   onActiveChange: (i: number) => void;
 }) {
-  const list = images.length ? images : ['https://placehold.co/600x600?text=Plant'];
+  const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
 
   return (
     <div className="space-y-3">

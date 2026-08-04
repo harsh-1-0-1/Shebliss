@@ -40,14 +40,14 @@ VARIANTS = {
 
 
 async def _seed_variant_product(client: AsyncClient, admin_token: str) -> dict:
-    cat = await _seed_category(client, admin_token, "Variant Plants")
+    cat = await _seed_category(client, admin_token, "Variant Jewellery")
     from app.db.models import Product
     async with test_session_factory() as db:
         p = Product(
-            name="Variant Pothos", slug="variant-pothos", description="Configurable",
+            name="Variant Choker", slug="variant-choker", description="Configurable",
             price=200.0, original_price=None, stock_qty=sum(VARIANTS["stock"].values()),
             category_id=cat["id"], images=["https://example.com/base.jpg"],
-            tags=["indoor"], variants=VARIANTS, is_active=True,
+            tags=["new-arrival"], variants=VARIANTS, is_active=True,
         )
         db.add(p)
         await db.commit()
@@ -246,10 +246,10 @@ async def test_guest_cart_add_multiple_products(client: AsyncClient):
 
         cat = (await db.execute(select(Category).limit(1))).scalar_one()
         product_b = Product(
-            name="Cart Plant B", slug="cart-plant-b", description="Second plant",
+            name="Cart Earrings B", slug="cart-earrings-b", description="Second item",
             price=399.0, original_price=None, stock_qty=10,
             category_id=cat.id, images=["https://placehold.co/300"],
-            tags=["indoor"], is_active=True,
+            tags=["new-arrival"], is_active=True,
         )
         db.add(product_b)
         await db.commit()
@@ -282,10 +282,10 @@ async def test_guest_cart_persists_via_session_header(client: AsyncClient):
 
         cat = (await db.execute(select(Category).limit(1))).scalar_one()
         product_b = Product(
-            name="Header Cart Plant B", slug="header-cart-plant-b", description="Second plant",
+            name="Header Cart Earrings B", slug="header-cart-earrings-b", description="Second item",
             price=399.0, original_price=None, stock_qty=10,
             category_id=cat.id, images=["https://placehold.co/300"],
-            tags=["indoor"], is_active=True,
+            tags=["new-arrival"], is_active=True,
         )
         db.add(product_b)
         await db.commit()

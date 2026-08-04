@@ -298,7 +298,7 @@ export default function BlogAdminPage() {
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. 5 Simple Steps to Grow Healthy Monsteras at Home"
+                    placeholder="e.g. 5 Styling Tips for Wearing Statement Earrings"
                     className={inputClass}
                   />
                   <p className="text-[10px] text-gray-400 mt-1">Make your header catchy to attract clicks.</p>

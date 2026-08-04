@@ -30,7 +30,7 @@ export default function ProductTagBadges({
     })
     .filter((styleObj): styleObj is TagConfig => styleObj !== null);
 
-  // Deduplicate by label (e.g. low-maintenance + easy-care → one "Easy Care" badge)
+  // Deduplicate by label (e.g. combo + gift-set → one "Gift Set" badge)
   const seenLabels = new Set<string>();
   const uniqueMapped = mappedList.filter((styleObj) => {
     if (seenLabels.has(styleObj.label)) return false;

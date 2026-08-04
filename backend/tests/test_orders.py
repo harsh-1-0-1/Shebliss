@@ -36,14 +36,14 @@ ORDER_VARIANTS = {
 
 
 async def _seed_variant_product(client: AsyncClient, admin_token: str) -> dict:
-    cat = await _seed_category(client, admin_token, "Order Variant Plants")
+    cat = await _seed_category(client, admin_token, "Order Variant Jewellery")
     from app.db.models import Product
     async with test_session_factory() as db:
         p = Product(
-            name="Order Variant Pothos", slug="order-variant-pothos", description="Configurable",
+            name="Order Variant Earring", slug="order-variant-earring", description="Configurable",
             price=200.0, original_price=None, stock_qty=sum(ORDER_VARIANTS["stock"].values()),
             category_id=cat["id"], images=["https://example.com/base.jpg"],
-            tags=["indoor"], variants=ORDER_VARIANTS, is_active=True,
+            tags=["new-arrival"], variants=ORDER_VARIANTS, is_active=True,
         )
         db.add(p)
         await db.commit()

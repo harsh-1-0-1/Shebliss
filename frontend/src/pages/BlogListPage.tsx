@@ -4,10 +4,9 @@ import { useBlogPosts } from '@/hooks/useBlog';
 
 const CATEGORIES = [
   { label: 'All', value: '' },
-  { label: 'Style Guide', value: 'Style Guide' },
-  { label: 'Care Guide', value: 'Care Guide' },
-  { label: 'Trends', value: 'Trends' },
   { label: 'News', value: 'NEWS' },
+  { label: 'Buying Guides', value: 'GUIDES' },
+  { label: 'Style Tips', value: 'TIPS' },
   { label: 'Stories', value: 'STORIES' },
 ];
 
