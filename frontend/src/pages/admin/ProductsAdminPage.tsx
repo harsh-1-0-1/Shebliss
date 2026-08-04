@@ -67,9 +67,7 @@ const productSchema = z.object({
   stock_qty: z.coerce.number().int().min(0, 'Stock cannot be negative'),
   category_id: z.coerce.number().int().positive('Please select a category'),
   badge: z.string().optional(),
-  how_to_guide: z.string().optional(),
   tags: z.array(z.object({ value: z.string() })).optional(),
-  care_tips: z.array(z.object({ value: z.string() })).optional(),
 });
 
 /**
@@ -138,7 +136,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     basic: true,
     pricing: true,
-    details: false,
     images: false,
     faqs: false,
     variants: false,
@@ -194,21 +191,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
   // Per-combination stock: keyed by combo_key (same space as comboImageKeys). Dense on save.
   const [comboStock, setComboStock] = useState<Record<string, number>>({});
   const [uploadingComboKey, setUploadingComboKey] = useState<string | null>(null);
-  // Plantoga Promise banner — per-product image replacing the four hardcoded cards
-  // promiseBannerKey: relative key stored in DB. promiseBannerUrl: resolved URL for preview only.
-  const [promiseBannerKey, setPromiseBannerKey] = useState('');
-  const [promiseBannerUrl, setPromiseBannerUrl] = useState('');
-  const [uploadingPromiseBanner, setUploadingPromiseBanner] = useState(false);
-
-  // Why Plantoga banner — per-product image replacing the comparison table
-  const [whyPlantogaBannerKey, setWhyPlantogaBannerKey] = useState('');
-  const [whyPlantogaBannerUrl, setWhyPlantogaBannerUrl] = useState('');
-  const [uploadingWhyPlantogaBanner, setUploadingWhyPlantogaBanner] = useState(false);
-
-  // Care Card image — per-product image shown above the care card tiles
-  const [careCardImageKey, setCareCardImageKey] = useState('');
-  const [careCardImageUrl, setCareCardImageUrl] = useState('');
-  const [uploadingCareCardImage, setUploadingCareCardImage] = useState(false);
 
   // Per-product FAQ entries
   const [faqItems, setFaqItems] = useState<{ question: string; answer: string }[]>([]);
@@ -249,13 +231,10 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
       stock_qty: 0,
       category_id: undefined,
       badge: '',
-      how_to_guide: '',
       tags: [],
-      care_tips: [],
     },
   });
   const { fields: tagFields, append: addTag, remove: removeTag } = useFieldArray({ control, name: 'tags' });
-  const { fields: tipFields, append: addTip, remove: removeTip } = useFieldArray({ control, name: 'care_tips' });
 
   const applyProductToForm = (p: Product) => {
     reset({
@@ -266,9 +245,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
       stock_qty: p.stock_qty ?? 0,
       category_id: p.category_id,
       badge: p.badge || '',
-      how_to_guide: p.how_to_guide || '',
       tags: p.tags?.length ? p.tags.map((value) => ({ value })) : [],
-      care_tips: p.care_tips?.length ? p.care_tips.map((value) => ({ value })) : [],
     });
     setProductImages(p.images || []);
     setNewImageUrl('');
@@ -304,14 +281,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
     setComboImageUrls({});
     setComboStock({});
     setVariantError(null);
-    // Promise banner URL comes pre-resolved from the public API response.
-    // The raw key is seeded separately from rawProduct in the useEffect below.
-    setPromiseBannerUrl(p.promise_banner_image || '');
-    setPromiseBannerKey('');  // will be overwritten by rawProduct effect
-    setWhyPlantogaBannerUrl(p.why_plantoga_banner_image || '');
-    setWhyPlantogaBannerKey('');  // will be overwritten by rawProduct effect
-    setCareCardImageUrl(p.care_card_image || '');
-    setCareCardImageKey('');  // will be overwritten by rawProduct effect
     setFaqItems(p.faqs || []);
   };
   // Seed default_image from the raw admin endpoint (relative key, not resolved URL).
@@ -376,21 +345,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
           };
         }));
       }
-
-      // Seed promise banner raw key
-      const rawBannerKey = rawProduct.promise_banner_image || '';
-      setPromiseBannerKey(rawBannerKey);
-      if (rawBannerKey) setPromiseBannerUrl(resolveImageUrl(rawBannerKey));
-
-      // Seed why plantoga banner raw key
-      const rawWhyBannerKey = rawProduct.why_plantoga_banner_image || '';
-      setWhyPlantogaBannerKey(rawWhyBannerKey);
-      if (rawWhyBannerKey) setWhyPlantogaBannerUrl(resolveImageUrl(rawWhyBannerKey));
-
-      // Seed care card image raw key
-      const rawCareCardKey = rawProduct.care_card_image || '';
-      setCareCardImageKey(rawCareCardKey);
-      if (rawCareCardKey) setCareCardImageUrl(resolveImageUrl(rawCareCardKey));
 
       // Seed FAQs from raw product
       const rawFaqs = rawProduct.faqs;
@@ -535,9 +489,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
         stock_qty: number;
         category_id: number;
         badge: string | null;
-        how_to_guide: string | null;
         tags: string[];
-        care_tips: string[];
         variants?: ProductVariants;
       };
       const payload: ProductPayload = {
@@ -548,9 +500,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
         stock_qty: totalStock,
         category_id: data.category_id,
         badge: data.badge || null,
-        how_to_guide: data.how_to_guide?.trim() || null,
         tags: data.tags?.map((t) => t.value).filter(Boolean) || [],
-        care_tips: data.care_tips?.map((t) => t.value).filter(Boolean) || [],
       };
       if (variants !== null) {
         payload.variants = variants;
@@ -574,9 +524,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
         const updatePayload = {
           ...payload,
           images: finalImages,
-          promise_banner_image: promiseBannerKey || null,
-          why_plantoga_banner_image: whyPlantogaBannerKey || null,
-          care_card_image: careCardImageKey || null,
           faqs: faqItems.filter(f => f.question.trim() && f.answer.trim()),
         };
         const { data: updatedProduct } = await api.put<Product>(`/products/${editProduct.id}`, updatePayload);
@@ -610,13 +557,8 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
         if (payload.original_price) fd.append('original_price', String(payload.original_price));
         fd.append('stock_qty', String(payload.stock_qty));
         fd.append('tags', JSON.stringify(payload.tags));
-        fd.append('care_tips', JSON.stringify(payload.care_tips));
         if (payload.badge) fd.append('badge', payload.badge);
-        if (payload.how_to_guide) fd.append('how_to_guide', payload.how_to_guide);
         if (payload.variants) fd.append('variants', JSON.stringify(payload.variants));
-        if (promiseBannerKey) fd.append('promise_banner_image', promiseBannerKey);
-        if (whyPlantogaBannerKey) fd.append('why_plantoga_banner_image', whyPlantogaBannerKey);
-        if (careCardImageKey) fd.append('care_card_image', careCardImageKey);
         const cleanFaqs = faqItems.filter(f => f.question.trim() && f.answer.trim());
         if (cleanFaqs.length) fd.append('faqs', JSON.stringify(cleanFaqs));
         fd.append('image_urls', JSON.stringify(productImages));
@@ -721,60 +663,6 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
     }
   }
 
-  async function handlePromiseBannerUpload(file?: File) {
-    if (!file) return;
-    setUploadingPromiseBanner(true);
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      if (editProduct?.id) fd.append('product_id', String(editProduct.id));
-      const { data } = await api.post<{ key: string; url: string }>('/products/upload-image', fd);
-      setPromiseBannerKey(data.key);
-      setPromiseBannerUrl(data.url);
-      toast.success('Promise banner uploaded');
-    } catch (err) {
-      toast.error(getApiErrorDetail(err, 'Failed to upload banner image'));
-    } finally {
-      setUploadingPromiseBanner(false);
-    }
-  }
-
-  async function handleWhyPlantogaBannerUpload(file?: File) {
-    if (!file) return;
-    setUploadingWhyPlantogaBanner(true);
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      if (editProduct?.id) fd.append('product_id', String(editProduct.id));
-      const { data } = await api.post<{ key: string; url: string }>('/products/upload-image', fd);
-      setWhyPlantogaBannerKey(data.key);
-      setWhyPlantogaBannerUrl(data.url);
-      toast.success('Why Plantoga banner uploaded');
-    } catch (err) {
-      toast.error(getApiErrorDetail(err, 'Failed to upload banner image'));
-    } finally {
-      setUploadingWhyPlantogaBanner(false);
-    }
-  }
-
-  async function handleCareCardImageUpload(file?: File) {
-    if (!file) return;
-    setUploadingCareCardImage(true);
-    try {
-      const fd = new FormData();
-      fd.append('image', file);
-      if (editProduct?.id) fd.append('product_id', String(editProduct.id));
-      const { data } = await api.post<{ key: string; url: string }>('/products/upload-image', fd);
-      setCareCardImageKey(data.key);
-      setCareCardImageUrl(data.url);
-      toast.success('Care card image uploaded');
-    } catch (err) {
-      toast.error(getApiErrorDetail(err, 'Failed to upload care card image'));
-    } finally {
-      setUploadingCareCardImage(false);
-    }
-  }
-
   // ─── end of handlers ──────────────────────────────────────────────────────
 
   if (isEdit && (isLoadingProduct || !formInitialized)) {
@@ -823,7 +711,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                   <label className="text-xs font-semibold text-gray-700 mb-1 block">Product Name *</label>
                   <input
                     {...register('name')}
-                    placeholder="e.g., Fiddle Leaf Fig"
+                    placeholder="e.g., Gold Plated Jhumka Earrings"
                     className={inputClass}
                   />
                   <p className="text-[11px] text-gray-400 mt-1">This is the title customers will see on the website.</p>
@@ -860,7 +748,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                   <textarea
                     {...register('description')}
                     rows={4}
-                    placeholder="Provide details about the plant, its beauty, growth habits, etc."
+                    placeholder="Describe the piece — materials, style, occasion, craftsmanship..."
                     className={inputClass}
                   />
                   <p className="text-[11px] text-gray-400 mt-1">Use blank lines for paragraphs and start lines with - for bullet points.</p>
@@ -926,103 +814,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
             )}
           </div>
 
-          {/* Section 3: Plant Details */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection('details')}
-              className="w-full flex items-center justify-between px-5 py-4 font-semibold text-sm text-gray-800 hover:bg-gray-50 text-left"
-            >
-              <span className="flex items-center gap-2">🌿 <span>Plant Care Details</span></span>
-              {openSections.details ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-            {openSections.details && (
-              <div className="p-5 border-t border-gray-100 space-y-4 bg-white">
-                {/* Care Card Image */}
-                <div className="border-t pt-4 space-y-2">
-                  <label className="text-xs font-semibold text-gray-700 block">Care Card Image</label>
-                  <p className="text-[10px] text-gray-400">Optional image displayed above the care card tiles.</p>
-                  <div className="flex gap-3 items-center">
-                    <div className="h-16 w-16 rounded-lg border overflow-hidden bg-white shrink-0 flex items-center justify-center">
-                      {careCardImageUrl
-                        ? <img src={careCardImageUrl} alt="Care card" className="h-full w-full object-cover" />
-                        : <ImageIcon size={22} className="text-gray-300" />}
-                    </div>
-                    <div className="flex-1">
-                      <label className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border bg-white text-xs font-medium text-primary cursor-pointer hover:bg-green-50 w-full justify-center ${uploadingCareCardImage ? 'opacity-60 pointer-events-none' : ''}`}>
-                        <Upload size={14} />
-                        {uploadingCareCardImage ? 'Uploading…' : careCardImageKey ? 'Change image' : 'Upload image'}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => { void handleCareCardImageUpload(e.target.files?.[0]); e.target.value = ''; }}
-                        />
-                      </label>
-                      {careCardImageKey && (
-                        <button type="button" onClick={() => { setCareCardImageKey(''); setCareCardImageUrl(''); }}
-                          className="text-xs text-red-500 hover:text-red-600 mt-1 font-medium">
-                          Remove image
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 mb-1 block">How to Guide</label>
-                  <textarea
-                    {...register('how_to_guide')}
-                    rows={4}
-                    placeholder="e.g. Use well-draining soil and keep it in a spot with soft, indirect light..."
-                    className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary resize-y"
-                  />
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    Shown as a green card on the product page. Leave blank to auto-build from care tips.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-700">Care Tips / Bullet Points</label>
-                      <p className="text-[11px] text-gray-400">Step-by-step tips displayed on product page.</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => addTip({ value: '' })}
-                      className="px-2.5 py-1 text-xs text-primary font-medium hover:bg-primary-light/10 border border-primary/20 rounded transition"
-                    >
-                      + Add Tip
-                    </button>
-                  </div>
-                  <div className="space-y-2">
-                    {tipFields.map((f, i) => (
-                      <div key={f.id} className="flex items-center gap-2">
-                        <input
-                          {...register(`care_tips.${i}.value`)}
-                          placeholder="e.g. Keep away from air conditioner drafts"
-                          className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeTip(i)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <X size={15} />
-                        </button>
-                      </div>
-                    ))}
-                    {tipFields.length === 0 && (
-                      <p className="text-xs text-gray-400 italic text-center py-2">No care tips added yet.</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Section 4: Images */}
+          {/* Section 3: Images */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <button
               type="button"
@@ -1110,73 +902,11 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                     <p className="text-xs text-gray-400 italic text-center py-4 border rounded-xl bg-gray-50/50 mt-4">No images added yet.</p>
                   )}
                 </div>
-
-                {/* Plantoga Promise Banner */}
-                <div className="border-t pt-4 space-y-2">
-                  <label className="text-xs font-semibold text-gray-700 block">Plantoga Promise Banner</label>
-                  <p className="text-[10px] text-gray-400">Replaces the four trust cards when set.</p>
-                  <div className="flex gap-3 items-center">
-                    <div className="h-16 w-16 rounded-lg border overflow-hidden bg-white shrink-0 flex items-center justify-center">
-                      {promiseBannerUrl
-                        ? <img src={promiseBannerUrl} alt="Promise banner" className="h-full w-full object-cover" />
-                        : <ImageIcon size={22} className="text-gray-300" />}
-                    </div>
-                    <div className="flex-1">
-                      <label className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border bg-white text-xs font-medium text-primary cursor-pointer hover:bg-green-50 w-full justify-center ${uploadingPromiseBanner ? 'opacity-60 pointer-events-none' : ''}`}>
-                        <Upload size={14} />
-                        {uploadingPromiseBanner ? 'Uploading…' : promiseBannerKey ? 'Change banner' : 'Upload banner'}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => { void handlePromiseBannerUpload(e.target.files?.[0]); e.target.value = ''; }}
-                        />
-                      </label>
-                      {promiseBannerKey && (
-                        <button type="button" onClick={() => { setPromiseBannerKey(''); setPromiseBannerUrl(''); }}
-                          className="text-xs text-red-500 hover:text-red-600 mt-1 font-medium">
-                          Remove banner
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Why Plantoga Banner */}
-                <div className="border-t pt-4 space-y-2">
-                  <label className="text-xs font-semibold text-gray-700 block">Why Plantoga Banner</label>
-                  <p className="text-[10px] text-gray-400">Replaces the "Plantoga vs the rest" comparison table when set.</p>
-                  <div className="flex gap-3 items-center">
-                    <div className="h-16 w-16 rounded-lg border overflow-hidden bg-white shrink-0 flex items-center justify-center">
-                      {whyPlantogaBannerUrl
-                        ? <img src={whyPlantogaBannerUrl} alt="Why Plantoga banner" className="h-full w-full object-cover" />
-                        : <ImageIcon size={22} className="text-gray-300" />}
-                    </div>
-                    <div className="flex-1">
-                      <label className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border bg-white text-xs font-medium text-primary cursor-pointer hover:bg-green-50 w-full justify-center ${uploadingWhyPlantogaBanner ? 'opacity-60 pointer-events-none' : ''}`}>
-                        <Upload size={14} />
-                        {uploadingWhyPlantogaBanner ? 'Uploading…' : whyPlantogaBannerKey ? 'Change banner' : 'Upload banner'}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => { void handleWhyPlantogaBannerUpload(e.target.files?.[0]); e.target.value = ''; }}
-                        />
-                      </label>
-                      {whyPlantogaBannerKey && (
-                        <button type="button" onClick={() => { setWhyPlantogaBannerKey(''); setWhyPlantogaBannerUrl(''); }}
-                          className="text-xs text-red-500 hover:text-red-600 mt-1 font-medium">
-                          Remove banner
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
           </div>
 
-          {/* Section 5: FAQs */}
+          {/* Section 4: FAQs */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <button
               type="button"
@@ -1210,7 +940,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                             <input
                               value={item.question}
                               onChange={(e) => setFaqItems(prev => prev.map((f, i) => i === index ? { ...f, question: e.target.value } : f))}
-                              placeholder="Question (e.g. How do I care for my plant?)"
+                              placeholder="Question (e.g. Does this come in a gift box?)"
                               className="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-primary"
                             />
                             <textarea
@@ -1654,7 +1384,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                   <div className="flex items-center justify-between mb-1.5">
                     <div>
                       <label className="text-xs font-semibold text-gray-700">Search Tags</label>
-                      <p className="text-[11px] text-gray-400">Add words customers might type in the search bar (e.g. "indoor", "fern").</p>
+                      <p className="text-[11px] text-gray-400">Add words customers might search (e.g. "gold", "bridal", "kundan").</p>
                     </div>
                     <button
                       type="button"
@@ -1786,7 +1516,7 @@ export default function ProductsAdminPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Products Catalog</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Manage details, stock levels, variants, and visibility of plants on the website.</p>
+          <p className="text-xs text-gray-500 mt-0.5">Manage details, stock levels, variants, and visibility of products on the website.</p>
         </div>
         <button
           onClick={() => { setEditingProduct(null); setShowModal(true); }}

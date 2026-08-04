@@ -137,14 +137,11 @@ async def get_product_raw(
     
     Returns relative image keys exactly as stored in DB, not resolved URLs.
     Used by admin edit form to seed state without URL→key round-trip.
-    
-    ⚠️ Keep field list in sync with Product model when schema changes.
     """
     product = await product_service.get_product_by_id(db, product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    # Explicit dict to avoid SQLAlchemy __dict__ leakage and datetime encoding issues
     return {
         "id": product.id,
         "name": product.name,
@@ -156,17 +153,10 @@ async def get_product_raw(
         "category_id": product.category_id,
         "images": product.images or [],  # relative keys, not resolved URLs
         "tags": product.tags or [],
-        "care_tips": product.care_tips or [],
-        "how_to_guide": product.how_to_guide,
-        "sunlight": product.sunlight,
-        "watering": product.watering,
         "badge": product.badge,
         "is_active": product.is_active,
         "variants": product.variants,  # raw dict with relative keys in image fields
-        "promise_banner_image": product.promise_banner_image,  # raw relative key
-        "why_plantoga_banner_image": product.why_plantoga_banner_image,  # raw relative key
-        "care_card_image": product.care_card_image,  # raw relative key
-        "faqs": product.faqs,  # raw list of {question, answer}
+        "faqs": product.faqs,
         "created_at": product.created_at.isoformat() if product.created_at else None,
     }
 
@@ -197,15 +187,8 @@ async def create_product(
     original_price: Annotated[float | None, Form()] = None,
     stock_qty: Annotated[int, Form()] = 0,
     tags: Annotated[str, Form()] = "[]",
-    care_tips: Annotated[str, Form()] = "[]",
-    how_to_guide: Annotated[str | None, Form()] = None,
-    sunlight: Annotated[str | None, Form()] = None,
-    watering: Annotated[str | None, Form()] = None,
     badge: Annotated[str | None, Form()] = None,
     variants: Annotated[str | None, Form()] = None,
-    promise_banner_image: Annotated[str | None, Form()] = None,  # relative key from prior /upload-image call
-    why_plantoga_banner_image: Annotated[str | None, Form()] = None,  # relative key from prior /upload-image call
-    care_card_image: Annotated[str | None, Form()] = None,  # relative key from prior /upload-image call
     faqs: Annotated[str | None, Form()] = None,  # JSON string: [{question, answer}, ...]
     image_urls: Annotated[str, Form()] = "[]",
     images: list[UploadFile] = File(default=[]),
@@ -246,15 +229,8 @@ async def create_product(
         stock_qty=stock_qty,
         category_id=category_id,
         tags=json.loads(tags),
-        care_tips=json.loads(care_tips),
-        how_to_guide=how_to_guide,
-        sunlight=sunlight,
-        watering=watering,
         badge=badge,
         variants=json.loads(variants) if variants else None,
-        promise_banner_image=promise_banner_image or None,
-        why_plantoga_banner_image=why_plantoga_banner_image or None,
-        care_card_image=care_card_image or None,
         faqs=[FAQItem(**f) for f in json.loads(faqs)] if faqs else None,
     )
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Minus, Plus, ShoppingCart, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
@@ -9,12 +9,8 @@ import { useCartStore } from '@/store/cartStore';
 import ProductCard from '@/components/product/ProductCard';
 import ProductTagBadges from '@/components/product/ProductTagBadges';
 import ProductReviews, { ProductRatingInline } from '@/components/product/ProductReviews';
-import PlantCareCard from '@/components/product/PlantCareCard';
-import PlantogaPromise from '@/components/product/PlantogaPromise';
-import HowToGuide from '@/components/product/HowToGuide';
 import ProductSpecification from '@/components/product/ProductSpecification';
-import WhyPlantoga from '@/components/product/WhyPlantoga';
-import HappyPlanters from '@/components/product/HappyPlanters';
+import CustomerPhotos from '@/components/product/HappyPlanters';
 import ProductFaq from '@/components/product/ProductFaq';
 import { useBanners } from '@/hooks/useBanners';
 import { STORE_LEGAL } from '@/lib/branding';
@@ -27,7 +23,7 @@ import { getApiErrorDetail } from '@/lib/apiError';
 
 
 function findCategoryName(categories: Category[] | undefined, categoryId: number): string {
-  if (!categories?.length) return 'PLANTS';
+  if (!categories?.length) return 'JEWELLERY';
 
   const search = (list: Category[]): string | null => {
     for (const cat of list) {
@@ -40,7 +36,7 @@ function findCategoryName(categories: Category[] | undefined, categoryId: number
     return null;
   };
 
-  return (search(categories) || 'Plants').toUpperCase();
+  return (search(categories) || 'Jewellery').toUpperCase();
 }
 
 // Full cartesian product of variant groups → combo rows (cap guards pathological products,
@@ -438,34 +434,6 @@ function DesktopGallery({
               <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
             </button>
           ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CareTips({ tips }: { tips: string[] }) {
-  const [open, setOpen] = useState(false);
-  if (!tips?.length) return null;
-
-  return (
-    <div className="border rounded-xl overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-sm font-semibold hover:bg-gray-50 transition touch-target"
-      >
-        Plant Care Tips
-        {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-      </button>
-      {open && (
-        <div className="px-4 pb-4">
-          <ul className="space-y-2">
-            {tips.map((tip, i) => (
-              <li key={i} className="text-sm text-gray-600 flex gap-2">
-                <span className="text-primary-light mt-0.5">•</span>{tip}
-              </li>
-            ))}
-          </ul>
         </div>
       )}
     </div>
@@ -1076,24 +1044,14 @@ export default function ProductDetailPage() {
             )}
 
             <ProductDescription description={product.description} />
-
-            <CareTips tips={product.care_tips || []} />
           </div>
         </div>
 
-        <PlantCareCard careCardImage={product.care_card_image} />
-
-        <PlantogaPromise bannerImage={product.promise_banner_image} />
-
-        <HowToGuide product={product} />
-
-        {renderInlineBannerItem(productSpecBanner, 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1400&q=80')}
+        {renderInlineBannerItem(productSpecBanner, 'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=1400&q=80')}
 
         <ProductSpecification specs={productSpecs} />
 
         <StoriesCarousel stories={stories} />
-
-        <WhyPlantoga bannerImage={product.why_plantoga_banner_image} />
 
         {/* Similar products */}
         {similarProducts.length > 0 && (
@@ -1111,7 +1069,7 @@ export default function ProductDetailPage() {
           </ErrorBoundary>
         )}
 
-        <HappyPlanters fallbackImages={galleryImages} />
+        <CustomerPhotos fallbackImages={galleryImages} />
 
         <ProductReviews productId={product.id} />
 

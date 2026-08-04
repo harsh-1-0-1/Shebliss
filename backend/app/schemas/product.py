@@ -86,16 +86,9 @@ class ProductCreate(BaseModel):
     stock_qty: int = 0
     category_id: int
     tags: list[str] = []
-    care_tips: list[str] = []
-    how_to_guide: str | None = None
-    sunlight: str | None = None
-    watering: str | None = None
     badge: str | None = None
     is_active: bool = True
     variants: dict | None = None
-    promise_banner_image: str | None = None  # relative storage key
-    why_plantoga_banner_image: str | None = None  # relative storage key
-    care_card_image: str | None = None  # relative storage key
     faqs: Optional[List[FAQItem]] = None
 
     @field_validator("variants")
@@ -113,19 +106,12 @@ class ProductUpdate(BaseModel):
     category_id: int | None = None
     images: list[str] | None = None
     tags: list[str] | None = None
-    care_tips: list[str] | None = None
-    how_to_guide: str | None = None
-    sunlight: str | None = None
-    watering: str | None = None
     badge: str | None = None
     is_active: bool | None = None
     # null  → field omitted from update (existing variants are preserved).
     # {}    → explicitly clear all variant data.
     # {...} → replace variants with the provided structure.
     variants: dict | None = None
-    promise_banner_image: str | None = None  # relative key; null clears, omit to preserve
-    why_plantoga_banner_image: str | None = None  # relative key; null clears, omit to preserve
-    care_card_image: str | None = None  # relative key; null clears, omit to preserve
     faqs: Optional[List[FAQItem]] = None
 
     @field_validator("variants")
@@ -145,17 +131,10 @@ class ProductResponse(BaseModel):
     category_id: int
     images: list[str]
     tags: list[str]
-    care_tips: list[str]
-    how_to_guide: str | None
-    sunlight: str | None
-    watering: str | None
     badge: str | None
     is_active: bool
     created_at: datetime
     variants: dict | None = None
-    promise_banner_image: str | None = None
-    why_plantoga_banner_image: str | None = None
-    care_card_image: str | None = None
     faqs: Optional[List[dict]] = None
     # ⚠️ NOTE on variants field image storage:
     # Despite field names like "image_url", variants store RELATIVE KEYS in the database
@@ -168,30 +147,6 @@ class ProductResponse(BaseModel):
     def serialize_images(self, images: list[str]) -> list[str]:
         from app.utils.image_upload import resolve_image_url
         return [resolve_image_url(img) for img in images] if images else []
-
-    @field_serializer("promise_banner_image")
-    def serialize_promise_banner_image(self, key: str | None) -> str | None:
-        """Resolve relative storage key to full CDN/static URL."""
-        if not key:
-            return None
-        from app.utils.image_upload import resolve_image_url
-        return resolve_image_url(key)
-
-    @field_serializer("why_plantoga_banner_image")
-    def serialize_why_plantoga_banner_image(self, key: str | None) -> str | None:
-        """Resolve relative storage key to full CDN/static URL."""
-        if not key:
-            return None
-        from app.utils.image_upload import resolve_image_url
-        return resolve_image_url(key)
-
-    @field_serializer("care_card_image")
-    def serialize_care_card_image(self, key: str | None) -> str | None:
-        """Resolve relative storage key to full CDN/static URL."""
-        if not key:
-            return None
-        from app.utils.image_upload import resolve_image_url
-        return resolve_image_url(key)
 
     @field_serializer("variants")
     def serialize_variants(self, variants: dict | None) -> dict | None:

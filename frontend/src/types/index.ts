@@ -34,17 +34,10 @@ export interface Product {
   category_id: number;
   images: string[];
   tags: string[];
-  care_tips: string[];
-  how_to_guide: string | null;
-  sunlight: string | null;
-  watering: string | null;
   badge: string | null;
   is_active: boolean;
   created_at: string;
   variants: ProductVariants | null;
-  promise_banner_image?: string | null;
-  why_plantoga_banner_image?: string | null;
-  care_card_image?: string | null;
   faqs?: FAQItem[] | null;
 }
 
@@ -315,7 +308,7 @@ export type BannerPlacement =
   | 'highlight'
   | 'mobile_promo'
   | 'corporate_gifting'
-  | 'happy_planters'
+  | 'customer_photos'
   | 'trending'
   | 'product_detail'
   | 'product_spec';

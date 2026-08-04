@@ -20,7 +20,7 @@ export default function FeaturedProductsGrid() {
   const { data, isLoading } = useProducts({
     sort_by: tab.sort || undefined,
     tags: tab.tags || undefined,
-    limit: 8,
+    limit: 10,
   });
 
   const products = data?.items ?? [];
@@ -60,11 +60,11 @@ export default function FeaturedProductsGrid() {
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+            {Array.from({ length: 10 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
             {products.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         )}

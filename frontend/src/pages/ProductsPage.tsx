@@ -40,7 +40,7 @@ function titleCase(s: string) {
 function InlineEditorialBanner() {
   return (
     <div
-      className="col-span-2 sm:col-span-2 lg:col-span-4 overflow-hidden flex flex-col sm:flex-row items-center gap-0"
+      className="col-span-2 sm:col-span-3 lg:col-span-5 overflow-hidden flex flex-col sm:flex-row items-center gap-0"
       style={{ backgroundColor: '#1A1A1A', minHeight: '160px' }}
     >
       <img
@@ -338,8 +338,8 @@ export default function ProductsPage() {
 
             <ErrorBoundary>
               {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-                  {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+                  {Array.from({ length: 15 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
@@ -350,7 +350,7 @@ export default function ProductsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
                   {gridItems.map((gi, idx) =>
                     gi.type === 'banner' ? (
                       <InlineEditorialBanner key={`banner-${idx}`} />

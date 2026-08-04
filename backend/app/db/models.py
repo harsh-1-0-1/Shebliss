@@ -74,17 +74,10 @@ class Product(Base):
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False)
     images: Mapped[list | None] = mapped_column(JSON, default=list)
     tags: Mapped[list | None] = mapped_column(JSON, default=list)
-    care_tips: Mapped[list | None] = mapped_column(JSON, default=list)
-    how_to_guide: Mapped[str | None] = mapped_column(Text, nullable=True)
-    sunlight: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    watering: Mapped[str | None] = mapped_column(String(100), nullable=True)
     badge: Mapped[str | None] = mapped_column(String(100), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     variants: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    promise_banner_image: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    why_plantoga_banner_image: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    care_card_image: Mapped[str | None] = mapped_column(String(512), nullable=True)
     faqs: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     category: Mapped["Category"] = relationship(back_populates="products")
@@ -242,6 +235,7 @@ class BlogCategory(str, enum.Enum):
     CARE = "CARE"
     DIY = "DIY"
     TIPS = "TIPS"
+    NEWS = "NEWS"
 
 
 class BlogPost(Base):
