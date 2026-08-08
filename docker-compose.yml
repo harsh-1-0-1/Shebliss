@@ -18,7 +18,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-    mem_limit: 512m
+    mem_limit: 320m
     cpus: 0.5
 
   redis:
@@ -33,7 +33,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    mem_limit: 256m
+    mem_limit: 128m
     cpus: 0.25
 
   backend:
@@ -85,7 +85,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    mem_limit: 512m
+    mem_limit: 320m
     cpus: 0.75
 
   frontend:
@@ -112,7 +112,7 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
-    mem_limit: 256m
+    mem_limit: 128m
     cpus: 0.5
 
   seed:
@@ -133,7 +133,7 @@ services:
         condition: service_healthy
       backend:
         condition: service_healthy
-    command: sh -c "uv run alembic upgrade head && uv run python seed.py"
+    command: sh -c "uv run python seed.py"
     restart: "no"
 
 volumes:
