@@ -137,3 +137,22 @@ async def list_users(
         .offset(offset).limit(limit)
     )
     return list(result.scalars().all()), total
+
+
+async def update_user(
+    db: AsyncSession,
+    user_id: int,
+    *,
+    is_active: bool | None = None,
+    is_admin: bool | None = None,
+) -> User | None:
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        return None
+    if is_active is not None:
+        user.is_active = is_active
+    if is_admin is not None:
+        user.is_admin = is_admin
+    await db.flush()
+    return user

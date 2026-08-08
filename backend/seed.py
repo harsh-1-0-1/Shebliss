@@ -151,7 +151,7 @@ PRODUCTS = [
     # ── Earrings ──
     {"name": "Meenakari Jhumka Earrings", "cat": "jhumkas", "price": 549,
      "desc": "Hand-enamelled meenakari jhumkas with a traditional dandiya finish — featherlight for all-day wear.",
-     "tags": ["earrings", "jhumkas", "festive", "daily-wear"], "badge": "Bestseller",
+     "tags": ["earrings", "jhumkas", "festive", "daily-wear", "best-seller"], "badge": "Bestseller",
      "variants": _make_variants(549)},
     {"name": "Kundan Chandelier Jhumkas", "cat": "jhumkas", "price": 799,
      "desc": "Multi-layered chandelier jhumkas set with shimmering kundan stones and pearl dangles.",
@@ -180,7 +180,7 @@ PRODUCTS = [
     # ── Necklaces ──
     {"name": "Layered Kundan Choker", "cat": "chokers", "price": 899,
      "desc": "A regal layered choker stacked with kundan rosettes and pearl cascades.",
-     "tags": ["necklaces", "chokers", "bridal", "kundan"], "badge": "Bestseller",
+     "tags": ["necklaces", "chokers", "bridal", "kundan", "best-seller"], "badge": "Bestseller",
      "variants": _make_variants(899)},
     {"name": "American Diamond Choker", "cat": "chokers", "price": 749,
      "desc": "Brilliant-cut american diamonds in a structured collar for instant glamour.",

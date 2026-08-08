@@ -229,6 +229,9 @@ export interface Order {
   user_id: number;
   status: string;
   total_amount: number;
+  subtotal?: number | null;
+  discount_amount?: number;
+  coupon_code?: string | null;
   payment_id: string | null;
   payment_method: string;
   payment_status: string;
@@ -305,11 +308,10 @@ export type BannerPlacement =
   | 'page'
   | 'themed'
   | 'strip'
-  | 'highlight'
+  | 'menu_banner'
   | 'mobile_promo'
   | 'corporate_gifting'
   | 'customer_photos'
-  | 'trending'
   | 'product_detail'
   | 'product_spec';
 

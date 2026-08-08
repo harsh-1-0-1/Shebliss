@@ -76,3 +76,38 @@ async def list_users(
         "page": page,
         "pages": pages,
     }
+
+
+@router.patch("/users/{user_id}")
+async def update_user(
+    user_id: int,
+    body: dict,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="You cannot modify your own account")
+
+    is_active = body.get("is_active")
+    is_admin = body.get("is_admin")
+    if is_active is None and is_admin is None:
+        raise HTTPException(status_code=400, detail="Provide is_active and/or is_admin")
+    for value in (is_active, is_admin):
+        if value is not None and not isinstance(value, bool):
+            raise HTTPException(status_code=400, detail="is_active and is_admin must be booleans")
+
+    user = await admin_service.update_user(
+        db, user_id, is_active=is_active, is_admin=is_admin
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "is_active": user.is_active,
+        "is_admin": user.is_admin,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+    }

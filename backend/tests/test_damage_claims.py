@@ -139,7 +139,9 @@ async def test_full_damage_claim_flow(client: AsyncClient):
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code == 200, resp.text
-    assert resp.json()["description"].startswith("The ceramic pot")
+    assert resp.json()["description"] == (
+        "The packaging was crushed in transit and the item inside was damaged."
+    )
 
     # 8. Admin approves with notes
     resp = await client.patch(

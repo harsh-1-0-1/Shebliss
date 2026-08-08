@@ -104,6 +104,13 @@ function OrderSummary({
   subtotal,
   shipping,
   total,
+  discount,
+  couponCode,
+  couponInput,
+  couponApplying,
+  onCouponInputChange,
+  onApplyCoupon,
+  onRemoveCoupon,
   mobileOpen,
   setMobileOpen,
 }: {
@@ -111,6 +118,13 @@ function OrderSummary({
   subtotal: number;
   shipping: number;
   total: number;
+  discount: number;
+  couponCode: string | null;
+  couponInput: string;
+  couponApplying: boolean;
+  onCouponInputChange: (value: string) => void;
+  onApplyCoupon: () => void;
+  onRemoveCoupon: () => void;
   mobileOpen: boolean;
   setMobileOpen: (value: boolean) => void;
 }) {
@@ -133,13 +147,25 @@ function OrderSummary({
       </div>
 
       <div className="flex gap-2">
-        <input className={inputClass()} placeholder="Discount code or gift card" />
-        <button className="h-11 rounded-lg border border-gray-200 bg-[#f8f4ec] px-4 text-xs sm:text-sm font-semibold text-gray-600 transition hover:border-primary">Apply</button>
+        {couponCode ? (
+          <div className="flex h-11 flex-1 items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3">
+            <span className="text-xs font-bold text-emerald-700">{couponCode} · -{money(discount)}</span>
+            <button type="button" onClick={onRemoveCoupon} className="text-xs font-semibold text-emerald-700 hover:underline">Remove</button>
+          </div>
+        ) : (
+          <>
+            <input className={inputClass()} placeholder="Discount code or gift card" value={couponInput} onChange={(e) => onCouponInputChange(e.target.value)} />
+            <button onClick={onApplyCoupon} disabled={couponApplying} className="h-11 rounded-lg border border-gray-200 bg-[#f8f4ec] px-4 text-xs sm:text-sm font-semibold text-gray-600 transition hover:border-primary disabled:opacity-50">
+              {couponApplying ? '...' : 'Apply'}
+            </button>
+          </>
+        )}
       </div>
 
       <div className="space-y-2 text-xs">
         <div className="flex justify-between"><span>Subtotal</span><span>{money(subtotal)}</span></div>
         <div className="flex justify-between"><span>Shipping</span><span className="text-right text-gray-500">{shipping === 0 ? 'Free' : money(shipping)}</span></div>
+        {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Discount ({couponCode})</span><span>-{money(discount)}</span></div>}
         <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[10px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
       </div>
     </div>
@@ -156,7 +182,19 @@ function OrderSummary({
   );
 }
 
-function DesktopSummary({ items, subtotal, shipping, total }: { items: CheckoutItem[]; subtotal: number; shipping: number; total: number }) {
+function DesktopSummary({ items, subtotal, shipping, total, discount, couponCode, couponInput, couponApplying, onCouponInputChange, onApplyCoupon, onRemoveCoupon }: {
+  items: CheckoutItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  discount: number;
+  couponCode: string | null;
+  couponInput: string;
+  couponApplying: boolean;
+  onCouponInputChange: (value: string) => void;
+  onApplyCoupon: () => void;
+  onRemoveCoupon: () => void;
+}) {
   return (
     <aside className="sticky top-0 min-h-screen border-l border-gray-200 bg-[#f8f4ec] px-4 py-6 sm:px-6 lg:pl-10 lg:pr-4 lg:py-8">
       <h2 className="mb-4 text-base font-bold text-gray-900">Order Summary</h2>
@@ -175,12 +213,24 @@ function DesktopSummary({ items, subtotal, shipping, total }: { items: CheckoutI
           </div>
         ))}
         <div className="flex gap-2">
-          <input className={inputClass()} placeholder="Discount code or gift card" />
-          <button className="h-11 rounded-lg border border-gray-200 bg-[#f8f4ec] px-4 text-xs sm:text-sm font-semibold text-gray-600 transition hover:border-primary">Apply</button>
+          {couponCode ? (
+            <div className="flex h-11 flex-1 items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3">
+              <span className="text-xs font-bold text-emerald-700">{couponCode} · -{money(discount)}</span>
+              <button onClick={onRemoveCoupon} className="text-xs font-semibold text-emerald-700 hover:underline">Remove</button>
+            </div>
+          ) : (
+            <>
+              <input className={inputClass()} placeholder="Discount code or gift card" value={couponInput} onChange={(e) => onCouponInputChange(e.target.value)} />
+              <button onClick={onApplyCoupon} disabled={couponApplying} className="h-11 rounded-lg border border-gray-200 bg-[#f8f4ec] px-4 text-xs sm:text-sm font-semibold text-gray-600 transition hover:border-primary disabled:opacity-50">
+                {couponApplying ? '...' : 'Apply'}
+              </button>
+            </>
+          )}
         </div>
         <div className="space-y-2 text-xs">
           <div className="flex justify-between"><span>Subtotal</span><span>{money(subtotal)}</span></div>
           <div className="flex justify-between"><span>Shipping</span><span className="text-right text-gray-500">{shipping === 0 ? 'Free' : money(shipping)}</span></div>
+          {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Discount ({couponCode})</span><span>-{money(discount)}</span></div>}
           <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[10px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
         </div>
       </div>
@@ -203,6 +253,9 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay');
   const [billingMode, setBillingMode] = useState<'same' | 'different'>('same');
   const [paying, setPaying] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponApplying, setCouponApplying] = useState(false);
 
   const isBuyNow = new URLSearchParams(location.search).get('mode') === 'buy-now';
   // eslint suppression: readDirectCheckoutSession reads sessionStorage, not location.search
@@ -212,7 +265,7 @@ export default function CheckoutPage() {
   const items: CheckoutItem[] = isBuyNow ? directSession?.items ?? [] : cart.items;
   const subtotal = items.reduce((sum, item) => sum + item.line_total, 0);
   const shipping = subtotal >= 499 ? 0 : 49;
-  const total = subtotal + shipping;
+  const total = Math.max(subtotal + shipping - (appliedCoupon?.discount ?? 0), 0);
   const addressReady = Boolean(form.address && form.city && form.state && form.pincode && form.phone);
 
   useEffect(() => {
@@ -297,6 +350,33 @@ export default function CheckoutPage() {
     navigate(`/orders/${orderId}`);
   }
 
+  async function applyCoupon() {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponApplying(true);
+    try {
+      const { data } = await api.post<{ valid: boolean; discount: number; message?: string }>('/coupons/validate', {
+        code,
+        subtotal,
+      });
+      if (!data.valid) {
+        toast.error(data.message || 'Invalid coupon code');
+        return;
+      }
+      setAppliedCoupon({ code, discount: data.discount });
+      toast.success(`Coupon "${code}" applied! You save ${money(data.discount)}`);
+    } catch {
+      toast.error('Could not validate coupon. Please try again.');
+    } finally {
+      setCouponApplying(false);
+    }
+  }
+
+  function removeCoupon() {
+    setAppliedCoupon(null);
+    setCouponInput('');
+  }
+
   async function handlePay(e: FormEvent) {
     e.preventDefault();
     if (!validate()) return;
@@ -334,6 +414,7 @@ export default function CheckoutPage() {
             selected_options: item.selected_options,
           })),
           payment_method: paymentMethod,
+          coupon_code: appliedCoupon?.code ?? null,
         });
         if (paymentMethod === 'cod') completeCodOrder(data.order_id);
         else await openRazorpay(data);
@@ -344,6 +425,7 @@ export default function CheckoutPage() {
           address_id: savedAddress.id,
           cart_id: currentCartId,
           payment_method: paymentMethod,
+          coupon_code: appliedCoupon?.code ?? null,
         });
         if (paymentMethod === 'cod') completeCodOrder(data.order_id);
         else {
@@ -371,7 +453,7 @@ export default function CheckoutPage() {
         </Link>
       </header>
 
-      <OrderSummary items={items} subtotal={subtotal} shipping={shipping} total={total} mobileOpen={summaryOpen} setMobileOpen={setSummaryOpen} />
+      <OrderSummary items={items} subtotal={subtotal} shipping={shipping} total={total} discount={appliedCoupon?.discount ?? 0} couponCode={appliedCoupon?.code ?? null} couponInput={couponInput} couponApplying={couponApplying} onCouponInputChange={setCouponInput} onApplyCoupon={applyCoupon} onRemoveCoupon={removeCoupon} mobileOpen={summaryOpen} setMobileOpen={setSummaryOpen} />
 
       <main className="mx-auto grid max-w-5xl lg:grid-cols-[minmax(0,1fr)_400px]">
         <form onSubmit={handlePay} className="px-4 py-6 sm:px-6 lg:pl-8 lg:pr-12 lg:py-8">
@@ -503,7 +585,7 @@ export default function CheckoutPage() {
         </form>
 
         <div className="hidden lg:block">
-          <DesktopSummary items={items} subtotal={subtotal} shipping={shipping} total={total} />
+          <DesktopSummary items={items} subtotal={subtotal} shipping={shipping} total={total} discount={appliedCoupon?.discount ?? 0} couponCode={appliedCoupon?.code ?? null} couponInput={couponInput} couponApplying={couponApplying} onCouponInputChange={setCouponInput} onApplyCoupon={applyCoupon} onRemoveCoupon={removeCoupon} />
         </div>
       </main>
 

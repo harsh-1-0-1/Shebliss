@@ -127,6 +127,17 @@ export default function OrderDetailPage() {
           Payment reference: <span className="font-mono text-[#1A1A1A] break-all">{order.payment_id}</span>
         </p>
       )}
+
+      {(order.discount_amount ?? 0) > 0 && (
+        <div className="border border-[#EFECE6] px-5 py-4 space-y-1.5 text-[12px] font-body" style={{ backgroundColor: '#EFECE6' }}>
+          <div className="flex justify-between text-[#767676]"><span>Subtotal</span><span>{format(order.subtotal ?? order.total_amount + (order.discount_amount ?? 0))}</span></div>
+          <div className="flex justify-between text-[#0E7A3D]">
+            <span>Discount{order.coupon_code ? ` (${order.coupon_code})` : ''}</span>
+            <span>-{format(order.discount_amount ?? 0)}</span>
+          </div>
+          <div className="flex justify-between pt-1.5 border-t border-[#F9F8F6] font-bold text-[#1A1A1A]"><span>Total</span><span>{format(order.total_amount)}</span></div>
+        </div>
+      )}
     </div>
   );
 }

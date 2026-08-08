@@ -1,65 +1,8 @@
 import { useState } from 'react';
 import { Phone, Mail, Building, FileText, X, Info, User } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-interface Inquiry {
-  id: number;
-  fullName: string;
-  phone: string;
-  email: string;
-  companyName: string;
-  customisation: string;
-  status: 'new' | 'review' | 'quoted' | 'approved' | 'cancelled';
-  date: string;
-  qtyRequested: number;
-}
-
-const INITIAL_INQUIRIES: Inquiry[] = [
-  {
-    id: 101,
-    fullName: 'Rajesh Sharma',
-    phone: '+91 98765 43210',
-    email: 'rajesh@reliance.com',
-    companyName: 'Reliance Industries',
-    customisation: 'Need 500 branded gift hampers with company logo stickers printed on the front for Diwali gifting.',
-    status: 'new',
-    date: '2026-06-18T10:30:00Z',
-    qtyRequested: 500,
-  },
-  {
-    id: 102,
-    fullName: 'Sneha Patel',
-    phone: '+91 70123 45678',
-    email: 'sneha.p@tcs.com',
-    companyName: 'Tata Consultancy Services',
-    customisation: 'Looking for 200 desk accessories gift sets with eco-friendly packaging for office onboarding kits.',
-    status: 'review',
-    date: '2026-06-16T14:15:00Z',
-    qtyRequested: 200,
-  },
-  {
-    id: 103,
-    fullName: 'Amit Verma',
-    phone: '+91 81234 56789',
-    email: 'amit@infosys.com',
-    companyName: 'Infosys Ltd',
-    customisation: 'Premium wooden tray gift hampers containing a bottle, accessories, and organic chocolates. Need quotation for 100 sets.',
-    status: 'quoted',
-    date: '2026-06-12T09:00:00Z',
-    qtyRequested: 100,
-  },
-  {
-    id: 104,
-    fullName: 'Priya Nair',
-    phone: '+91 90909 09090',
-    email: 'priya@wipro.com',
-    companyName: 'Wipro Limited',
-    customisation: 'Requesting 50 customized welcome kits in gift boxes for executive onboarding gifts.',
-    status: 'approved',
-    date: '2026-06-08T11:45:00Z',
-    qtyRequested: 50,
-  },
-];
+import { useCorporateInquiries, useUpdateInquiryStatus } from '@/hooks/useAdmin';
+import type { CorporateInquiry } from '@/hooks/useAdmin';
 
 const STATUS_LABELS: Record<string, string> = {
   new: '📥 New Inquiry',
@@ -77,22 +20,40 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-red-50 text-red-800 border-red-200',
 };
 
-export default function CorporateAdminPage() {
-  const [inquiries, setInquiries] = useState<Inquiry[]>(INITIAL_INQUIRIES);
-  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+const STATUS_FILTERS = [
+  { value: '', label: 'All' },
+  { value: 'new', label: 'New' },
+  { value: 'review', label: 'Under Review' },
+  { value: 'quoted', label: 'Quoted' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
 
-  const handleStatusChange = (id: number, newStatus: Inquiry['status']) => {
-    const updated = inquiries.map((inq) => {
-      if (inq.id === id) {
-        return { ...inq, status: newStatus };
-      }
-      return inq;
-    });
-    setInquiries(updated);
-    if (selectedInquiry?.id === id) {
-      setSelectedInquiry({ ...selectedInquiry, status: newStatus });
-    }
-    toast.success(`Inquiry status updated to: ${newStatus.toUpperCase()}`);
+export default function CorporateAdminPage() {
+  const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useCorporateInquiries(statusFilter, page);
+  const [selectedInquiry, setSelectedInquiry] = useState<CorporateInquiry | null>(null);
+  const updateStatus = useUpdateInquiryStatus();
+
+  const handleStatusChange = (id: number, newStatus: string) => {
+    updateStatus.mutate(
+      { id, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success(`Inquiry status updated to: ${newStatus.toUpperCase()}`);
+          if (selectedInquiry?.id === id) {
+            setSelectedInquiry({ ...selectedInquiry, status: newStatus as CorporateInquiry['status'] });
+          }
+        },
+        onError: (err: unknown) => {
+          toast.error(
+            (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+              'Failed to update inquiry status',
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -109,52 +70,88 @@ export default function CorporateAdminPage() {
         </div>
         <div className="text-xs text-gray-600 leading-normal">
           <p className="font-bold text-primary">How do clients submit these?</p>
-          <p className="mt-0.5">Submissions arrive when customers fill out the corporate gifting form on `/corporate-gifting`. They are currently forwarded to your email. This panel helps you track progress status centrally.</p>
+          <p className="mt-0.5">Submissions arrive when customers fill out the corporate gifting form on `/corporate-gifting`. They are stored in the database and listed here, where you can track each deal through its stages.</p>
         </div>
+      </div>
+
+      {/* Status filter */}
+      <div className="flex flex-wrap gap-2">
+        {STATUS_FILTERS.map((f) => (
+          <button
+            key={f.value}
+            onClick={() => {
+              setStatusFilter(f.value);
+              setPage(1);
+            }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+              statusFilter === f.value
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       {/* List Layout */}
       <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-gray-500 border-b bg-gray-50">
-              <th className="px-5 py-3.5 font-semibold text-xs">Client ID</th>
-              <th className="px-5 py-3.5 font-semibold text-xs">Customer Name</th>
-              <th className="px-5 py-3.5 font-semibold text-xs">Company Name</th>
-              <th className="px-5 py-3.5 font-semibold text-xs">Qty Requested</th>
-              <th className="px-5 py-3.5 font-semibold text-xs">Current Stage</th>
-              <th className="px-5 py-3.5 font-semibold text-xs">Submitted On</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inquiries.map((inq) => (
-              <tr
-                key={inq.id}
-                onClick={() => setSelectedInquiry(inq)}
-                className="border-b last:border-0 hover:bg-gray-50/50 cursor-pointer transition-colors"
-              >
-                <td className="px-5 py-4 text-gray-400 font-semibold">#{inq.id}</td>
-                <td className="px-5 py-4 font-semibold text-gray-900">{inq.fullName}</td>
-                <td className="px-5 py-4 text-gray-700 font-medium">{inq.companyName}</td>
-                <td className="px-5 py-4 text-gray-950 font-bold">{inq.qtyRequested} units</td>
-                <td className="px-5 py-4">
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[inq.status]}`}>
-                    {STATUS_LABELS[inq.status]}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-gray-400 text-xs">{new Date(inq.date).toLocaleDateString()}</td>
+        {isLoading ? (
+          <div className="p-12 text-center text-gray-400 text-sm">Loading inquiries...</div>
+        ) : data?.items?.length === 0 ? (
+          <div className="p-12 text-center text-gray-400 text-sm">
+            No corporate inquiries found. New form submissions will appear here.
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-500 border-b bg-gray-50">
+                <th className="px-5 py-3.5 font-semibold text-xs">Client ID</th>
+                <th className="px-5 py-3.5 font-semibold text-xs">Customer Name</th>
+                <th className="px-5 py-3.5 font-semibold text-xs">Company Name</th>
+                <th className="px-5 py-3.5 font-semibold text-xs">Qty Requested</th>
+                <th className="px-5 py-3.5 font-semibold text-xs">Current Stage</th>
+                <th className="px-5 py-3.5 font-semibold text-xs">Submitted On</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data?.items?.map((inq: CorporateInquiry) => (
+                <tr
+                  key={inq.id}
+                  onClick={() => setSelectedInquiry(inq)}
+                  className="border-b last:border-0 hover:bg-gray-50/50 cursor-pointer transition-colors"
+                >
+                  <td className="px-5 py-4 text-gray-400 font-semibold">#{inq.id}</td>
+                  <td className="px-5 py-4 font-semibold text-gray-900">{inq.full_name}</td>
+                  <td className="px-5 py-4 text-gray-700 font-medium">{inq.company_name}</td>
+                  <td className="px-5 py-4 text-gray-950 font-bold">{inq.qty_requested ? `${inq.qty_requested} units` : '—'}</td>
+                  <td className="px-5 py-4">
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[inq.status]}`}>
+                      {STATUS_LABELS[inq.status]}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-gray-400 text-xs">{new Date(inq.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {data && data.pages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1.5 border bg-white rounded-lg text-xs font-semibold disabled:opacity-30">Prev</button>
+          <span className="text-xs text-gray-500 font-medium">Page {page} of {data.pages}</span>
+          <button disabled={page >= data.pages} onClick={() => setPage(page + 1)} className="px-3 py-1.5 border bg-white rounded-lg text-xs font-semibold disabled:opacity-30">Next</button>
+        </div>
+      )}
 
       {/* Detail Drawer */}
       {selectedInquiry && (
         <>
           <div className="fixed inset-0 bg-black/55 z-50 transition-opacity" onClick={() => setSelectedInquiry(null)} />
           <div className="fixed inset-0 sm:inset-auto sm:top-0 sm:right-0 sm:h-full sm:w-full sm:max-w-md bg-[#f8f4ec] z-50 sm:shadow-2xl flex flex-col overflow-hidden">
-            
+
             <div className="flex items-center justify-between p-4 sm:p-5 border-b bg-white shrink-0">
               <div>
                 <h3 className="font-bold text-lg text-gray-900">Inquiry Details</h3>
@@ -166,12 +163,12 @@ export default function CorporateAdminPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-              
+
               {/* Contact Card */}
               <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Company Contact</span>
-                <p className="text-base font-bold text-gray-900 flex items-center gap-1.5"><Building size={16} className="text-gray-400" /> {selectedInquiry.companyName}</p>
-                <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5"><User size={15} className="text-gray-400" /> {selectedInquiry.fullName}</p>
+                <p className="text-base font-bold text-gray-900 flex items-center gap-1.5"><Building size={16} className="text-gray-400" /> {selectedInquiry.company_name}</p>
+                <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5"><User size={15} className="text-gray-400" /> {selectedInquiry.full_name}</p>
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t text-xs text-gray-600">
                   <a href={`tel:${selectedInquiry.phone}`} className="flex items-center gap-1 hover:text-primary"><Phone size={13} /> {selectedInquiry.phone}</a>
                   <a href={`mailto:${selectedInquiry.email}`} className="flex items-center gap-1 hover:text-primary truncate"><Mail size={13} /> {selectedInquiry.email}</a>
@@ -181,11 +178,13 @@ export default function CorporateAdminPage() {
               {/* Requirement Card */}
               <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase block">Requirements</span>
-                <p className="text-xs text-gray-800 font-bold">Volume Requested: {selectedInquiry.qtyRequested} units</p>
-                <div className="bg-gray-50 p-3 rounded-lg border text-xs text-gray-600 leading-normal flex gap-1.5">
-                  <FileText size={16} className="shrink-0 text-gray-400 mt-0.5" />
-                  <p className="italic">"{selectedInquiry.customisation}"</p>
-                </div>
+                <p className="text-xs text-gray-800 font-bold">Volume Requested: {selectedInquiry.qty_requested ? `${selectedInquiry.qty_requested} units` : 'Not specified'}</p>
+                {selectedInquiry.customisation && (
+                  <div className="bg-gray-50 p-3 rounded-lg border text-xs text-gray-600 leading-normal flex gap-1.5">
+                    <FileText size={16} className="shrink-0 text-gray-400 mt-0.5" />
+                    <p className="italic">"{selectedInquiry.customisation}"</p>
+                  </div>
+                )}
               </div>
 
               {/* Status Update Panel */}
@@ -195,8 +194,9 @@ export default function CorporateAdminPage() {
                   {Object.entries(STATUS_LABELS).map(([key, label]) => (
                     <button
                       key={key}
-                      onClick={() => handleStatusChange(selectedInquiry.id, key as Inquiry['status'])}
-                      className={`w-full py-2 px-3 border rounded-xl text-xs font-semibold text-left transition flex items-center justify-between ${
+                      onClick={() => handleStatusChange(selectedInquiry.id, key)}
+                      disabled={updateStatus.isPending}
+                      className={`w-full py-2 px-3 border rounded-xl text-xs font-semibold text-left transition flex items-center justify-between disabled:opacity-50 ${
                         selectedInquiry.status === key
                           ? 'bg-primary text-white border-primary shadow-sm'
                           : 'bg-white hover:bg-gray-50 text-gray-700'

@@ -110,6 +110,8 @@ async def guest_register_or_login(
     existing = await db.execute(select(User).where(func.lower(User.email) == func.lower(email)))
     user = existing.scalar_one_or_none()
     if user:
+        if not user.is_active:
+            raise ValueError("Account deactivated. Contact support.")
         updated = False
         if not user.phone and phone:
             user.phone = phone
@@ -150,6 +152,9 @@ async def authenticate(db: AsyncSession, email: str, password: str) -> User | No
     if not valid:
         logger.warning("Login failed – bad password for email: {}", email)
         return None
+    if not user.is_active:
+        logger.warning("Login blocked – inactive account: {}", email)
+        raise ValueError("Account deactivated. Contact support.")
     if updated_hash:
         user.hashed_password = updated_hash
         await db.flush()
@@ -162,7 +167,7 @@ async def authenticate(db: AsyncSession, email: str, password: str) -> User | No
 # Refresh
 # ---------------------------------------------------------------------------
 
-async def refresh_tokens(token: str) -> TokenResponse:
+async def refresh_tokens(db: AsyncSession, token: str) -> TokenResponse:
     try:
         payload = decode_token(token)
     except JWTError as exc:
@@ -174,6 +179,11 @@ async def refresh_tokens(token: str) -> TokenResponse:
     user_id = int(payload["sub"])
     if not await _verify_refresh_token(user_id, token):
         raise ValueError("Refresh token revoked or expired")
+
+    user = await db.get(User, user_id)
+    if user is None or not user.is_active:
+        await _delete_refresh_token(user_id)
+        raise ValueError("Account deactivated. Contact support.")
 
     # Rotate: delete old, issue new pair
     await _delete_refresh_token(user_id)
@@ -280,4 +290,6 @@ async def google_callback(db: AsyncSession, code: str, state: str) -> User:
     await db.flush()
     await db.refresh(user)
     logger.info("Google OAuth login: id={} email={}", user.id, user.email)
+    if not user.is_active:
+        raise ValueError("Account deactivated. Contact support.")
     return user

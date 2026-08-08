@@ -124,6 +124,69 @@ async def test_logout_flow(client: AsyncClient):
     assert resp2.status_code == 401
 
 
+# ---- Inactive / locked account ---------------------------------------------
+
+async def _lock_user(email: str) -> None:
+    from sqlalchemy import update
+
+    from app.db.models import User
+    from tests.conftest import test_session_factory
+
+    async with test_session_factory() as db:
+        await db.execute(update(User).where(User.email == email).values(is_active=False))
+        await db.commit()
+
+
+@pytest.mark.asyncio
+async def test_login_blocked_for_inactive_user(client: AsyncClient):
+    reg_email = "locked@example.com"
+    await client.post(REGISTER_URL, json={**SAMPLE_USER, "email": reg_email})
+    await _lock_user(reg_email)
+
+    resp = await client.post(LOGIN_URL, json={"email": reg_email, "password": SAMPLE_USER["password"]})
+    assert resp.status_code == 403
+    assert "deactivated" in resp.json()["detail"].lower()
+    assert "access_token" not in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_refresh_blocked_for_inactive_user(client: AsyncClient):
+    reg_email = "refresh_locked@example.com"
+    reg_resp = await client.post(REGISTER_URL, json={**SAMPLE_USER, "email": reg_email})
+    refresh_token = reg_resp.json()["refresh_token"]
+    await _lock_user(reg_email)
+
+    resp = await client.post(REFRESH_URL, json={"refresh_token": refresh_token})
+    assert resp.status_code == 401
+    assert "deactivated" in resp.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_guest_blocked_for_inactive_user(client: AsyncClient):
+    reg_email = "guest_locked@example.com"
+    await client.post(REGISTER_URL, json={**SAMPLE_USER, "email": reg_email})
+    await _lock_user(reg_email)
+
+    resp = await client.post(
+        "/api/v1/auth/guest",
+        json={"email": reg_email, "full_name": "Guest User", "phone": "9876500000"},
+    )
+    assert resp.status_code == 403
+    assert "deactivated" in resp.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_locked_user_access_token_rejected_on_protected_endpoint(client: AsyncClient):
+    reg_email = "access_locked@example.com"
+    await client.post(REGISTER_URL, json={**SAMPLE_USER, "email": reg_email})
+    reg_resp = await client.post(LOGIN_URL, json={"email": reg_email, "password": SAMPLE_USER["password"]})
+    access_token = reg_resp.json()["access_token"]
+    await _lock_user(reg_email)
+
+    resp = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {access_token}"})
+    assert resp.status_code == 403
+
+
 # ---- Protected endpoint --------------------------------------------------
 
 @pytest.mark.asyncio

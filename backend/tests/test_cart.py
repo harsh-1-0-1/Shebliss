@@ -350,7 +350,7 @@ async def test_duplicate_carts_are_consolidated(client: AsyncClient):
 # If this function is refactored, these tests will catch silent regressions.
 # NOTE: These are sync unit tests — not marked asyncio despite the file-level mark.
 
-from app.utils.variant_pricing import calculate_variant_price
+from app.utils.variant_pricing import build_dense_stock_map, calculate_variant_price
 
 
 LEAF_VARIANTS = {
@@ -387,6 +387,7 @@ LEAF_VARIANTS = {
     "default_image": None,
     "image_map": None,
 }
+LEAF_VARIANTS["stock_map"] = build_dense_stock_map(LEAF_VARIANTS["variant_groups"])
 
 
 class _MockProduct:
@@ -448,6 +449,7 @@ def test_variant_groups_zero_required_falls_back_to_product_price():
         ],
         "default_image": None,
         "image_map": None,
+        "stock_map": {"o1": 10},
     }
     p = _MockProduct(price=249.0, stock_qty=10, variants=no_required_variants)
     d = calculate_variant_price(p, ["o1"])
@@ -468,6 +470,7 @@ def test_variant_groups_out_of_stock_raises_when_validating():
         ],
         "default_image": None,
         "image_map": None,
+        "stock_map": {"o1": 0},
     }
     p = _MockProduct(price=99.0, stock_qty=0, variants=low_stock_variants)
     with pytest.raises(ValueError, match="out of stock"):

@@ -20,6 +20,7 @@ from app.db.models import (
 )
 from app.schemas.order import DirectCheckoutItem
 from app.services.cart_service import resolve_variant_details
+from app.services.coupon_service import apply_coupon
 
 
 async def _create_razorpay_order(order: Order, email: str, full_name: str, phone: str) -> dict:
@@ -157,6 +158,7 @@ async def _reserve_product_for_order(
 async def checkout(
     db: AsyncSession, user_id: int, address_id: int, cart_id: int,
     email: str, full_name: str, phone: str, payment_method: str = "razorpay",
+    coupon_code: str | None = None,
 ) -> tuple[Order, dict | None]:
     """
     1. Validate cart + stock
@@ -194,11 +196,21 @@ async def checkout(
         order_items_data.append(item_data)
 
     total_amount = round(total_amount, 2)
+    subtotal = total_amount
+
+    discount_amount = 0.0
+    used_coupon_code: str | None = None
+    if coupon_code:
+        used_coupon_code, discount_amount = await apply_coupon(db, coupon_code, subtotal)
+        total_amount = round(max(subtotal - discount_amount, 0.0), 2)
 
     order = Order(
         user_id=user_id,
         status=OrderStatus.PENDING,
         total_amount=total_amount,
+        subtotal=subtotal,
+        discount_amount=discount_amount,
+        coupon_code=used_coupon_code,
         payment_method=payment_method,
         payment_status=PaymentStatus.PENDING,
         address_id=address_id,
@@ -233,6 +245,7 @@ async def checkout(
 async def direct_checkout(
     db: AsyncSession, user_id: int, address_id: int, items: list[DirectCheckoutItem],
     email: str, full_name: str, phone: str, payment_method: str = "razorpay",
+    coupon_code: str | None = None,
 ) -> tuple[Order, dict | None]:
     address = await db.execute(
         select(Address).where(Address.id == address_id, Address.user_id == user_id)
@@ -255,10 +268,22 @@ async def direct_checkout(
         total_amount += round(item_data["unit_price"] * item_data["quantity"], 2)
         order_items_data.append(item_data)
 
+    subtotal = round(total_amount, 2)
+    total_amount = subtotal
+
+    discount_amount = 0.0
+    used_coupon_code: str | None = None
+    if coupon_code:
+        used_coupon_code, discount_amount = await apply_coupon(db, coupon_code, subtotal)
+        total_amount = round(max(subtotal - discount_amount, 0.0), 2)
+
     order = Order(
         user_id=user_id,
         status=OrderStatus.PENDING,
-        total_amount=round(total_amount, 2),
+        total_amount=total_amount,
+        subtotal=subtotal,
+        discount_amount=discount_amount,
+        coupon_code=used_coupon_code,
         payment_method=payment_method,
         payment_status=PaymentStatus.PENDING,
         address_id=address_id,

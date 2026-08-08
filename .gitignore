@@ -41,6 +41,13 @@ frontend/dist/
 frontend/build/
 frontend/.vite/
 
+# ── SQLite dev databases ─────────────────────────────────────────────────────
+backend/*.db
+*.db
+
+# ── Uploaded static files (user uploads, product images, damage claim photos) ─
+backend/static/store/
+
 # ── Logs ─────────────────────────────────────────────────────────────────────
 logs/
 *.log

@@ -342,7 +342,7 @@ export default function CategoriesAdminPage() {
             <div>
               <label className="text-xs font-semibold text-gray-700 block mb-1">Category Name *</label>
               <input
-                placeholder="e.g., Ferns, Bonsai, Ceramic Pots"
+                placeholder="e.g., Earrings, Necklaces, Bangles"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 required

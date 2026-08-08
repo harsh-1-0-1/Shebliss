@@ -1,68 +1,72 @@
 import { useState } from 'react';
-import { Tag, Percent, IndianRupee, Plus, Trash2 } from 'lucide-react';
+import { Tag, Percent, IndianRupee, Plus, Trash2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-interface Coupon {
-  id: number;
-  code: string;
-  type: 'percent' | 'fixed';
-  value: number;
-  minAmount: number;
-  isActive: boolean;
-  timesUsed: number;
-}
-
-const INITIAL_COUPONS: Coupon[] = [
-  { id: 1, code: 'MYSTORE15', type: 'percent', value: 15, minAmount: 999, isActive: true, timesUsed: 142 },
-  { id: 2, code: 'WELCOME200', type: 'fixed', value: 200, minAmount: 1499, isActive: true, timesUsed: 89 },
-  { id: 3, code: 'FESTIVE50', type: 'percent', value: 50, minAmount: 2999, isActive: false, timesUsed: 312 },
-  { id: 4, code: 'FLAT100', type: 'fixed', value: 100, minAmount: 500, isActive: true, timesUsed: 23 },
-];
+import {
+  useCoupons,
+  useCreateCoupon,
+  useToggleCoupon,
+  useDeleteCoupon,
+  type Coupon,
+} from '@/hooks/useAdmin';
 
 export default function CouponsAdminPage() {
-  const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS);
+  const { data: coupons = [], isLoading } = useCoupons();
+  const createCoupon = useCreateCoupon();
+  const toggleCoupon = useToggleCoupon();
+  const deleteCoupon = useDeleteCoupon();
+
   const [code, setCode] = useState('');
   const [type, setType] = useState<'percent' | 'fixed'>('percent');
   const [value, setValue] = useState<string>('');
   const [minAmount, setMinAmount] = useState<string>('');
+  const [usageLimit, setUsageLimit] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim() || !value || !minAmount) {
       toast.error('Please fill in all fields');
       return;
     }
-
-    const newCoupon: Coupon = {
-      id: Date.now(),
-      code: code.trim().toUpperCase(),
-      type,
-      value: Number(value),
-      minAmount: Number(minAmount),
-      isActive: true,
-      timesUsed: 0,
-    };
-
-    setCoupons([newCoupon, ...coupons]);
-    toast.success(`Coupon code "${newCoupon.code}" created successfully!`);
-    
-    // reset form
-    setCode('');
-    setValue('');
-    setMinAmount('');
+    setSubmitting(true);
+    try {
+      await createCoupon.mutateAsync({
+        code: code.trim().toUpperCase(),
+        discount_type: type,
+        value: Number(value),
+        min_order_amount: Number(minAmount),
+        usage_limit: usageLimit ? Number(usageLimit) : null,
+      });
+      toast.success(`Coupon code "${code.trim().toUpperCase()}" created successfully!`);
+      setCode('');
+      setValue('');
+      setMinAmount('');
+      setUsageLimit('');
+    } catch (err: unknown) {
+      toast.error(
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Failed to create coupon',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleToggle = (id: number) => {
-    setCoupons(
-      coupons.map((c) => (c.id === id ? { ...c, isActive: !c.isActive } : c))
-    );
-    toast.success('Coupon visibility toggled');
+  const handleToggle = async (id: number) => {
+    try {
+      await toggleCoupon.mutateAsync(id);
+      toast.success('Coupon visibility toggled');
+    } catch {
+      toast.error('Failed to toggle coupon');
+    }
   };
 
   const handleDelete = (id: number, codeStr: string) => {
     if (confirm(`Are you sure you want to delete coupon code "${codeStr}"?`)) {
-      setCoupons(coupons.filter((c) => c.id !== id));
-      toast.success('Coupon code deleted');
+      deleteCoupon.mutate(id, {
+        onSuccess: () => toast.success('Coupon code deleted'),
+        onError: () => toast.error('Failed to delete coupon'),
+      });
     }
   };
 
@@ -70,7 +74,7 @@ export default function CouponsAdminPage() {
 
   return (
     <div className="space-y-5">
-      
+
       {/* Title */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Coupons & Discounts</h1>
@@ -100,7 +104,7 @@ export default function CouponsAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        
+
         {/* Coupon Form */}
         <div className="md:col-span-1 bg-white p-4 rounded-xl border shadow-sm space-y-4 h-fit">
           <h2 className="text-sm font-bold text-gray-800 pb-2 border-b">Create Promo Code</h2>
@@ -164,10 +168,22 @@ export default function CouponsAdminPage() {
               </div>
             </div>
 
+            <div>
+              <label className="text-xs font-semibold text-gray-700 block mb-1">Usage Limit (optional)</label>
+              <input
+                type="number"
+                placeholder="e.g. 100"
+                value={usageLimit}
+                onChange={(e) => setUsageLimit(e.target.value)}
+                className={inputClass}
+              />
+              <p className="text-[9px] text-gray-400 mt-1">Maximum number of redemptions. Leave empty for unlimited.</p>
+            </div>
+
             {/* Formula Preview Box */}
             <div className="rounded-lg bg-gray-50 border p-3 text-[10px] text-gray-500 leading-normal">
               {type === 'percent' ? (
-                <p>💡 Formula: Orders above ₹{minAmount || 'X'} will get {value || 'Y'}% deducted from cart total before delivery tax.</p>
+                <p>💡 Formula: Orders above ₹{minAmount || 'X'} will get {value || 'Y'}% deducted from the subtotal.</p>
               ) : (
                 <p>💡 Formula: Orders above ₹{minAmount || 'X'} will get flat ₹{value || 'Y'} subtracted directly at checkout.</p>
               )}
@@ -175,9 +191,10 @@ export default function CouponsAdminPage() {
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-primary text-white text-xs rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-primary/95 transition"
+              disabled={submitting}
+              className="w-full py-2.5 bg-primary text-white text-xs rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-primary/95 transition disabled:opacity-60"
             >
-              <Plus size={14} /> Add Coupon
+              {submitting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} Add Coupon
             </button>
           </form>
         </div>
@@ -185,55 +202,67 @@ export default function CouponsAdminPage() {
         {/* Coupon Registry Table */}
         <div className="md:col-span-2 bg-white p-4 rounded-xl border shadow-sm">
           <h2 className="text-sm font-bold text-gray-800 pb-2 border-b mb-3">Coupons Ledger</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead>
-                <tr className="border-b text-gray-500 bg-gray-50">
-                  <th className="p-3 font-semibold">Promo Code</th>
-                  <th className="p-3 font-semibold">Deduction Value</th>
-                  <th className="p-3 font-semibold">Min Basket Limit</th>
-                  <th className="p-3 font-semibold text-center">Times Claimed</th>
-                  <th className="p-3 font-semibold text-center">Active Status</th>
-                  <th className="p-3 font-semibold text-right w-16">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coupons.map((c) => (
-                  <tr key={c.id} className="border-b last:border-0 hover:bg-gray-50/50">
-                    <td className="p-3 font-bold text-gray-900 flex items-center gap-1.5">
-                      <Tag size={13} className="text-primary-light" />
-                      {c.code}
-                    </td>
-                    <td className="p-3 font-medium">
-                      {c.type === 'percent' ? `${c.value}% Off` : `₹${c.value} Flat`}
-                    </td>
-                    <td className="p-3 text-gray-600">₹{c.minAmount}</td>
-                    <td className="p-3 text-center font-bold text-primary">{c.timesUsed} claims</td>
-                    <td className="p-3 text-center">
-                      <button
-                        onClick={() => handleToggle(c.id)}
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
-                          c.isActive
-                            ? 'bg-green-50 text-green-700 border-green-200'
-                            : 'bg-gray-100 text-gray-500 border-gray-200'
-                        }`}
-                      >
-                        {c.isActive ? 'Active' : 'Paused'}
-                      </button>
-                    </td>
-                    <td className="p-3 text-right">
-                      <button
-                        onClick={() => handleDelete(c.id, c.code)}
-                        className="p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </td>
+          {isLoading ? (
+            <div className="py-12 text-center text-gray-400 text-sm">
+              Loading coupons...
+            </div>
+          ) : coupons.length === 0 ? (
+            <div className="py-12 text-center text-gray-400 text-sm">
+              No coupons created yet. Add your first promo code on the left.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b text-gray-500 bg-gray-50">
+                    <th className="p-3 font-semibold">Promo Code</th>
+                    <th className="p-3 font-semibold">Deduction Value</th>
+                    <th className="p-3 font-semibold">Min Basket Limit</th>
+                    <th className="p-3 font-semibold text-center">Times Claimed</th>
+                    <th className="p-3 font-semibold text-center">Active Status</th>
+                    <th className="p-3 font-semibold text-right w-16">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {coupons.map((c: Coupon) => (
+                    <tr key={c.id} className="border-b last:border-0 hover:bg-gray-50/50">
+                      <td className="p-3 font-bold text-gray-900 flex items-center gap-1.5">
+                        <Tag size={13} className="text-primary-light" />
+                        {c.code}
+                      </td>
+                      <td className="p-3 font-medium">
+                        {c.discount_type === 'percent' ? `${c.value}% Off` : `₹${c.value} Flat`}
+                      </td>
+                      <td className="p-3 text-gray-600">₹{c.min_order_amount}</td>
+                      <td className="p-3 text-center font-bold text-primary">
+                        {c.times_used}{c.usage_limit ? ` / ${c.usage_limit}` : ''} claims
+                      </td>
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => handleToggle(c.id)}
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
+                            c.is_active
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : 'bg-gray-100 text-gray-500 border-gray-200'
+                          }`}
+                        >
+                          {c.is_active ? 'Active' : 'Paused'}
+                        </button>
+                      </td>
+                      <td className="p-3 text-right">
+                        <button
+                          onClick={() => handleDelete(c.id, c.code)}
+                          className="p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
       </div>

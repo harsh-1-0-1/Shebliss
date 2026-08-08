@@ -1,4 +1,4 @@
-import type { Banner } from '@/types';
+import type { Banner, Category } from '@/types';
 
 export interface DropdownLink {
   label: string;
@@ -205,6 +205,14 @@ export function bannerToCollection(b: Banner): MobileCollection {
     image: b.image_url || '',
     accent: b.bg_color || '#f3d9cf',
   };
+}
+
+export function categoryLink(c: Category): string {
+  return `/products?category=${c.slug}`;
+}
+
+export function sortByMenuOrder<T extends { sort_order?: number }>(items: T[]): T[] {
+  return [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 }
 
 export const LABEL_TO_NAV: Record<string, NavItemDef | undefined> = {};

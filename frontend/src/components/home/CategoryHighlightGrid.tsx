@@ -254,18 +254,12 @@ export default function CategoryHighlightGrid() {
             <CategoryCard key={cat.slug} cat={cat} />
           ))}
 
-          {/* Discover callout — col-span-2 fills the 2 remaining empty slots on desktop */}
-          <div className="col-span-2">
+          {/* Discover callout — full row on mobile, 2 slots on desktop */}
+          <div className="col-span-3 sm:col-span-2">
             <DiscoverCalloutTile />
           </div>
         </div>
 
-        {/* Mobile "view all" */}
-        <div className="sm:hidden mt-5 text-center">
-          <Link to="/products" className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#767676] hover:text-[#1A1A1A] underline underline-offset-4 transition-colors">
-            View all categories
-          </Link>
-        </div>
       </div>
     </section>
   );

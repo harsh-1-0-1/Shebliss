@@ -48,12 +48,6 @@ const PLACEMENTS = [
     helpText: 'Best for category-wide discounts. Recommended size: 1400x300px.',
   },
   {
-    key: 'trending',
-    label: '🔥 Trending Carousel Banner',
-    description: 'Square promotional banners displayed within the "Trending Now" homepage slider.',
-    helpText: 'Recommended size: 600x600px square format. Use vibrant colors.',
-  },
-  {
     key: 'themed',
     label: '🎨 Seasonal Offer Banner',
     description: 'Large grids and themed sections on the homepage, e.g., "Monsoon Collection".',
@@ -64,12 +58,6 @@ const PLACEMENTS = [
     label: '🏷️ Promotional Strip Tile',
     description: 'A thin horizontal banner strip embedded between sections on the homepage.',
     helpText: 'Recommended size: 1200x120px. Ideal for coupon announcements.',
-  },
-  {
-    key: 'highlight',
-    label: '⭐ Best Seller Highlight Card',
-    description: 'Vertical card in a 4-column grid. Highlights custom sets like "Combos" or "Starter Kits".',
-    helpText: 'Recommended size: 400x550px. The title becomes the bold text overlay.',
   },
   {
     key: 'mobile_promo',
@@ -84,16 +72,10 @@ const PLACEMENTS = [
     helpText: 'Recommended size: 320x450px. Use clear category imagery and short labels.',
   },
   {
-    key: 'mobile_category',
-    label: '📲 Home Mobile Category Chips',
-    description: 'Circular category shortcuts shown above the homepage hero on mobile.',
-    helpText: 'Recommended size: 300x300px square images. Title becomes the chip label.',
-  },
-  {
-    key: 'cart_suggestions',
-    label: '🛒 Empty Cart Suggestions',
-    description: 'Collection cards shown when the cart drawer or cart page is empty.',
-    helpText: 'Recommended size: 500x380px. Title, subtitle, link, and image are used.',
+    key: 'customer_photos',
+    label: '📸 Customer Photos',
+    description: 'Square images shown in the "As seen on you" customer-photos section on product pages.',
+    helpText: 'Recommended size: 600x600px square format. Use real customer-worn photos.',
   },
   {
     key: 'corporate_gifting',
@@ -122,7 +104,7 @@ const bannerSchema = z
     cta_text: z.string().max(50).optional().or(z.literal('')),
     cta_link: z.string().max(255).optional().or(z.literal('')),
     badge_text: z.string().max(100).optional().or(z.literal('')),
-    placement: z.enum(['hero', 'announcement', 'page', 'trending', 'themed', 'strip', 'highlight', 'collection', 'mobile_promo', 'menu_banner', 'mobile_category', 'cart_suggestions', 'corporate_gifting', 'product_detail', 'product_spec']),
+    placement: z.enum(['hero', 'announcement', 'page', 'themed', 'strip', 'menu_banner', 'mobile_promo', 'corporate_gifting', 'customer_photos', 'product_detail', 'product_spec']),
     target_path: z.string().max(255).optional().or(z.literal('')),
     bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color (e.g. #FFFFFF)'),
     text_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color (e.g. #000000)'),
@@ -360,103 +342,6 @@ function BannerPreview({
               }}
             />
           )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HighlightCardPreview({
-  title,
-  subtitle,
-  bgColor,
-  textColor,
-  imageSrc,
-}: {
-  title: string;
-  subtitle: string;
-  bgColor: string;
-  textColor: string;
-  imageSrc: string | null;
-}) {
-  return (
-    <div className="mt-4 p-4 border rounded-xl bg-gray-50 flex flex-col items-center">
-      <p className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Highlight Card Preview</p>
-      <div className="w-full max-w-[180px]">
-        <div
-          className="relative aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 shadow-sm"
-          style={{ backgroundColor: bgColor || '#f1e9dc' }}
-        >
-          {imageSrc ? (
-            <img
-              src={imageSrc}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          ) : null}
-          <h3 className="absolute inset-x-2 bottom-4 text-center text-sm font-semibold leading-tight text-white drop-shadow-sm">
-            {title || 'Combos'}
-          </h3>
-        </div>
-        <p
-          className="mt-2 text-center text-xs font-bold leading-tight"
-          style={{ color: textColor || '#a34a2f' }}
-        >
-          {subtitle || 'Get 4 at ₹699'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function TrendingBannerPreview({
-  title,
-  subtitle,
-  bgColor,
-  textColor,
-  ctaText,
-  imageSrc,
-}: {
-  title: string;
-  subtitle: string;
-  bgColor: string;
-  textColor: string;
-  ctaText: string;
-  imageSrc: string | null;
-}) {
-  return (
-    <div className="mt-4 p-4 border rounded-xl bg-gray-50 flex flex-col items-center">
-      <p className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Carousel Banner Preview</p>
-      <div
-        className="relative aspect-square w-48 overflow-hidden rounded-xl border border-gray-200"
-        style={{ backgroundColor: bgColor || '#e8decb' }}
-      >
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        ) : null}
-        <h3
-          className="absolute left-3 top-3 max-w-[80%] text-xs font-bold leading-tight text-white drop-shadow"
-          style={{ color: textColor || '#FFFFFF' }}
-        >
-          {title || 'Featured Collection'}
-        </h3>
-        {subtitle && (
-          <div className="absolute right-3 top-3 bg-yellow-400 text-primary text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-            {subtitle}
-          </div>
-        )}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded bg-[#d9b36c] px-3 py-1 text-[9px] font-bold text-primary shadow">
-          {ctaText || 'SHOP NOW'}
         </div>
       </div>
     </div>
@@ -1007,27 +892,6 @@ function BannerDrawer({
               bgColor={watchedBgColor}
               textColor={watchedTextColor}
               ctaText={watchedCtaText || ''}
-              imageSrc={previewImageSrc}
-            />
-          )}
-
-          {watchedPlacement === 'trending' && (
-            <TrendingBannerPreview
-              title={watchedTitle || ''}
-              subtitle={watchedSubtitle || ''}
-              bgColor={watchedBgColor}
-              textColor={watchedTextColor}
-              ctaText={watchedCtaText || ''}
-              imageSrc={previewImageSrc}
-            />
-          )}
-
-          {watchedPlacement === 'highlight' && (
-            <HighlightCardPreview
-              title={watchedTitle || ''}
-              subtitle={watchedSubtitle || ''}
-              bgColor={watchedBgColor}
-              textColor={watchedTextColor}
               imageSrc={previewImageSrc}
             />
           )}

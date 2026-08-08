@@ -3,6 +3,22 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, field_serializer
 
+VALID_PLACEMENTS = frozenset({
+    "hero",
+    "announcement",
+    "page",
+    "themed",
+    "strip",
+    "menu_banner",
+    "mobile_promo",
+    "corporate_gifting",
+    "customer_photos",
+    "product_detail",
+    "product_spec",
+})
+
+_PLACEMENT_PATTERN = "^(?:" + "|".join(sorted(VALID_PLACEMENTS)) + ")$"
+
 
 class BannerBase(BaseModel):
     title: str = Field(..., max_length=100)
@@ -15,7 +31,7 @@ class BannerBase(BaseModel):
     position: int = 0
     placement: str = Field(
         default="hero",
-        pattern=r"^(hero|announcement|page|themed|strip|highlight|collection|mobile_promo|menu_banner|mobile_category|cart_suggestions|corporate_gifting|trending|product_detail|product_spec)$",
+        pattern=_PLACEMENT_PATTERN,
     )
     target_path: Optional[str] = Field(None, max_length=255)
     is_active: bool = True

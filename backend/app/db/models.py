@@ -177,6 +177,9 @@ class Order(Base):
     )
     partial_refund_amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     address_id: Mapped[int] = mapped_column(Integer, ForeignKey("addresses.id"), nullable=False)
+    coupon_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    discount_amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    subtotal: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     user: Mapped["User"] = relationship(back_populates="orders")
@@ -341,6 +344,58 @@ class DamageClaim(Base):
     user: Mapped["User"] = relationship("User")
     order: Mapped["Order"] = relationship("Order")
     order_item: Mapped["OrderItem | None"] = relationship("OrderItem")
+
+
+class InquiryStatus(str, enum.Enum):
+    NEW = "new"
+    UNDER_REVIEW = "review"
+    QUOTED = "quoted"
+    APPROVED = "approved"
+    CANCELLED = "cancelled"
+
+
+class CorporateInquiry(Base):
+    __tablename__ = "corporate_inquiries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    company_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    customisation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    qty_requested: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[InquiryStatus] = mapped_column(
+        Enum(InquiryStatus, values_callable=lambda e: [m.value for m in e]),
+        default=InquiryStatus.NEW,
+        index=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+class CouponType(str, enum.Enum):
+    PERCENT = "percent"
+    FIXED = "fixed"
+
+
+class Coupon(Base):
+    __tablename__ = "coupons"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    code: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
+    discount_type: Mapped[CouponType] = mapped_column(
+        Enum(CouponType, values_callable=lambda e: [m.value for m in e]),
+        nullable=False,
+    )
+    value: Mapped[float] = mapped_column(Float, nullable=False)
+    min_order_amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    max_discount_amount: Mapped[float | None] = mapped_column(Float, nullable=True)
+    usage_limit: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    times_used: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    valid_from: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    valid_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 
 class StoreSettings(Base):

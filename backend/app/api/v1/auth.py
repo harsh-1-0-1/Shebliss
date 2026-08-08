@@ -39,7 +39,10 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
             detail="Too many login attempts. Try again in a minute.",
         )
 
-    user = await auth_service.authenticate(db, body.email, body.password)
+    try:
+        user = await auth_service.authenticate(db, body.email, body.password)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,11 +50,10 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
         )
     return await auth_service.issue_tokens(user)
 
-
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(body: RefreshRequest):
+async def refresh(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
     try:
-        return await auth_service.refresh_tokens(body.refresh_token)
+        return await auth_service.refresh_tokens(db, body.refresh_token)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc),
@@ -94,7 +96,10 @@ async def google_callback(code: str, state: str, db: AsyncSession = Depends(get_
 
 @router.post("/guest", response_model=TokenResponse)
 async def guest_login(body: GuestRequest, db: AsyncSession = Depends(get_db)):
-    user = await auth_service.guest_register_or_login(
-        db, email=body.email, full_name=body.full_name, phone=body.phone
-    )
+    try:
+        user = await auth_service.guest_register_or_login(
+            db, email=body.email, full_name=body.full_name, phone=body.phone
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     return await auth_service.issue_tokens(user)

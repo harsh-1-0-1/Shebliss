@@ -53,10 +53,10 @@ export default function CorporateGiftInquiryForm() {
     setFormError('');
     try {
       await submitCorporateGiftInquiry({
-        fullName: values.fullName,
+        full_name: values.fullName,
         phone: values.phone,
         email: values.email,
-        companyName: values.companyName,
+        company_name: values.companyName,
         customisation: values.customisation || undefined,
       });
       toast.success('Thank you! Our team will get in touch with you shortly.');

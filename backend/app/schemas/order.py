@@ -9,6 +9,7 @@ class CheckoutRequest(BaseModel):
     address_id: int
     cart_id: int
     payment_method: Literal["razorpay", "cod"] = "razorpay"
+    coupon_code: str | None = None
 
 
 class DirectCheckoutItem(BaseModel):
@@ -21,6 +22,7 @@ class DirectCheckoutRequest(BaseModel):
     address_id: int
     items: list[DirectCheckoutItem]
     payment_method: Literal["razorpay", "cod"] = "razorpay"
+    coupon_code: str | None = None
 
 
 class RazorpayOrderData(BaseModel):
@@ -83,6 +85,9 @@ class OrderResponse(BaseModel):
     user_id: int
     status: str
     total_amount: float
+    subtotal: float | None = None
+    discount_amount: float = 0
+    coupon_code: str | None = None
     payment_id: str | None
     payment_method: str = "razorpay"
     payment_status: str

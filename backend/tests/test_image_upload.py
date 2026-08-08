@@ -129,6 +129,6 @@ def test_response_serializers_resolve_keys(monkeypatch):
 
     category = CategoryResponse.model_validate(
         {"id": 2, "name": "Products", "slug": "products", "parent_id": None,
-         "image_url": "store/categories/2/a.jpg", "is_active": True}
+         "image_url": "store/categories/2/a.jpg", "is_active": True, "sort_order": 0}
     )
     assert category.model_dump()["image_url"].startswith("https://cdn.test/")

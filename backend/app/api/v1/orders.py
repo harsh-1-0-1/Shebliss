@@ -40,6 +40,7 @@ async def checkout(
             full_name=user.full_name,
             phone=user.phone or "",
             payment_method=body.payment_method,
+            coupon_code=body.coupon_code,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -65,6 +66,7 @@ async def direct_checkout(
             full_name=user.full_name,
             phone=user.phone or "",
             payment_method=body.payment_method,
+            coupon_code=body.coupon_code,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

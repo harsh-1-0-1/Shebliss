@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import require_admin
 from app.db.models import Banner
 from app.db.session import get_db
-from app.schemas.banner import BannerOut, BannerReorderRequest
+from app.schemas.banner import VALID_PLACEMENTS, BannerOut, BannerReorderRequest
 from app.utils.image_upload import delete_image_file, extract_relative_key, upload_image_file
 from app.utils.redis import cache_delete, cache_get, cache_set
 
@@ -105,6 +105,8 @@ async def create_banner(
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
+    if placement not in VALID_PLACEMENTS:
+        raise HTTPException(422, detail=f"Invalid banner placement: {placement}")
     banner = Banner(
         title=title,
         subtitle=subtitle,
@@ -159,6 +161,9 @@ async def update_banner(
     banner = await db.get(Banner, banner_id)
     if not banner:
         raise HTTPException(404, "Banner not found")
+
+    if placement is not None and placement not in VALID_PLACEMENTS:
+        raise HTTPException(422, detail=f"Invalid banner placement: {placement}")
 
     old_placement = banner.placement
 
