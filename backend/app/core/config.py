@@ -71,6 +71,7 @@ class Settings(BaseSettings):
     CORS_ORIGIN_REGEX: str = ""
     REQUIRE_CLOUDFRONT: bool = False
     CLOUDFRONT_SECRET: str = ""
+    MAINTENANCE: bool = False
 
     @field_validator("DEBUG", mode="before")
     @classmethod

@@ -27,4 +27,5 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
         db=db_status,
         redis="ok" if redis_ok else "unavailable",
         version=settings.APP_VERSION,
+        maintenance=settings.MAINTENANCE,
     )

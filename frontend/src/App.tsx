@@ -71,12 +71,14 @@ function ScrollToHashElement() {
 
 function AppInit() {
   const hydrateFromStorage = useAuthStore((s) => s.hydrateFromStorage);
+  const checkMaintenance = useAuthStore((s) => s.checkMaintenance);
   const fetchCart = useCartStore((s) => s.fetchCart);
 
   useEffect(() => {
+    checkMaintenance();
     hydrateFromStorage();
     fetchCart();
-  }, [hydrateFromStorage, fetchCart]);
+  }, [checkMaintenance, hydrateFromStorage, fetchCart]);
 
   return null;
 }

@@ -3,6 +3,8 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cdn import get_real_client_ip
+from app.core.config import settings
+from app.core.exceptions import MaintenanceModeError
 from app.core.security import get_current_active_user
 from app.db.models import User
 from app.db.session import get_db
@@ -20,6 +22,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    if settings.MAINTENANCE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The site is undergoing maintenance. New registrations are currently disabled.",
+        )
     try:
         user = await auth_service.register_user(
             db, email=body.email, password=body.password, full_name=body.full_name, phone=body.phone,
@@ -48,6 +55,13 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    if settings.MAINTENANCE and not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The site is undergoing maintenance. Only administrator login is allowed at this time.",
+        )
+
     return await auth_service.issue_tokens(user)
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -83,6 +97,11 @@ async def google_auth():
 async def google_callback(code: str, state: str, db: AsyncSession = Depends(get_db)):
     try:
         user = await auth_service.google_callback(db, code=code, state=state)
+    except MaintenanceModeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except Exception as exc:
@@ -96,6 +115,11 @@ async def google_callback(code: str, state: str, db: AsyncSession = Depends(get_
 
 @router.post("/guest", response_model=TokenResponse)
 async def guest_login(body: GuestRequest, db: AsyncSession = Depends(get_db)):
+    if settings.MAINTENANCE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The site is undergoing maintenance. Guest checkout is currently disabled.",
+        )
     try:
         user = await auth_service.guest_register_or_login(
             db, email=body.email, full_name=body.full_name, phone=body.phone

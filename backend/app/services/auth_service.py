@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.exceptions import MaintenanceModeError
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -268,6 +269,16 @@ async def google_callback(db: AsyncSession, code: str, state: str) -> User:
     google_id = profile["id"]
     email = profile["email"]
     full_name = profile.get("name", email.split("@")[0])
+
+    if settings.MAINTENANCE:
+        # Check if the user exists and is an admin before making any database updates or inserts
+        stmt = select(User).where((User.google_id == google_id) | (User.email == email))
+        existing_res = await db.execute(stmt)
+        existing_user = existing_res.scalar_one_or_none()
+        if existing_user is None:
+            raise MaintenanceModeError("The site is undergoing maintenance. New registrations are currently disabled.")
+        if not existing_user.is_admin:
+            raise MaintenanceModeError("The site is undergoing maintenance. Only administrator login is allowed at this time.")
 
     # Try to find by google_id first, then by email
     result = await db.execute(select(User).where(User.google_id == google_id))

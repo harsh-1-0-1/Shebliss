@@ -6,3 +6,4 @@ class HealthResponse(BaseModel):
     db: str
     redis: str
     version: str
+    maintenance: bool

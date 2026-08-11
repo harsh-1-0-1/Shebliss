@@ -17,6 +17,9 @@ interface AuthState {
   setTokens: (data: TokenResponse) => void;
   hydrateFromStorage: () => void;
   guestCheckoutAuth: (email: string, full_name: string, phone?: string) => Promise<void>;
+  isMaintenance: boolean;
+  isMaintenanceLoading: boolean;
+  checkMaintenance: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -24,9 +27,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: localStorage.getItem('access_token'),
   isLoading: false,
   isAuthModalOpen: false,
+  isMaintenance: false,
+  isMaintenanceLoading: true,
 
   openAuthModal: () => set({ isAuthModalOpen: true }),
   closeAuthModal: () => set({ isAuthModalOpen: false }),
+
+  checkMaintenance: async () => {
+    try {
+      const { data } = await api.get<{ maintenance: boolean }>('/health');
+      set({ isMaintenance: data.maintenance, isMaintenanceLoading: false });
+    } catch {
+      // Fail closed: if health check fails/backend is offline, default to maintenance mode active
+      set({ isMaintenance: true, isMaintenanceLoading: false });
+    }
+  },
 
   setTokens: (data) => {
     localStorage.setItem('access_token', data.access_token);

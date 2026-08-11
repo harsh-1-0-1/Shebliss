@@ -1,66 +1,58 @@
-# Deploy the Backend on Render, the Frontend on Vercel, and CloudFront in Front
+# VPS Deployment Guide (Docker & Docker Compose)
 
-This repository is a monorepo:
+This guide explains how to deploy the Shebliss e-commerce application on a Linux VPS using Docker and Docker Compose, with Nginx acting as a reverse proxy on the host machine.
 
-- `backend/`: FastAPI API deployed as a Render Docker web service
-- `frontend/`: Vite React app deployed on Vercel
-- `render.yaml`: optional Render Blueprint for the backend service
+---
 
-## 1. Deploy the backend to Render
+## 1. Prerequisites
 
-Create the service from `render.yaml`, or configure the same settings in the Render dashboard:
+Ensure your Linux VPS has the following installed:
+1. **Docker Engine & Docker Compose CLI** (v2 or higher)
+2. **Nginx** (or any reverse proxy like Caddy / HestiaCP) installed on the host to manage SSL termination (Let's Encrypt) and forward traffic.
 
-- Runtime: Docker
-- Dockerfile: `backend/Dockerfile`
-- Docker build context: `backend`
-- Health check path: `/api/v1/health`
+---
 
-Set the database, Redis, authentication, Cloudinary, Google, Razorpay, and CORS variables from `.env.example`. Keep CloudFront enforcement off during the first deployment:
+## 2. Environment Configuration
+
+Create a `.env` file in the root directory of your project on the VPS. This file contains the credentials and settings required by the Docker containers.
 
 ```env
-REQUIRE_CLOUDFRONT=false
-CLOUDFRONT_SECRET=
-BACKEND_PUBLIC_URL=https://your-service.onrender.com
-CORS_ORIGINS=https://your-frontend.vercel.app
-CORS_ORIGIN_REGEX=
+# --- Database Configuration ---
+POSTGRES_DB=shebliss
+POSTGRES_USER=shebliss_user
+POSTGRES_PASSWORD=secure_db_password
+
+# --- Backend Configuration ---
+ENVIRONMENT=production
 DEBUG=false
 LOG_JSON=true
-```
+SECRET_KEY=generate-a-long-random-string-for-security
+BACKEND_PUBLIC_URL=https://my-store.example.com
+BACKEND_PORT=8000
 
-`CORS_ORIGINS` is the main control for which frontend sites can call the backend. It can be a single URL, comma-separated URLs, or a JSON array string. These are all valid:
+# --- Frontend Configuration ---
+FRONTEND_PORT=8090
+VITE_API_BASE_URL=https://my-store.example.com/api/v1
+# VITE_CDN_BASE_URL=https://your-cdn.cloudfront.net # Optional
+# VITE_RAZORPAY_KEY_ID= # Optional
 
-```env
-CORS_ORIGINS=https://your-vercel-frontend-domain
-CORS_ORIGINS=https://first.vercel.app,https://second.vercel.app
-CORS_ORIGINS=["https://your-vercel-frontend-domain"]
-```
-
-For Vercel preview deployments, you can either add each preview URL to `CORS_ORIGINS`, or use:
-
-```env
-CORS_ORIGIN_REGEX=https://.*\.vercel\.app
-```
-
-For the tightest production setup, keep `CORS_ORIGIN_REGEX` empty and list only your real production frontend URL in `CORS_ORIGINS`.
-
-Optional variables:
-
-```env
+# --- Third-Party Services (Optional) ---
+# Cloudinary (Image Uploads)
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
+
+# Google OAuth
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=https://your-railway-backend-domain/api/v1/auth/google/callback
+GOOGLE_REDIRECT_URI=https://my-store.example.com/api/v1/auth/google/callback
+
+# Razorpay Payments
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
-WHATSAPP_ACCESS_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=
-WHATSAPP_ADMIN_RECIPIENT=
-WHATSAPP_API_VERSION=v23.0
-WHATSAPP_ORDER_TEMPLATE_NAME=new_order_received
-WHATSAPP_ORDER_TEMPLATE_LANGUAGE=en_US
+
+# SMTP Email Configuration
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_USERNAME=
@@ -72,128 +64,126 @@ SMTP_USE_SSL=false
 ADMIN_ORDER_EMAIL=
 ```
 
-WhatsApp order alerts use Meta WhatsApp Cloud API and are disabled until
-`WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ADMIN_RECIPIENT`,
-and an approved `WHATSAPP_ORDER_TEMPLATE_NAME` are configured. Create the
-template with five body variables: order id, amount, customer name, customer
-phone, and item summary.
+---
 
-Email order alerts use SMTP and are disabled until `SMTP_HOST` and
-`SMTP_FROM_EMAIL` are configured. Customers receive an order confirmation email;
-if `ADMIN_ORDER_EMAIL` is set, the store team also receives a new-order alert.
-The template includes order id, payment method/status, customer contact,
-shipping address, item summary, total, and next steps.
+## 3. Build & Run the Application
 
-Do not put `uv run alembic upgrade head` in Railway's Start Command. It is a one-off migration command and exits immediately, which prevents the HTTP server from starting.
+The multi-container stack consists of:
+- `postgres`: PostgreSQL database (not exposed to host, storage persisted in `postgres_data` volume)
+- `redis`: Redis cache (not exposed to host, storage persisted in `redis_data` volume)
+- `backend`: FastAPI API server (listens on `127.0.0.1:8000`)
+- `frontend`: React/Vite served via Nginx (listens on `127.0.0.1:8090`)
 
-Optional sample data:
-
+### Step 1: Start the Services
+Run the following command to build the Docker images and start the containers in detached mode:
 ```bash
-uv run python seed.py
+docker compose up -d --build
 ```
 
-Confirm these requests work before creating the distribution:
-
-```text
-https://your-service.onrender.com/api/v1/health
-https://your-service.onrender.com/api/v1/products
-```
-
-## 2. Create the CloudFront distribution
-
-Use the following origin settings:
-
-- Origin domain: `your-service.onrender.com` (no protocol prefix)
-- Origin protocol: HTTPS only
-- Custom origin header: `X-Origin-Verify: <a generated 64-character hex secret>`
-
-Generate a secret locally:
-
+### Step 2: Check Logs
+You can monitor the startup logs of all services to ensure they are healthy:
 ```bash
-python -c "import secrets; print(secrets.token_hex(32))"
+docker compose logs -f
+```
+The backend container (`ecomm_backend`) runs `backend/start.sh`, which automatically waits for PostgreSQL to become available and executes the database migrations (`uv run alembic upgrade head`) before starting the Uvicorn web server.
+
+### Step 3: Seed Sample Data (Optional)
+If you want to populate the database with initial products, categories, and blogs:
+```bash
+docker compose run --rm seed
 ```
 
-Create a custom origin request policy that forwards:
+---
 
-- Viewer headers: `Authorization`, `Origin`, `Access-Control-Request-Headers`,
-  `Access-Control-Request-Method`, and `X-Cart-Session-Id`
-- CloudFront header: `CloudFront-Viewer-Address`
-- All query strings
-- No cookies
+## 4. Reverse Proxy Setup (Nginx on Host)
 
-Do not add `X-Origin-Verify` to the origin request policy. It is already configured as a static custom origin header and CloudFront adds it to origin requests.
+Since your frontend container listens on loopback `127.0.0.1:8090`, you should configure Nginx on the host VPS to forward public traffic to it and manage SSL certificates.
 
-Configure the cache behaviors in this order:
+Create a virtual host configuration in `/etc/nginx/sites-available/shebliss` (and symlink it to `/etc/nginx/sites-enabled/`):
 
-| Path pattern | Allowed methods | Cached methods | Cache policy |
-|---|---|---|---|
-| `/api/v1/products*` | All | GET, HEAD | Custom public API policy |
-| `/api/v1/categories*` | All | GET, HEAD | Custom public API policy |
-| Default `/*` | All | None | `CachingDisabled` |
+```nginx
+server {
+    listen 80;
+    server_name my-store.example.com;
 
-The custom public API cache policy should use:
+    # Redirect all HTTP requests to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
 
-- Minimum TTL: `0`
-- Default TTL: `60`
-- Maximum TTL: `300`
-- Query strings in cache key: all
-- Authorization in cache key: no
+server {
+    listen 443 ssl http2;
+    server_name my-store.example.com;
 
-The API sends `Cache-Control: public, max-age=300, stale-while-revalidate=60` for list responses and `public, max-age=60` for detail responses. Product and category writes are allowed through the public path behaviors, but CloudFront only caches GET and HEAD responses.
+    # SSL Certificate Config (e.g., from Let's Encrypt Certbot)
+    ssl_certificate /etc/letsencrypt/live/my-store.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/my-store.example.com/privkey.pem;
 
-If more than one browser origin is allowed, include `Origin` in the cache key or configure an appropriate CloudFront CORS response policy.
+    client_max_body_size 25M;
 
-## 3. Enable CloudFront enforcement on Render
-
-After CloudFront reports that the distribution is deployed, update Render:
-
-```env
-REQUIRE_CLOUDFRONT=true
-CLOUDFRONT_SECRET=<the same secret configured on the CloudFront origin>
-BACKEND_PUBLIC_URL=https://d1234abc.cloudfront.net
-GOOGLE_REDIRECT_URI=https://d1234abc.cloudfront.net/api/v1/auth/google/callback
+    # Forward all traffic to the Frontend docker container
+    location / {
+        proxy_pass http://127.0.0.1:8090;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 ```
 
-The application refuses to start if enforcement is enabled without a secret. `BACKEND_PUBLIC_URL` must use CloudFront because it is used to generate Google OAuth callback URLs.
-
-## 4. Deploy the frontend to Vercel
-
-Set:
-
-```env
-VITE_API_BASE_URL=https://d1234abc.cloudfront.net/api/v1
+Test your configuration and reload Nginx:
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
 ```
 
-Redeploy the Vercel project after changing this build-time variable.
+---
 
-## 5. Verify the deployment
+## 5. Promoting an Admin User
 
-- CloudFront `/api/v1/products` returns product data.
-- Different product query strings return their corresponding results.
-- Raw Render `/api/v1/products` returns `403`.
-- Raw Render `/api/v1/health` returns `200` for Render health checks.
-- Cart, address, order, authentication, and admin GET responses are not cached.
-- Admin product and category writes work through CloudFront.
-- Google OAuth redirects use the CloudFront hostname.
+To promote a registered user to administrator, open a Python interactive shell inside the backend container and run the database update:
 
-CloudFront responses can remain stale for up to their configured TTL after an admin mutation. This version intentionally relies on the short TTL instead of issuing CloudFront invalidations.
+1. Exec into the running backend container:
+   ```bash
+   docker exec -it ecomm_backend uv run python
+   ```
 
-## 6. Promote an administrator
+2. Copy and paste the following Python script (replacing `your-email@example.com` with the user's email):
+   ```python
+   import asyncio
+   from sqlalchemy import update
+   from app.db.session import async_session_factory
+   from app.db.models import User
 
-Open a Render shell for the backend and run `uv run python`, then execute:
+   async def promote(email: str):
+       async with async_session_factory() as db:
+           await db.execute(
+               update(User).where(User.email == email).values(is_admin=True)
+           )
+           await db.commit()
+           print(f"Successfully promoted {email} to admin!")
 
-```python
-import asyncio
-from sqlalchemy import update
-from app.db.session import async_session_factory
-from app.db.models import User
+   asyncio.run(promote("your-email@example.com"))
+   ```
+3. Type `exit()` or press `Ctrl+D` to exit the python shell.
 
-async def promote(email: str):
-    async with async_session_factory() as db:
-        await db.execute(
-            update(User).where(User.email == email).values(is_admin=True)
-        )
-        await db.commit()
+---
 
-asyncio.run(promote("your-email@example.com"))
-```
+## 6. Restarting and Maintenance
+
+- **Stop the application:**
+  ```bash
+  docker compose down
+  ```
+- **Stop and remove database/redis volumes (Warning: resets all data):**
+  ```bash
+  docker compose down -v
+  ```
+- **Rebuild and restart after pulling code updates:**
+  ```bash
+  git pull
+  docker compose up -d --build
+  ```

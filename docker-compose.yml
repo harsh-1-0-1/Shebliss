@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: ecomm_postgres
+    container_name: shebliss_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-ecommerce}
@@ -12,7 +12,7 @@ services:
     # Not published to the host at all - only reachable by other
     # containers on this compose's internal network (via service name "postgres").
     # If you ever need to psql in manually from the VPS shell, use:
-    #   docker exec -it ecomm_postgres psql -U $POSTGRES_USER -d $POSTGRES_DB
+    #   docker exec -it shebliss_postgres psql -U $POSTGRES_USER -d $POSTGRES_DB
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -23,7 +23,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: ecomm_redis
+    container_name: shebliss_redis
     restart: unless-stopped
     volumes:
       - redis_data:/data
@@ -40,7 +40,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ecomm_backend
+    container_name: shebliss_backend
     restart: unless-stopped
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
@@ -97,7 +97,7 @@ services:
         VITE_RAZORPAY_KEY_ID: ${VITE_RAZORPAY_KEY_ID:-}
         VITE_CDN_BASE_URL: ${VITE_CDN_BASE_URL:-}
         VITE_CORPORATE_INQUIRY_ENDPOINT: ${VITE_CORPORATE_INQUIRY_ENDPOINT:-}
-    container_name: ecomm_frontend
+    container_name: shebliss_frontend
     restart: unless-stopped
     ports:
       # NOT port 80 - that's already owned by Hestia's nginx for all domains
