@@ -53,6 +53,7 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-7}
       ENVIRONMENT: ${ENVIRONMENT:-production}
       DEBUG: ${DEBUG:-false}
+      MAINTENANCE: ${MAINTENANCE:-false}
       LOG_JSON: ${LOG_JSON:-true}
       SLOW_QUERY_MS: ${SLOW_QUERY_MS:-100}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://my-store.example.com,https://www.my-store.example.com}

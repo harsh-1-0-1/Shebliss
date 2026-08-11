@@ -25,6 +25,7 @@ POSTGRES_PASSWORD=secure_db_password
 # --- Backend Configuration ---
 ENVIRONMENT=production
 DEBUG=false
+MAINTENANCE=false
 LOG_JSON=true
 SECRET_KEY=generate-a-long-random-string-for-security
 BACKEND_PUBLIC_URL=https://my-store.example.com
@@ -85,7 +86,7 @@ You can monitor the startup logs of all services to ensure they are healthy:
 ```bash
 docker compose logs -f
 ```
-The backend container (`ecomm_backend`) runs `backend/start.sh`, which automatically waits for PostgreSQL to become available and executes the database migrations (`uv run alembic upgrade head`) before starting the Uvicorn web server.
+The backend container (`shebliss_backend`) runs `backend/start.sh`, which automatically waits for PostgreSQL to become available and executes the database migrations (`uv run alembic upgrade head`) before starting the Uvicorn web server.
 
 ### Step 3: Seed Sample Data (Optional)
 If you want to populate the database with initial products, categories, and blogs:
@@ -148,7 +149,7 @@ To promote a registered user to administrator, open a Python interactive shell i
 
 1. Exec into the running backend container:
    ```bash
-   docker exec -it ecomm_backend uv run python
+   docker exec -it shebliss_backend uv run python
    ```
 
 2. Copy and paste the following Python script (replacing `your-email@example.com` with the user's email):
