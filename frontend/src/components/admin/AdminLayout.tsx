@@ -36,7 +36,7 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)]">
+    <div className="flex min-h-screen">
       {/* Desktop sidebar */}
       <aside className="w-56 shrink-0 bg-white border-r hidden md:block">
         <div className="p-4 border-b">

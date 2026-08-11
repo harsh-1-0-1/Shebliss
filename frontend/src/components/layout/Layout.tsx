@@ -43,7 +43,7 @@ export default function Layout() {
       </main>
       {!isAdminPath && <Footer />}
       {!isAdminPath && <BottomNav />}
-      <CartDrawer />
+      {!isAdminPath && <CartDrawer />}
       <AuthModal />
     </div>
   );

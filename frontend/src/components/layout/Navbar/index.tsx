@@ -69,6 +69,7 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
   const { user, openAuthModal, logout } = useAuthStore();
   const { itemCount, openDrawer } = useCartStore();
   const wishlistCount = useWishlistStore((s) => s.items.length);
@@ -196,13 +197,15 @@ export default function Navbar() {
         scrolled ? 'h-[60px] sm:h-[68px]' : 'h-[72px] sm:h-[80px] lg:h-[88px]',
       )}>
         {/* Hamburger (mobile) */}
-        <button
-          className="p-2 -ml-1 text-[#2B2421] hover:text-[#C6A15E] transition-colors touch-target lg:hidden"
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open menu"
-        >
-          <Menu size={22} strokeWidth={1.5} />
-        </button>
+        {!isAdminPath && (
+          <button
+            className="p-2 -ml-1 text-[#2B2421] hover:text-[#C6A15E] transition-colors touch-target lg:hidden"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={22} strokeWidth={1.5} />
+          </button>
+        )}
 
         {/* Logo — centred on mobile, left-flow on desktop */}
         <div className="absolute left-1/2 -translate-x-1/2 lg:relative lg:left-auto lg:translate-x-0 z-10">
@@ -210,7 +213,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop nav — centre */}
-        <nav className="hidden lg:flex items-center gap-0 mx-auto">
+        {!isAdminPath && <nav className="hidden lg:flex items-center gap-0 mx-auto">
           {NAV_ITEMS.map((item) => {
             const hasDD = !!(item.groups?.length);
             const isOpen = activeDropdown === item.label;
@@ -276,7 +279,7 @@ export default function Navbar() {
               </div>
             );
           })}
-        </nav>
+        </nav>}
 
         {/* Right icons */}
         <div className="flex items-center gap-0.5 ml-auto shrink-0">
@@ -289,23 +292,24 @@ export default function Navbar() {
             <Search size={19} strokeWidth={1.5} />
           </button>
 
-          {/* Wishlist */}
-          <Link
-            to="/wishlist"
-            className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
-            aria-label="Wishlist"
-          >
-            <Heart size={19} strokeWidth={1.5} />
-            {wishlistCount > 0 && (
-              <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {wishlistCount > 9 ? '9+' : wishlistCount}
-              </span>
-            )}
-          </Link>
+          {!isAdminPath && (
+            <Link
+              to="/wishlist"
+              className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+              aria-label="Wishlist"
+            >
+              <Heart size={19} strokeWidth={1.5} />
+              {wishlistCount > 0 && (
+                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {wishlistCount > 9 ? '9+' : wishlistCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* Account */}
           {user ? (
-            <div className="relative hidden lg:block">
+            <div className={clsx('relative', isAdminPath ? 'block' : 'hidden lg:block')}>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
@@ -345,26 +349,30 @@ export default function Navbar() {
           ) : (
             <button
               onClick={openAuthModal}
-              className="hidden lg:flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+              className={clsx(
+                'items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target',
+                isAdminPath ? 'flex' : 'hidden lg:flex',
+              )}
               aria-label="Login"
             >
               <User size={19} strokeWidth={1.5} />
             </button>
           )}
 
-          {/* Cart */}
-          <button
-            onClick={openDrawer}
-            className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
-            aria-label="Cart"
-          >
-            <ShoppingBag size={19} strokeWidth={1.5} />
-            {itemCount > 0 && (
-              <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {itemCount > 9 ? '9+' : itemCount}
-              </span>
-            )}
-          </button>
+          {!isAdminPath && (
+            <button
+              onClick={openDrawer}
+              className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+              aria-label="Cart"
+            >
+              <ShoppingBag size={19} strokeWidth={1.5} />
+              {itemCount > 0 && (
+                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {itemCount > 9 ? '9+' : itemCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -412,7 +420,7 @@ export default function Navbar() {
       </div>
 
       {/* ── Mobile Drawer ── */}
-      <div className={clsx('fixed inset-0 z-50 transition-all duration-500', drawerOpen ? 'visible' : 'invisible pointer-events-none')}>
+      {!isAdminPath && <div className={clsx('fixed inset-0 z-50 transition-all duration-500', drawerOpen ? 'visible' : 'invisible pointer-events-none')}>
         <div className={clsx('absolute inset-0 bg-black/50 transition-opacity duration-500', drawerOpen ? 'opacity-100' : 'opacity-0')} onClick={closeDrawer} />
         <div
           className={clsx(
@@ -553,7 +561,7 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* suppress unused var warning */}
     </header>
