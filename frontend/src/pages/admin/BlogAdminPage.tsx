@@ -373,7 +373,9 @@ export default function BlogAdminPage() {
                           onChange={handleImageChange}
                           className="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border file:text-xs file:font-semibold file:bg-primary-light/10 file:text-primary file:border-primary-light/20 hover:file:bg-primary-light/20 cursor-pointer"
                         />
-                        <p className="text-[9px] text-gray-400 mt-1">Recommended size: 1200x600px landscape format.</p>
+                        <p className="text-[10px] text-red-600 font-semibold mt-1">
+                          Recommended size: 1200x600px landscape. Keep the subject centered for mobile and desktop crops.
+                        </p>
                       </div>
                       {coverImagePreview && (
                         <div className="h-12 w-20 border rounded-lg overflow-hidden shrink-0 bg-gray-50">

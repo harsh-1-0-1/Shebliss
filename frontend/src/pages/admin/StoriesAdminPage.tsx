@@ -120,6 +120,9 @@ function StoryForm({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Custom Thumbnail (Image)
           </label>
+          <p className="text-[10px] text-red-600 font-semibold mb-2">
+            Recommended size: 1080x1920px vertical, or 1080x1080px square with centered subject for clean mobile story previews.
+          </p>
           <input
             type="file"
             accept="image/*"

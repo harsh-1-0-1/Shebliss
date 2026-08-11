@@ -829,6 +829,9 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-1.5 block">Upload Images (Files)</label>
+                  <p className="text-[10px] text-red-600 font-semibold mb-2">
+                    Recommended size: 1200x1200px square. Keep jewellery centered with padding so it looks good in product cards, desktop gallery, and mobile gallery.
+                  </p>
                   <div className="border-2 border-dashed border-gray-200 hover:border-primary/50 rounded-xl p-6 text-center transition-colors cursor-pointer relative">
                     <input
                       type="file"
@@ -1075,7 +1078,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                                 /* Clickable image thumbnail / upload trigger — shows first image */
                                 <label
                                   className={`relative h-10 w-10 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 shrink-0 flex items-center justify-center cursor-pointer hover:border-primary/60 transition group ${uploadingOptionImage === opt.id ? 'opacity-60 pointer-events-none' : ''}`}
-                                  title={opt.image_urls[0] ? 'Add more images below' : 'Upload image'}
+                                  title="Recommended size: 1200x1200px square. Center the jewellery for mobile and desktop views."
                                 >
                                   {uploadingOptionImage === opt.id ? (
                                     <Loader2 size={14} className="animate-spin text-primary" />
@@ -1157,7 +1160,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                               {isColourGroup && (
                                 <label
                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border bg-gray-50 text-[11px] font-medium text-primary cursor-pointer hover:bg-green-50 shrink-0 ${uploadingOptionImage === opt.id ? 'opacity-60 pointer-events-none' : ''}`}
-                                  title="Upload colour photo"
+                                  title="Recommended size: 1200x1200px square. Center the jewellery for mobile and desktop views."
                                 >
                                   {uploadingOptionImage === opt.id
                                     ? <Loader2 size={12} className="animate-spin" />
@@ -1218,6 +1221,9 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                           <p className="text-[10px] text-gray-400 mt-0.5">
                             Upload a photo for each combination — shown in the gallery when that exact combo is selected.
                             Combinations without a photo fall back to the colour option's image, then the default image.
+                          </p>
+                          <p className="text-[10px] text-red-600 font-semibold mt-1">
+                            Recommended size: 1200x1200px square. Keep the exact variant centered for mobile and desktop galleries.
                           </p>
                         </div>
                         {hasAnyComboImage && (
@@ -1337,7 +1343,9 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                 {/* Default Fallback Image */}
                 <div className="border-t pt-4 space-y-2">
                   <label className="text-xs font-semibold text-gray-700 block">Default Variant Image</label>
-                  <p className="text-[10px] text-gray-400">Fallback shown if a selected option has no image of its own.</p>
+                  <p className="text-[10px] text-red-600 font-semibold">
+                    Recommended size: 1200x1200px square. Fallback shown if a selected option has no image of its own.
+                  </p>
                   <div className="flex gap-3 items-center">
                     <div className="h-16 w-16 rounded-lg border overflow-hidden bg-white shrink-0 flex items-center justify-center">
                       {defaultImageUrl

@@ -398,6 +398,9 @@ export default function CategoriesAdminPage() {
                       </div>
                     )}
                   </div>
+                  <p className="text-[10px] text-red-600 font-semibold">
+                    Recommended size: 600x600px square. Center the product/category so it looks clean on mobile circles and desktop tiles.
+                  </p>
                 </div>
               )}
 
@@ -411,6 +414,9 @@ export default function CategoriesAdminPage() {
                     placeholder="https://..."
                     className="w-full px-2.5 py-1.5 text-xs border rounded-lg focus:outline-none"
                   />
+                  <p className="text-[10px] text-red-600 font-semibold">
+                    Recommended size: 600x600px square. Center the product/category so it looks clean on mobile circles and desktop tiles.
+                  </p>
                   {urlValid === true && (
                     <p className="text-[10px] text-green-600 flex items-center gap-1 font-semibold">
                       <CheckCircle size={11} /> Image loaded

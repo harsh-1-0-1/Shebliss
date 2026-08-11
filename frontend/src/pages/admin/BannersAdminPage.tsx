@@ -835,9 +835,17 @@ function BannerDrawer({
                             <p className="text-[10px] text-gray-400 mt-0.5">
                               Drag file or click to select
                             </p>
+                            <p className="text-[10px] text-red-600 font-semibold mt-1">
+                              {activePlacementDetails.helpText}
+                            </p>
                           </div>
                         )}
                       </div>
+                      {filePreview && (
+                        <p className="text-[10px] text-red-600 font-semibold mt-1">
+                          {activePlacementDetails.helpText}
+                        </p>
+                      )}
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -867,6 +875,9 @@ function BannerDrawer({
                         placeholder="e.g. https://images.unsplash.com/..."
                         className={inputClass}
                       />
+                      <p className="text-[10px] text-red-600 font-semibold mt-1">
+                        {activePlacementDetails.helpText}
+                      </p>
                       {urlValid === true && (
                         <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                           <CheckCircle size={12} /> Image URL loaded successfully
@@ -1112,7 +1123,7 @@ export default function BannersAdminPage() {
         <div>
           <h3 className="font-bold text-sm text-gray-800">{activePlacementInfo.label}</h3>
           <p className="text-xs text-gray-500 mt-0.5">{activePlacementInfo.description}</p>
-          <p className="text-[11px] text-[#0e4d3a] font-semibold mt-1.5 flex items-center gap-1">
+          <p className="text-[11px] text-red-600 font-semibold mt-1.5 flex items-center gap-1">
             <Info size={12} /> {activePlacementInfo.helpText}
           </p>
         </div>
