@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -21,24 +21,29 @@
   --color-text:          #2B2421;
 }
 
+:root {
+  --font-heading: 'Cormorant Garamond', 'Playfair Display', 'Georgia', serif;
+  --font-ui: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   @apply bg-bone text-espresso antialiased;
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-ui);
   -webkit-tap-highlight-color: transparent;
 }
 
 /* ── Typography ───────────────────────────────────────── */
 h1, h2, h3, .font-display {
-  font-family: 'Cormorant Garamond', 'Playfair Display', 'Georgia', serif;
+  font-family: var(--font-heading);
   letter-spacing: 0.02em;
 }
 
 .font-body {
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Prevent iOS auto-zoom */
@@ -143,7 +148,7 @@ body.overflow-hidden {
 .btn-gold {
   background-color: #C6A15E;
   color: #1A1A1A;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -160,7 +165,7 @@ body.overflow-hidden {
 .btn-ink {
   background-color: #1A1A1A;
   color: #F9F8F6;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -179,7 +184,7 @@ body.overflow-hidden {
   background: transparent;
   border: 1.5px solid #1A1A1A;
   color: #1A1A1A;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;

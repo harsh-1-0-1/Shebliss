@@ -53,6 +53,16 @@ function HeroSkeleton() {
   );
 }
 
+function isLightColor(hex?: string) {
+  if (!hex) return false;
+  const h = hex.replace('#', '');
+  if (h.length < 6) return false;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 150;
+}
+
 export default function HeroBanner() {
   const { data: banners = [], isLoading } = useBanners('hero');
   const slides = banners.length > 0 ? banners : FALLBACK_SLIDES;
@@ -74,6 +84,7 @@ export default function HeroBanner() {
 
   const slide = slides[current];
   const titleLines = slide.title?.split('\n') ?? [];
+  const lightTheme = isLightColor(slide.text_color);
 
   return (
     <section
@@ -96,12 +107,12 @@ export default function HeroBanner() {
         {slides.map((s, i) => (
           <div
             key={s.id ?? i}
-            className="w-full shrink-0 relative flex flex-col lg:flex-row"
-            style={{ backgroundColor: s.bg_color || '#EFECE6', minHeight: 'clamp(480px, 62vh, 660px)' }}
+            className="w-full shrink-0 relative flex flex-col lg:flex-row overflow-hidden"
+            style={{ backgroundColor: s.bg_color || '#EFECE6', minHeight: 'clamp(520px, 84vh, 700px)' }}
             aria-hidden={i !== current}
           >
             {/* Left panel — editorial photo (60%) */}
-            <div className="relative w-full lg:w-[60%] overflow-hidden" style={{ minHeight: 'clamp(280px, 45vw, 560px)' }}>
+            <div className="relative w-full lg:w-[60%] overflow-hidden aspect-[4/3] lg:aspect-auto lg:min-h-[clamp(280px,45vw,560px)]">
               {s.image_url && (
                 <img
                   src={s.image_url}
@@ -111,27 +122,26 @@ export default function HeroBanner() {
                   loading={i === 0 ? 'eager' : 'lazy'}
                 />
               )}
-              {/* Subtle gradient for text readability on mobile */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent lg:hidden" />
+              {/* Contrast overlay for text readability on mobile */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/15 to-transparent lg:hidden" />
             </div>
 
             {/* Right panel — typography (40%) */}
             <div
-              className="w-full lg:w-[40%] flex flex-col justify-center px-8 sm:px-12 lg:px-14 xl:px-16 py-10 lg:py-0"
+              className="w-full lg:w-[40%] flex flex-1 lg:flex-none flex-col justify-center px-4 py-5 sm:px-6 sm:py-6 lg:px-14 xl:px-16 lg:py-0 overflow-hidden"
               style={{ backgroundColor: s.bg_color || '#EFECE6' }}
             >
               {s.badge_text && (
-                <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-4">
+                <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-[#C6A15E] mb-1.5 lg:mb-4">
                   {s.badge_text}
                 </span>
               )}
 
               <h1
-                className="leading-[1.06] tracking-[0.02em]"
+                className="text-[1.75rem] lg:text-[clamp(2.4rem,4.5vw,4rem)] leading-[1.15] lg:leading-[1.06] tracking-[0.02em] mb-2 lg:mb-0"
                 style={{
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
                   fontWeight: 600,
-                  fontSize: 'clamp(2.4rem, 4.5vw, 4rem)',
                   color: s.text_color || '#1A1A1A',
                 }}
               >
@@ -141,7 +151,10 @@ export default function HeroBanner() {
               </h1>
 
               {s.subtitle && (
-                <p className="mt-5 text-[13px] sm:text-[14px] leading-relaxed text-[#767676] max-w-xs font-body">
+                <p className={clsx(
+                  'mt-3 lg:mt-5 text-[12px] sm:text-[14px] leading-[1.4] max-w-xs font-body line-clamp-2 lg:line-clamp-none',
+                  lightTheme ? 'text-[#F8F4EC]/75' : 'text-[#767676]',
+                )}>
                   {s.subtitle}
                 </p>
               )}
@@ -149,7 +162,12 @@ export default function HeroBanner() {
               {s.cta_text && s.cta_link && (
                 <Link
                   to={s.cta_link}
-                  className="mt-8 inline-flex items-center gap-3 w-fit px-8 py-3.5 border border-[#1A1A1A] text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors duration-300 group/btn"
+                  className={clsx(
+                    'mt-5 lg:mt-8 inline-flex items-center gap-3 w-fit px-[18px] py-[10px] sm:px-8 sm:py-3.5 border text-[11px] font-semibold tracking-[0.18em] uppercase transition-colors duration-300 group/btn',
+                    lightTheme
+                      ? 'border-[#F8F4EC] text-[#F8F4EC] hover:bg-[#F8F4EC] hover:text-[#1A1A1A]'
+                      : 'border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6]',
+                  )}
                 >
                   {s.cta_text}
                   <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
@@ -158,7 +176,7 @@ export default function HeroBanner() {
 
               {/* Slide counter */}
               {slides.length > 1 && (
-                <div className="flex items-center gap-3 mt-10">
+                <div className="flex items-center gap-3 mt-8 lg:mt-10">
                   {slides.map((_, idx) => (
                     <button
                       key={idx}
@@ -167,8 +185,8 @@ export default function HeroBanner() {
                       className={clsx(
                         'transition-all duration-300',
                         idx === current
-                          ? 'w-8 h-[2px] bg-[#1A1A1A]'
-                          : 'w-3 h-[2px] bg-[#1A1A1A]/25 hover:bg-[#1A1A1A]/50',
+                          ? `w-8 h-[2px] ${lightTheme ? 'bg-[#F8F4EC]' : 'bg-[#1A1A1A]'}`
+                          : `w-3 h-[2px] ${lightTheme ? 'bg-[#F8F4EC]/25 hover:bg-[#F8F4EC]/50' : 'bg-[#1A1A1A]/25 hover:bg-[#1A1A1A]/50'}`,
                       )}
                     />
                   ))}

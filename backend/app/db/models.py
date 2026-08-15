@@ -114,6 +114,23 @@ class ProductReview(Base):
     user: Mapped["User | None"] = relationship(back_populates="reviews")
 
 
+class Testimonial(Base):
+    __tablename__ = "testimonials"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
+    quote: Mapped[str] = mapped_column(Text, nullable=False)
+    item_purchased: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    location: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
 class Cart(Base):
     __tablename__ = "carts"
     __table_args__ = (

@@ -32,7 +32,7 @@ function Logo({ onClick }: { onClick?: () => void }) {
       </span>
       <span
         className="text-[7px] tracking-[0.35em] uppercase text-[#767676] mt-0.5 font-body"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+        style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         Fine Artificial Jewellery
       </span>
@@ -282,11 +282,11 @@ export default function Navbar() {
         </nav>}
 
         {/* Right icons */}
-        <div className="flex items-center gap-0.5 ml-auto shrink-0">
+        <div className="flex items-center gap-0 ml-auto shrink-0">
           {/* Search */}
           <button
             onClick={() => { setSearchOpen((v) => { if (!v) setTimeout(() => document.querySelector<HTMLInputElement>('.nav-search-input')?.focus(), 50); return !v; }); }}
-            className="flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+            className="flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors"
             aria-label="Search"
           >
             <Search size={19} strokeWidth={1.5} />
@@ -295,7 +295,7 @@ export default function Navbar() {
           {!isAdminPath && (
             <Link
               to="/wishlist"
-              className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+              className="relative flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors"
               aria-label="Wishlist"
             >
               <Heart size={19} strokeWidth={1.5} />
@@ -362,7 +362,7 @@ export default function Navbar() {
           {!isAdminPath && (
             <button
               onClick={openDrawer}
-              className="relative flex items-center justify-center w-10 h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors touch-target"
+              className="relative flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 text-[#2B2421]/70 hover:text-[#1A1A1A] transition-colors"
               aria-label="Cart"
             >
               <ShoppingBag size={19} strokeWidth={1.5} />

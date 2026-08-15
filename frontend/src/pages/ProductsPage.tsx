@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
-import { useBanners } from '@/hooks/useBanners';
 import ProductCard from '@/components/product/ProductCard';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
@@ -35,82 +34,6 @@ const MATERIAL_TAGS = [
 
 function titleCase(s: string) {
   return s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-// Inline editorial banner that replaces a grid slot every ~10 products.
-// Backed by the "page" banner placement; falls back to static copy when no banner is set.
-function InlineEditorialBanner() {
-  const { data: banners = [] } = useBanners('page');
-  const banner = banners.find((b) => b.is_active) ?? banners[0];
-
-  if (!banner) {
-    return (
-      <div
-        className="col-span-2 sm:col-span-3 lg:col-span-5 overflow-hidden flex flex-col sm:flex-row items-center gap-0"
-        style={{ backgroundColor: '#1A1A1A', minHeight: '180px' }}
-      >
-        <img
-          src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=300&fit=crop&crop=center&q=80"
-          alt=""
-          className="w-full sm:w-64 h-44 sm:h-full object-cover shrink-0"
-          loading="lazy"
-        />
-        <div className="px-8 sm:px-10 py-10 flex flex-col justify-center gap-2">
-          <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E]">Craftsmanship</p>
-          <p
-            className="text-xl sm:text-2xl text-[#F9F8F6] leading-snug"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}
-          >
-            Sustainably sourced,<br />hand-selected.
-          </p>
-          <p className="text-[12px] text-[#F9F8F6]/50 font-body leading-relaxed max-w-sm mt-1">
-            Every piece begins with ethically chosen materials and ends with hands that care.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <a
-      href={banner.cta_link || '/products'}
-      className="col-span-2 sm:col-span-3 lg:col-span-5 overflow-hidden flex flex-col sm:flex-row items-center gap-0"
-      style={{ backgroundColor: banner.bg_color || '#1A1A1A', minHeight: '180px' }}
-    >
-      {banner.image_url ? (
-        <img
-          src={banner.image_url}
-          alt={banner.title}
-          className="w-full sm:w-64 h-44 sm:h-full object-cover shrink-0"
-          loading="lazy"
-        />
-      ) : (
-        <div className="w-full sm:w-64 h-44 sm:h-full shrink-0" />
-      )}
-      <div className="px-8 sm:px-10 py-10 flex flex-col justify-center gap-2">
-        {banner.badge_text && (
-          <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E]">{banner.badge_text}</p>
-        )}
-        <p
-          className="text-xl sm:text-2xl leading-snug"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, color: banner.text_color || '#F9F8F6' }}
-        >
-          {banner.title}
-        </p>
-        {banner.subtitle && (
-          <p
-            className="text-[12px] font-body leading-relaxed max-w-sm mt-1"
-            style={{ color: banner.text_color || '#F9F8F6' }}
-          >
-            {banner.subtitle}
-          </p>
-        )}
-        {banner.cta_text && (
-          <span className="mt-2 text-[10px] font-bold tracking-[0.18em] uppercase text-[#C6A15E]">{banner.cta_text} →</span>
-        )}
-      </div>
-    </a>
-  );
 }
 
 interface FilterProps {
@@ -312,13 +235,7 @@ export default function ProductsPage() {
     onReset: resetFilters,
   };
 
-  // Build product rows, inserting editorial banner every 12 items
   const items = data?.items ?? [];
-  const gridItems: Array<{ type: 'product'; index: number } | { type: 'banner' }> = [];
-  items.forEach((_, i) => {
-    if (i > 0 && i % 12 === 0) gridItems.push({ type: 'banner' });
-    gridItems.push({ type: 'product', index: i });
-  });
 
   return (
     <div ref={topRef} style={{ backgroundColor: '#F9F8F6' }}>
@@ -402,13 +319,9 @@ export default function ProductsPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
-                  {gridItems.map((gi, idx) =>
-                    gi.type === 'banner' ? (
-                      <InlineEditorialBanner key={`banner-${idx}`} />
-                    ) : (
-                      <ProductCard key={items[gi.index].id} product={items[gi.index]} />
-                    )
-                  )}
+                  {items.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
                 </div>
               )}
             </ErrorBoundary>

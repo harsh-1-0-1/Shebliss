@@ -78,7 +78,7 @@ export default function EditorialCollection() {
 
             <Link
               to="/products?tags=best-seller"
-              className="inline-flex items-center gap-3 w-fit px-8 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.18em] uppercase hover:bg-[#2B2421] transition-colors group/btn"
+              className="inline-flex items-center gap-3 w-fit px-8 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-semibold tracking-[0.18em] uppercase hover:bg-[#2B2421] transition-colors group/btn"
             >
               Shop the Collection
               <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />

@@ -134,8 +134,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Product name */}
         <h3
-          className="text-[14px] sm:text-[15px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors duration-200"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, letterSpacing: '0.02em' }}
+          className="text-[14px] sm:text-[15px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors duration-200 font-body"
+          style={{ fontWeight: 500, letterSpacing: '0.02em' }}
         >
           {product.name}
         </h3>

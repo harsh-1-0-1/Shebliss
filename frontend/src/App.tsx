@@ -34,6 +34,7 @@ import UsersAdminPage from '@/pages/admin/UsersAdminPage';
 import BannersAdminPage from '@/pages/admin/BannersAdminPage';
 import BlogAdminPage from '@/pages/admin/BlogAdminPage';
 import StoriesAdminPage from '@/pages/admin/StoriesAdminPage';
+import TestimonialsAdminPage from '@/pages/admin/TestimonialsAdminPage';
 import CorporateAdminPage from '@/pages/admin/CorporateAdminPage';
 import CouponsAdminPage from '@/pages/admin/CouponsAdminPage';
 import DamageClaimsAdminPage from '@/pages/admin/DamageClaimsAdminPage';
@@ -126,6 +127,7 @@ export default function App() {
                 <Route path="users" element={<UsersAdminPage />} />
                 <Route path="banners" element={<BannersAdminPage />} />
                 <Route path="stories" element={<StoriesAdminPage />} />
+                <Route path="testimonials" element={<TestimonialsAdminPage />} />
                 <Route path="blog" element={<BlogAdminPage />} />
                 <Route path="corporate" element={<CorporateAdminPage />} />
                 <Route path="coupons" element={<CouponsAdminPage />} />

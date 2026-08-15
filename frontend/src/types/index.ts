@@ -376,6 +376,21 @@ export interface Story {
   linked_product?: StoryProductInfo | null;
 }
 
+export interface Testimonial {
+  id: number;
+  name: string;
+  rating: number;
+  quote: string;
+  item_purchased?: string | null;
+  location?: string | null;
+  avatar_url?: string | null;
+  is_verified: boolean;
+  is_featured: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+}
+
 export interface StoreSettings {
   id: number;
   store_name: string;

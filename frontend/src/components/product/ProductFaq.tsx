@@ -40,7 +40,7 @@ export default function ProductFaq({ faqs }: ProductFaqProps) {
           <h2
             id="product-faqs-title"
             className="text-2xl font-bold tracking-normal text-gray-950 sm:text-3xl"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
           >
             Frequently Asked Questions
           </h2>

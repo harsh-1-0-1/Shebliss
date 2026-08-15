@@ -94,7 +94,7 @@ export default function Footer() {
                 className="flex-1 px-4 py-3 bg-white/8 border border-white/15 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#C6A15E] transition-colors"
                 style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
               />
-              <button type="submit" className="px-5 py-3 bg-[#C6A15E] text-[#1A1A1A] text-xs font-bold tracking-[0.12em] uppercase hover:bg-[#b8913e] transition-colors flex items-center gap-1.5 whitespace-nowrap">
+              <button type="submit" className="px-5 py-3 bg-[#C6A15E] text-[#1A1A1A] text-xs font-semibold tracking-[0.12em] uppercase hover:bg-[#b8913e] transition-colors flex items-center gap-1.5 whitespace-nowrap">
                 Subscribe <ArrowRight size={13} />
               </button>
             </form>
@@ -130,7 +130,7 @@ export default function Footer() {
           {/* Link columns */}
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C6A15E] mb-4">{col.title}</h4>
+              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C6A15E] mb-4">{col.title}</h4>
               <ul className="space-y-2.5">
                 {col.links.map((lk) => (
                   <li key={lk.label}>
@@ -155,7 +155,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10">
         <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
-          <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved. Thinking Web Technology</span>
           <div className="flex items-center gap-2">
             {['VISA', 'MASTERCARD', 'UPI', 'RAZORPAY'].map((m) => (
               <span key={m} className="px-2 py-0.5 border border-white/10 text-[9px] font-bold tracking-wider">{m}</span>

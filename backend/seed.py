@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.core.security import hash_password
 from app.db.models import (
     Address, Banner, BlogCategory, BlogPost, Cart, CartItem,
-    Category, Order, OrderItem, Product, ProductReview, User,
+    Category, Order, OrderItem, Product, ProductReview, Testimonial, User,
 )
 
 
@@ -390,6 +390,7 @@ async def seed() -> None:
         await db.execute(Order.__table__.delete())
         await db.execute(Address.__table__.delete())
         await db.execute(ProductReview.__table__.delete())
+        await db.execute(Testimonial.__table__.delete())
         await db.execute(Banner.__table__.delete())
         await db.execute(Product.__table__.delete())
         await db.execute(Category.__table__.delete())
@@ -544,11 +545,81 @@ async def seed() -> None:
         ]
         db.add_all(banners_seed)
 
+        testimonials_seed = [
+            Testimonial(
+                name="Ananya Sharma",
+                rating=5,
+                quote="The Kundan set looks even better in person! Wore it to a wedding for 8 hours and it didn't feel heavy at all. Truly anti-tarnish.",
+                item_purchased="Layered Kundan Choker",
+                location="Mumbai",
+                is_verified=True,
+                is_featured=True,
+                is_active=True,
+                sort_order=0,
+            ),
+            Testimonial(
+                name="Priya Deshmukh",
+                rating=5,
+                quote="Looks just like real gold. I've had compliments every single time I wear it — nobody believes it's artificial.",
+                item_purchased="Signature Jewellery Gift Box",
+                location="Pune",
+                is_verified=True,
+                is_featured=True,
+                is_active=True,
+                sort_order=1,
+            ),
+            Testimonial(
+                name="Ritika Mehta",
+                rating=5,
+                quote="The gift box presentation was stunning — it arrived like a luxury parcel. Made the perfect anniversary gift for my mother.",
+                item_purchased="Bridal Temple Necklace Set",
+                location="Delhi",
+                is_verified=True,
+                is_featured=True,
+                is_active=True,
+                sort_order=2,
+            ),
+            Testimonial(
+                name="Sneha Kulkarni",
+                rating=5,
+                quote="Super lightweight for long events. I danced the whole reception and the jhumkas stayed comfortable all night.",
+                item_purchased="Chandelier Jhumka Earrings",
+                location="Bengaluru",
+                is_verified=True,
+                is_featured=False,
+                is_active=True,
+                sort_order=3,
+            ),
+            Testimonial(
+                name="Kavya Iyer",
+                rating=4,
+                quote="Fast delivery and beautiful finish. The anti-tarnish coating is the real deal — still shiny after months of use.",
+                item_purchased="Meenakari Bangles",
+                location="Chennai",
+                is_verified=True,
+                is_featured=False,
+                is_active=True,
+                sort_order=4,
+            ),
+            Testimonial(
+                name="Neha Gupta",
+                rating=5,
+                quote="Ordered three sets for my sister's sangeet. The whole family asked where I got them. Absolutely worth it.",
+                item_purchased="Rani Haar & Maang Tikka Set",
+                location="Jaipur",
+                is_verified=True,
+                is_featured=False,
+                is_active=True,
+                sort_order=5,
+            ),
+        ]
+        db.add_all(testimonials_seed)
+
         await db.commit()
         print(
             f"\nSeeded 1 admin, {len(CATEGORIES)} categories, "
             f"{len(PRODUCTS)} products, {len(BLOG_POSTS)} blog posts, "
-            f"and {len(banners_seed)} banners."
+            f"{len(banners_seed)} banners, and {len(testimonials_seed)} testimonials."
         )
 
 

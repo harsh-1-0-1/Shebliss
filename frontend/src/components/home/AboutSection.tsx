@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const SERIF = "'Playfair Display', Georgia, serif";
+const SERIF = "'Cormorant Garamond', Georgia, serif";
 
 const A = ({ to, children }: { to: string; children: React.ReactNode }) => (
   <Link
