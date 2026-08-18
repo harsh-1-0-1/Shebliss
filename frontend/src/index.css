@@ -9,6 +9,9 @@
   --color-gold:       #C6A15E;   /* champagne gold accent  */
   --color-slate:      #767676;   /* muted / metadata text  */
   --color-ink:        #1A1A1A;   /* dark UI elements       */
+  --color-forest:     #14342B;   /* rich dark bg (hero/footer/full-bleed) */
+  --color-rust:       #C1502E;   /* CTA / action color     */
+  --color-sale:       #C1502E;   /* alias of rust — discount/price accent */
 
   /* Legacy aliases kept so admin & old code doesn't break */
   --color-primary:       #1A1A1A;

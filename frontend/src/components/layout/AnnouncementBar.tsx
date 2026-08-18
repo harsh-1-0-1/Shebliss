@@ -54,7 +54,7 @@ export default function AnnouncementBar() {
   return (
     <div
       className="relative w-full flex items-center overflow-hidden"
-      style={{ backgroundColor: '#1A1A1A', height: '36px' }}
+      style={{ backgroundColor: '#14342B', height: '36px' }}
     >
       {/* Scrolling text strip */}
       <div className="flex-1 overflow-hidden">

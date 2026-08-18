@@ -13,6 +13,8 @@ VALID_PLACEMENTS = frozenset({
     "mobile_promo",
     "corporate_gifting",
     "customer_photos",
+    "reels",
+    "home_collection",
     "product_detail",
     "product_spec",
 })
@@ -34,6 +36,7 @@ class BannerBase(BaseModel):
         pattern=_PLACEMENT_PATTERN,
     )
     target_path: Optional[str] = Field(None, max_length=255)
+    products_tag: Optional[str] = Field(None, max_length=100)
     is_active: bool = True
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None

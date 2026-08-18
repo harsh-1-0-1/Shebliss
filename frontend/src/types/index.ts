@@ -312,6 +312,8 @@ export type BannerPlacement =
   | 'mobile_promo'
   | 'corporate_gifting'
   | 'customer_photos'
+  | 'reels'
+  | 'home_collection'
   | 'product_detail'
   | 'product_spec';
 
@@ -328,6 +330,7 @@ export interface Banner {
   position: number;
   placement: BannerPlacement;
   target_path?: string | null;
+  products_tag?: string | null;
   is_active: boolean;
   valid_from?: string;
   valid_until?: string;
@@ -373,6 +376,7 @@ export interface Story {
   linked_product_id?: number | null;
   display_order: number;
   is_active: boolean;
+  is_placeholder?: boolean;
   linked_product?: StoryProductInfo | null;
 }
 

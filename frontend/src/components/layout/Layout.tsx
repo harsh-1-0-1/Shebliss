@@ -5,6 +5,8 @@ import Footer from './Footer';
 import BottomNav from './BottomNav';
 import CartDrawer from '@/components/cart/CartDrawer';
 import AuthModal from '@/components/auth/AuthModal';
+import QuickViewModal from '@/components/product/QuickViewModal';
+import FloatingWhatsAppButton from '@/components/corporate/FloatingWhatsAppButton';
 import { useAuthStore } from '@/store/authStore';
 import MaintenancePage from '@/pages/MaintenancePage';
 
@@ -44,6 +46,8 @@ export default function Layout() {
       {!isAdminPath && <Footer />}
       {!isAdminPath && <BottomNav />}
       {!isAdminPath && <CartDrawer />}
+      {!isAdminPath && <FloatingWhatsAppButton />}
+      <QuickViewModal />
       <AuthModal />
     </div>
   );

@@ -69,6 +69,7 @@ async def create_story(
     linked_product_id: Optional[int] = Form(None),
     display_order: int = Form(0),
     is_active: bool = Form(True),
+    is_placeholder: Optional[bool] = Form(None),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -88,6 +89,7 @@ async def create_story(
         linked_product_id=resolved_product_id,
         display_order=display_order,
         is_active=is_active,
+        is_placeholder=bool(is_placeholder),
     )
     db.add(story)
     await db.flush()
@@ -116,6 +118,7 @@ async def update_story(
     linked_product_id: Optional[int] = Form(None),
     display_order: Optional[int] = Form(None),
     is_active: Optional[bool] = Form(None),
+    is_placeholder: Optional[bool] = Form(None),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -153,6 +156,8 @@ async def update_story(
         story.display_order = display_order
     if is_active is not None:
         story.is_active = is_active
+    if is_placeholder is not None:
+        story.is_placeholder = is_placeholder
 
     await db.flush()
     if linked_product_id is not None:

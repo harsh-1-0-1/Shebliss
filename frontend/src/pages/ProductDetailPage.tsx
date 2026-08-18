@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus, ShoppingCart, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, ShoppingBag, ChevronLeft, ChevronRight, AlertTriangle, ZoomIn } from 'lucide-react';
+import { ZoomableImage, ImageLightbox } from '@/components/product/ImageZoom';
 import toast from 'react-hot-toast';
 import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useProductReviews } from '@/hooks/useReviews';
 import { useCartStore } from '@/store/cartStore';
+import { useCurrencyStore } from '@/store/currencyStore';
+import { useFloatingUi } from '@/store/useFloatingUi';
 import ProductCard from '@/components/product/ProductCard';
+import VariantPicker from '@/components/product/VariantPicker';
+import TrustFeatureGrid from '@/components/product/TrustFeatureGrid';
 import ProductTagBadges from '@/components/product/ProductTagBadges';
 import ProductReviews, { ProductRatingInline } from '@/components/product/ProductReviews';
 import ProductSpecification from '@/components/product/ProductSpecification';
@@ -16,10 +21,11 @@ import { useBanners } from '@/hooks/useBanners';
 import { STORE_LEGAL } from '@/lib/branding';
 import Spinner from '@/components/ui/Spinner';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
-import type { Banner, Category, VariantGroup, VariantOption } from '@/types';
+import type { Banner, Category, VariantOption } from '@/types';
 import { useStories } from '@/hooks/useStories';
 import { StoriesCarousel } from '@/components/stories/StoriesCarousel';
 import { getApiErrorDetail } from '@/lib/apiError';
+import { buildComboRows } from '@/lib/variants';
 
 
 function findCategoryName(categories: Category[] | undefined, categoryId: number): string {
@@ -39,30 +45,8 @@ function findCategoryName(categories: Category[] | undefined, categoryId: number
   return (search(categories) || 'Jewellery').toUpperCase();
 }
 
-// Full cartesian product of variant groups → combo rows (cap guards pathological products,
-// matching the admin combos table cap). Each row carries the per-group option map so
-// visibility/auto-select can be computed without re-walking the matrix.
-function buildComboRows(
-  groups: VariantGroup[],
-  cap = 50,
-): { key: string; groupOption: Record<string, string> }[] {
-  let rows: { key: string; groupOption: Record<string, string> }[] = [{ key: '', groupOption: {} }];
-  outer: for (const group of groups) {
-    const options = group?.options ?? [];
-    const next: { key: string; groupOption: Record<string, string> }[] = [];
-    for (const row of rows) {
-      for (const opt of options) {
-        if (next.length >= cap) break outer;
-        next.push({
-          key: row.key ? `${row.key}__${opt.id}` : opt.id,
-          groupOption: { ...row.groupOption, [group.id]: opt.id },
-        });
-      }
-    }
-    rows = next;
-  }
-  return rows;
-}
+// Full cartesian product of variant groups → combo rows is shared from @/lib/variants
+// (used here for auto-select and by the shared VariantPicker for visibility/selection).
 
 function findCategoryTrail(categories: Category[] | undefined, categoryId: number): Category[] {
   if (!categories?.length) return [];
@@ -206,6 +190,7 @@ function MobileGallery({
   const trackRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   const EASING = 'transform 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
@@ -375,6 +360,7 @@ function MobileGallery({
               className="w-full aspect-square object-cover"
               loading="lazy"
               draggable={false}
+              onClick={() => setLightboxSrc(img)}
             />
           </div>
         ))}
@@ -403,6 +389,19 @@ function MobileGallery({
           <ChevronRight size={20} />
         </button>
       )}
+
+      {/* Tap image or this button to open the fullscreen zoom viewer */}
+      <button
+        onClick={() => setLightboxSrc(list[activeIndex])}
+        className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
+        aria-label="Zoom in"
+      >
+        <ZoomIn size={14} /> Zoom
+      </button>
+
+      {lightboxSrc && (
+        <ImageLightbox src={lightboxSrc} alt={`Product image ${activeIndex + 1}`} onClose={() => setLightboxSrc(null)} />
+      )}
     </div>
   );
 }
@@ -417,11 +416,25 @@ function DesktopGallery({
   onActiveChange: (i: number) => void;
 }) {
   const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   return (
     <div className="space-y-3">
-      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50">
-        <img src={list[activeIndex]} alt="Product" className="w-full h-full object-cover" loading="lazy" />
+      <div className="relative">
+        <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50">
+          <ZoomableImage
+            src={list[activeIndex]}
+            alt="Product"
+            className="rounded-2xl"
+          />
+        </div>
+        {/* Zoom hint + open viewer */}
+        <button
+          onClick={() => setLightboxSrc(list[activeIndex])}
+          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
+        >
+          <ZoomIn size={13} /> Zoom
+        </button>
       </div>
       {list.length > 1 && (
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -435,6 +448,10 @@ function DesktopGallery({
             </button>
           ))}
         </div>
+      )}
+
+      {lightboxSrc && (
+        <ImageLightbox src={lightboxSrc} alt="Product" onClose={() => setLightboxSrc(null)} />
       )}
     </div>
   );
@@ -488,6 +505,8 @@ export default function ProductDetailPage() {
   const { data: categories } = useCategories();
   const addItem = useCartStore((s) => s.addItem);
   const navigate = useNavigate();
+  const { format } = useCurrencyStore();
+  const setPdpBarVisible = useFloatingUi((s) => s.setPdpBarVisible);
   const [qty, setQty] = useState(1);
   // New: selectedOptions maps groupId → optionId for the new flexible variant system
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -505,6 +524,12 @@ export default function ProductDetailPage() {
   useEffect(() => {
     isInitialized.current = false;
   }, [slug]);
+
+  // Signal the floating-element store so the WhatsApp bubble clears the sticky CTA bar.
+  useEffect(() => {
+    setPdpBarVisible(true);
+    return () => setPdpBarVisible(false);
+  }, [setPdpBarVisible]);
 
   // Auto-select the first in-stock combo row when the product loads (per-combination stock).
   // The row's combo_key dictates each group's selection, so groups are always consistent
@@ -593,30 +618,6 @@ export default function ProductDetailPage() {
     ? product.variants?.stock_map ?? null
     : null;
   const missingStockMap = hasGroups && !stockMap;
-  // Combo rows (with per-group option maps + stock) — used for per-combo visibility.
-  const comboRows = buildComboRows(variantGroups).map((row) => ({
-    ...row,
-    stock: Number(stockMap?.[row.key] ?? 0),
-  }));
-
-  // Option visibility: an option is visible if some combo row containing it — consistent
-  // with the other groups' current selections — has stock > 0. Recomputed on every render.
-  // Groups flagged `always_show_options` always render every defined option regardless of
-  // stock (e.g. Small/Medium/Large always visible).
-  function isOptionVisible(group: VariantGroup, opt: VariantOption): boolean {
-    if (group.always_show_options) return true;
-    if (!stockMap) return true;
-    return comboRows.some((row) => {
-      if (row.groupOption[group.id] !== opt.id) return false;
-      if (row.stock <= 0) return false;
-      for (const g of variantGroups) {
-        if (g.id === group.id) continue;
-        const sel = selectedOptions[g.id];
-        if (sel && row.groupOption[g.id] !== sel) return false;
-      }
-      return true;
-    });
-  }
 
   // Image swapping — mirrors old image_map[comboKey] system, adapted for new opt-ID keys.
   //
@@ -685,52 +686,12 @@ export default function ProductDetailPage() {
   // Cart options: flat array of selected option IDs (Task 6)
   const cartSelectedOptions: string[] = Object.values(selectedOptions);
 
-  function selectOption(groupId: string, optionId: string) {
-    const clickedGroup = variantGroups.find((g) => g.id === groupId);
-
-    // Stale-selection guard for always-show groups: a picked option (e.g. a size) may
-    // have no in-stock combo with the customer's currently-selected options in other
-    // groups. Re-derive those groups from the first in-stock combo that preserves as
-    // many of their current picks as possible, so we never strand them on a hidden
-    // colour / dead "Out of Stock" state. If nothing is in stock for this pick at all,
-    // keep the plain selection and let effectiveStock <= 0 show "Out of Stock" honestly.
-    if (clickedGroup?.always_show_options && stockMap) {
-      const candidates = comboRows.filter(
-        (row) =>
-          row.groupOption[groupId] === optionId &&
-          Number(stockMap[row.key] ?? 0) > 0,
-      );
-      if (candidates.length > 0) {
-        let best = candidates[0];
-        let bestScore = -1;
-        for (const row of candidates) {
-          let score = 0;
-          for (const g of variantGroups) {
-            if (g.id === groupId) continue;
-            const sel = selectedOptions[g.id];
-            if (sel && row.groupOption[g.id] === sel) score++;
-          }
-          // Strict > over comboRows' cartesian (admin-defined) order → tie-break is
-          // "first in defined order", matching auto-select and the admin combos table.
-          if (score > bestScore) {
-            bestScore = score;
-            best = row;
-          }
-        }
-        setSelectedOptions(best.groupOption);
-        setQty(1);
-        if (window.innerWidth < 768) {
-          galleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        return;
-      }
-    }
-
-    setSelectedOptions((prev) => ({ ...prev, [groupId]: optionId }));
+  // Applied by the shared VariantPicker, which owns visibility + the
+  // always_show_options stale-selection guard. Page-specific work here: reset qty
+  // and scroll the gallery back into view on mobile (it sits above the selector).
+  function handleVariantSelect(next: Record<string, string>) {
+    setSelectedOptions(next);
     setQty(1);
-    // On mobile the gallery sits above the variant selector and scrolls out of view.
-    // Scroll back to the top of the page (galleryRef) so the image update is visible.
-    // Skip on md+ breakpoints where the gallery is always in the left column.
     if (window.innerWidth < 768) {
       galleryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -776,7 +737,7 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div ref={galleryRef} className="pb-20 md:pb-0 scroll-mt-[100px] sm:scroll-mt-[110px] lg:scroll-mt-[120px]">
+    <div ref={galleryRef} className="pb-32 md:pb-0 scroll-mt-[100px] sm:scroll-mt-[110px] lg:scroll-mt-[120px]">
       {/* Mobile image gallery */}
       <div className="md:hidden">
         <MobileGallery images={galleryImages} activeIndex={galleryActive} onActiveChange={setGalleryActive} />
@@ -839,7 +800,7 @@ export default function ProductDetailPage() {
               <p className="text-sm text-red-500 font-medium">Out of Stock</p>
             )}
 
-            {/* Flexible Variant Picker — smart rendering per group type */}
+            {/* Flexible Variant Picker — shared component (visibility + stale-selection handled internally) */}
             {hasGroups && (
               missingStockMap ? (
                 <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 flex gap-2 items-start text-xs text-amber-800">
@@ -849,141 +810,12 @@ export default function ProductDetailPage() {
                   </span>
                 </div>
               ) : (
-              <div className="space-y-4">
-                {/* Always-show groups (e.g. Select Size) render on top of colours/pots,
-                    regardless of their admin-defined order. Stable sort preserves relative
-                    order within each bucket; combo keys keep using variantGroups order. */}
-                {[...variantGroups]
-                  .sort((a, b) => Number(Boolean(b.always_show_options)) - Number(Boolean(a.always_show_options)))
-                  .map((group) => {
-                  const isColourGroup = /colou?r/i.test(group.label);
-                  // Only options with at least one in-stock combo — consistent with the other
-                  // groups' current selections — are rendered.
-                  const visibleOptions = (group.options ?? []).filter((o) => isOptionVisible(group, o));
-                  const hasOptionImages = visibleOptions.some((o) => o.images?.[0]);
-                  // Render mode: colour → circular swatches; has images → image cards; else → pill chips
-                  const renderMode: 'colour' | 'image-card' | 'pill' =
-                    isColourGroup ? 'colour' : hasOptionImages ? 'image-card' : 'pill';
-
-                  // Group has no purchasable options — hide it entirely.
-                  if (visibleOptions.length === 0) return null;
-
-                  return (
-                    <div key={group.id}>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                        {group.label}
-                      </p>
-
-                      {/* ── Colour swatches ─────────────────────────────── */}
-                      {renderMode === 'colour' && (
-                        <div className="flex flex-wrap gap-2.5">
-                          {visibleOptions.map((opt) => {
-                            const isSelected = selectedOptions[group.id] === opt.id;
-                            const hex: string = opt.color_hex || '';
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => selectOption(group.id, opt.id)}
-                                title={opt.name}
-                                aria-label={opt.name}
-                                className={`relative h-9 w-9 rounded-full border-2 transition focus:outline-none
-                                  ${isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 hover:border-primary/40'}
-                                  cursor-pointer
-                                `}
-                                style={{ backgroundColor: hex || '#e5e7eb' }}
-                              />
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* ── Image cards (pot type, style, etc.) ─────────── */}
-                      {renderMode === 'image-card' && (
-                        <div className="flex flex-wrap gap-2">
-                          {visibleOptions.map((opt) => {
-                            const isSelected = selectedOptions[group.id] === opt.id;
-                            const priceDelta = Number(opt.price ?? 0);
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => selectOption(group.id, opt.id)}
-                                className={`relative flex flex-col items-center rounded-xl border-2 p-2 w-[88px] transition focus:outline-none
-                                  ${isSelected
-                                    ? 'border-primary bg-primary/5 shadow-sm'
-                                    : 'border-gray-200 hover:border-primary/60 bg-white cursor-pointer'
-                                  }`}
-                              >
-                                <div className="h-14 w-14 rounded-lg overflow-hidden bg-gray-50 mb-1.5 shrink-0">
-                                  {opt.images?.[0] ? (
-                                    <img
-                                      src={opt.images[0]}
-                                      alt={opt.name}
-                                      className="h-full w-full object-cover"
-                                      loading="lazy"
-                                    />
-                                  ) : (
-                                    <div className="h-full w-full flex items-center justify-center text-gray-300">
-                                      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                                        <path d="M21 15l-5-5L5 21"/>
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                                <span className={`text-[11px] font-semibold text-center leading-tight line-clamp-2 ${isSelected ? 'text-primary' : 'text-gray-800'}`}>
-                                  {opt.name}
-                                </span>
-                                {priceDelta > 0 && (
-                                  <span className={`text-[10px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
-                                    +₹{priceDelta}
-                                  </span>
-                                )}
-                                {priceDelta === 0 && (
-                                  <span className={`text-[10px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
-                                    Included
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* ── Pill chips (size, weight, etc.) ─────────────── */}
-                      {renderMode === 'pill' && (
-                        <div className="flex flex-wrap gap-2">
-                          {visibleOptions.map((opt) => {
-                            const isSelected = selectedOptions[group.id] === opt.id;
-                            const priceDelta = Number(opt.price ?? 0);
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => selectOption(group.id, opt.id)}
-                                className={`px-4 py-2 rounded-full border-2 text-sm font-semibold transition focus:outline-none
-                                  ${isSelected
-                                    ? 'bg-primary border-primary text-white shadow-sm'
-                                    : 'border-gray-200 text-gray-700 hover:border-primary hover:text-primary bg-white'
-                                  }`}
-                              >
-                                {opt.name}
-                                {priceDelta > 0 && (
-                                  <span className={`ml-1.5 text-xs font-normal ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
-                                    +₹{priceDelta}
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                <VariantPicker
+                  groups={variantGroups}
+                  stockMap={stockMap}
+                  selectedOptions={selectedOptions}
+                  onSelect={handleVariantSelect}
+                />
               )
             )}
 
@@ -1001,15 +833,14 @@ export default function ProductDetailPage() {
                 </div>
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white transition active:scale-[0.98] hover:opacity-90 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: '#16A34A' }}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-bone transition active:scale-[0.98] hover:opacity-90 flex items-center justify-center gap-2 bg-rust"
                 >
                   <ShoppingCart size={18} />
                   Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="flex-1 py-3.5 border-2 border-primary text-primary bg-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-primary/5 transition"
+                  className="flex-1 py-3.5 border-2 border-rust text-rust bg-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-rust hover:text-bone transition-colors"
                 >
                   Buy It Now
                 </button>
@@ -1029,19 +860,20 @@ export default function ProductDetailPage() {
                 </div>
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-3 rounded text-sm font-semibold uppercase tracking-wide text-white transition active:scale-[0.99] hover:opacity-90 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: '#16A34A' }}
+                  className="w-full py-3 rounded text-sm font-semibold uppercase tracking-wide text-bone transition active:scale-[0.99] hover:opacity-90 flex items-center justify-center gap-2 bg-rust"
                 >
                   Add to Cart
                 </button>
                 <button
                   onClick={handleBuyNow}
-                  className="w-full py-3 border border-primary text-primary bg-white rounded text-sm font-semibold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.99] transition hover:bg-primary/5"
+                  className="w-full py-3 border border-rust text-rust bg-white rounded text-sm font-semibold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.99] transition hover:bg-rust hover:text-bone"
                 >
                   Buy It Now
                 </button>
               </div>
             )}
+
+            <TrustFeatureGrid />
 
             <ProductDescription description={product.description} />
           </div>
@@ -1051,7 +883,7 @@ export default function ProductDetailPage() {
 
         <ProductSpecification specs={productSpecs} />
 
-        <StoriesCarousel stories={stories} />
+        <StoriesCarousel stories={stories.filter((s) => !s.is_placeholder)} />
 
         {/* Similar products */}
         {similarProducts.length > 0 && (
@@ -1078,6 +910,28 @@ export default function ProductDetailPage() {
 
         <ProductFaq faqs={product.faqs} />
       </div>
+
+      {/* Mobile sticky CTA bar — above BottomNav */}
+      {!isUnavailable && product && (
+        <div className="md:hidden fixed bottom-[64px] left-0 right-0 z-40 border-t border-card bg-bone/95 backdrop-blur-sm px-4 py-3 flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-espresso truncate">{product.name}</p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm font-bold text-espresso">{format(displayPrice)}</span>
+              {displayOriginalPrice && displayOriginalPrice > displayPrice && (
+                <span className="text-[11px] text-slate line-through">{format(displayOriginalPrice)}</span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className="shrink-0 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-bone bg-rust hover:opacity-90 transition active:scale-[0.99] flex items-center gap-2"
+          >
+            <ShoppingBag size={15} strokeWidth={1.5} />
+            Add to Bag
+          </button>
+        </div>
+      )}
 
     </div>
   );

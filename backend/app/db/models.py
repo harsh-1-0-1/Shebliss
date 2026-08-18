@@ -289,6 +289,7 @@ class Banner(Base):
     position: Mapped[int] = mapped_column(Integer, default=0)
     placement: Mapped[str] = mapped_column(String(20), default="hero")
     target_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    products_tag: Mapped[str | None] = mapped_column(String(100), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     valid_from: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     valid_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -464,6 +465,7 @@ class Story(Base):
     linked_product_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("products.id"), nullable=True)
     display_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_placeholder: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     linked_product: Mapped["Product | None"] = relationship("Product")

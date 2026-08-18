@@ -12,7 +12,7 @@ function optLabel(item: ReturnType<typeof useCartStore.getState>['items'][number
 }
 
 const SUGGESTIONS = [
-  { title: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=120&h=120&fit=crop&q=75' },
+  { title: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=120&h=120&fit=crop&q=75' },
   { title: 'Necklaces', href: '/products?category=necklaces', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=120&h=120&fit=crop&q=75' },
   { title: 'Bridal Sets', href: '/products?category=bridal-sets', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=120&h=120&fit=crop&q=75' },
   { title: 'Bangles', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=120&h=120&fit=crop&q=75' },

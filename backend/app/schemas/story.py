@@ -9,6 +9,7 @@ class StoryBase(BaseModel):
     linked_product_id: Optional[int] = None
     display_order: int = 0
     is_active: bool = True
+    is_placeholder: bool = False
 
 
 class StoryCreate(StoryBase):
@@ -20,6 +21,7 @@ class StoryUpdate(BaseModel):
     linked_product_id: Optional[int] = None
     display_order: Optional[int] = None
     is_active: Optional[bool] = None
+    is_placeholder: Optional[bool] = None
 
 
 class StoryProductInfo(BaseModel):
