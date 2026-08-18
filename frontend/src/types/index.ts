@@ -314,6 +314,7 @@ export type BannerPlacement =
   | 'customer_photos'
   | 'reels'
   | 'home_collection'
+  | 'editorial'
   | 'product_detail'
   | 'product_spec';
 

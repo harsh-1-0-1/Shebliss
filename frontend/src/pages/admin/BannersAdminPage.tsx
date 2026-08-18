@@ -84,6 +84,12 @@ const PLACEMENTS = [
     helpText: 'Recommended size: 1600x640px. Set "Products Tag" to choose which products appear in the sliding bar. Title = the block heading shown above the products.',
   },
   {
+    key: 'editorial',
+    label: '📸 Editorial Featured Collection',
+    description: 'The editorial two-column section on the homepage — a large portrait photo with the collection name and copy, followed by a sliding product bar.',
+    helpText: 'Recommended size: 900x1200px portrait. Title = the collection name, Sub-heading = the copy, Button Label/Link = the CTA, Products Tag = the sliding product bar.',
+  },
+  {
     key: 'corporate_gifting',
     label: '💼 Corporate Gifting Banner',
     description: 'Promotional banner displayed on the corporate gifting page.',
@@ -110,7 +116,7 @@ const bannerSchema = z
     cta_text: z.string().max(50).optional().or(z.literal('')),
     cta_link: z.string().max(255).optional().or(z.literal('')),
     badge_text: z.string().max(100).optional().or(z.literal('')),
-    placement: z.enum(['hero', 'announcement', 'page', 'themed', 'strip', 'menu_banner', 'mobile_promo', 'corporate_gifting', 'customer_photos', 'home_collection', 'product_detail', 'product_spec']),
+    placement: z.enum(['hero', 'announcement', 'page', 'themed', 'strip', 'menu_banner', 'mobile_promo', 'corporate_gifting', 'customer_photos', 'home_collection', 'editorial', 'product_detail', 'product_spec']),
     target_path: z.string().max(255).optional().or(z.literal('')),
     products_tag: z.string().max(100).optional().or(z.literal('')),
     bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color (e.g. #FFFFFF)'),
@@ -598,7 +604,7 @@ function BannerDrawer({
             </div>
           )}
 
-          {watchedPlacement === 'home_collection' && (
+          {(watchedPlacement === 'home_collection' || watchedPlacement === 'editorial') && (
             <div>
               <label className="text-xs font-semibold text-gray-700 mb-1 block">
                 Products Tag
