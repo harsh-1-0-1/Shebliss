@@ -14,20 +14,13 @@ import BlogSection from '@/components/home/BlogSection';
 export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#F9F8F6' }}>
-      {/* Category bubbles — mobile only, above the fold */}
-      <div className="lg:hidden">
-        <MobileCategoryNav />
-      </div>
+      {/* Category bubbles — above the hero on all breakpoints */}
+      <MobileCategoryNav />
 
       {/* Hero — split screen editorial */}
       <ErrorBoundary>
         <HeroBanner />
       </ErrorBoundary>
-
-      {/* Category strip — desktop variant under the hero, mobile above the fold */}
-      <div className="hidden lg:block">
-        <MobileCategoryNav />
-      </div>
 
       {/* Trust bar */}
       <TrustValueBar />
