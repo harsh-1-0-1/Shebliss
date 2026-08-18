@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useBanners } from '@/hooks/useBanners';
 
 const FALLBACK_BUBBLES = [
-  { label: 'New In', href: '/products?sort_by=newest', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=160&h=160&fit=crop&q=75' },
+  { label: 'New In', href: '/products?sort_by=newest', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=160&h=160&fit=crop&q=75' },
   { label: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=160&h=160&fit=crop&q=75' },
   { label: 'Necklaces', href: '/products?category=necklaces', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=160&h=160&fit=crop&q=75' },
   { label: 'Bangles', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=160&h=160&fit=crop&q=75' },

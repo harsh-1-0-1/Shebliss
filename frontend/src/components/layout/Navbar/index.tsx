@@ -41,14 +41,14 @@ function Logo({ onClick }: { onClick?: () => void }) {
 }
 
 const FALLBACK_MOBILE_ITEMS = [
-  { label: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=80&h=80&fit=crop&q=80' },
+  { label: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
   { label: 'Necklaces', href: '/products?category=necklaces', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
   { label: 'Bangles & Kada', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=80&h=80&fit=crop&q=80' },
   { label: 'Bridal', href: '/products?category=bridal-sets', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=80&h=80&fit=crop&q=80' },
   { label: 'Mangalsutra & Sets', href: '/products?category=mangalsutra', img: 'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=80&h=80&fit=crop&q=80' },
   { label: 'Gift Sets', href: '/products?tags=combo', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=80&h=80&fit=crop&q=80' },
   { label: 'Corporate Gifts', href: '/corporate-gifting', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=80&h=80&fit=crop&q=80' },
-  { label: 'Sale', href: '/products?tags=offers', img: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=80&h=80&fit=crop&q=80' },
+  { label: 'Sale', href: '/products?tags=offers', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
   { label: 'Blog', href: '/blog', img: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=80&h=80&fit=crop&q=80' },
 ];
 

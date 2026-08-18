@@ -6,7 +6,7 @@ const FALLBACK_CARDS = [
   {
     id: -1,
     image_url:
-      'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
+      'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
     title: 'Bundle & Save',
     subtitle:
       'Curated jewellery gift boxes — earrings, chains and bracelets packed in velvet, at a better price.',

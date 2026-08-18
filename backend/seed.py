@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.core.security import hash_password
 from app.db.models import (
     Address, Banner, BlogCategory, BlogPost, Cart, CartItem,
-    Category, Order, OrderItem, Product, ProductReview, Testimonial, User,
+    Category, Order, OrderItem, Product, ProductReview, Story, Testimonial, User,
 )
 
 
@@ -48,7 +48,6 @@ UNSPLASH = "https://images.unsplash.com/photo-{id}?w=600&q=80"
 # Only using photo IDs that appear verbatim as category fallback images, blog post
 # covers, or hero banners elsewhere in this codebase — proven jewelry shots, zero guessing.
 PRODUCT_IMAGES = [
-    UNSPLASH.format(id="1611591437281-460bfbe1220a"),   # jhumka earrings  [category + blog + banner]
     UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),   # kundan necklace   [category + blog]
     UNSPLASH.format(id="1573408301185-9146fe634ad0"),   # gold bangles      [category + blog]
     UNSPLASH.format(id="1611652022419-a9419f74343d"),   # bridal jewellery  [category + blog + banner]
@@ -109,7 +108,7 @@ def _make_variants(base_price: int, stock_per_option: int = 12) -> dict:
             {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Colour", "options": colours},
             {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Finish", "options": finishes},
         ],
-        "default_image": UNSPLASH.format(id="1611591437281-460bfbe1220a"),
+        "default_image": UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),
     }
 
 
@@ -278,7 +277,7 @@ BLOG_POSTS = [
         "title": "How to Care for Your Artificial Jewellery",
         "excerpt": "Simple habits that keep your gold-plated and kundan pieces shining for years.",
         "category": BlogCategory.TIPS,
-        "cover": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1200&q=80",
+        "cover": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1200&q=80",
         "author": "Shebliss Editorial",
         "content": """## Keeping Your Jewellery Lustrous
 
@@ -391,6 +390,7 @@ async def seed() -> None:
         await db.execute(Address.__table__.delete())
         await db.execute(ProductReview.__table__.delete())
         await db.execute(Testimonial.__table__.delete())
+        await db.execute(Story.__table__.delete())
         await db.execute(Banner.__table__.delete())
         await db.execute(Product.__table__.delete())
         await db.execute(Category.__table__.delete())
@@ -496,7 +496,7 @@ async def seed() -> None:
                 position=0,
                 bg_color="#0E4D3A",
                 text_color="#F8F4EC",
-                image_url="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1400&h=600&fit=crop&crop=center",
+                image_url="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1400&h=600&fit=crop&crop=center",
             ),
             Banner(
                 title="The Bridal Edit",
@@ -541,6 +541,42 @@ async def seed() -> None:
                 bg_color="#F1E9DC",
                 text_color="#0E4D3A",
                 image_url="/page-banner-default.jpeg",
+            ),
+            Banner(
+                title="Style Inspiration",
+                subtitle="Shop the looks you love — curated style edits from our jewellery.",
+                cta_text="View All",
+                cta_link="/products",
+                placement="reels",
+                position=0,
+                bg_color="#14342B",
+                text_color="#F9F8F6",
+            ),
+            Banner(
+                title="Kundan Necklaces — Wedding Edit",
+                badge_text="Kundan Jewellery Set",
+                subtitle="Timeless jewels — Flat 50% Off",
+                cta_text="Shop Kundan",
+                cta_link="/products?tags=kundan",
+                products_tag="kundan",
+                placement="home_collection",
+                position=0,
+                bg_color="#14342B",
+                text_color="#F9F8F6",
+                image_url="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1600&h=640&fit=crop&crop=center",
+            ),
+            Banner(
+                title="The Bridal Edit",
+                badge_text="Trending Bridal Looks",
+                subtitle="Full bridal sets — super budget friendly — Flat 50% Off",
+                cta_text="Shop Bridal",
+                cta_link="/products?tags=bridal",
+                products_tag="bridal",
+                placement="home_collection",
+                position=1,
+                bg_color="#14342B",
+                text_color="#F9F8F6",
+                image_url="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=1600&h=640&fit=crop&crop=center",
             ),
         ]
         db.add_all(banners_seed)
@@ -615,11 +651,53 @@ async def seed() -> None:
         ]
         db.add_all(testimonials_seed)
 
+        # Placeholder lifestyle reels for the homepage "Style Inspiration" section.
+        # is_placeholder=True marks them as stock/mood content (no linked product) so
+        # they can be bulk-queried and swapped for real product footage later, and so
+        # the PDP "real videos of this product" section can hide them.
+        UNSPLASH_THUMB = UNSPLASH.format(id="1599643478518-a784e5dc4c8f")
+        stories_seed = [
+            Story(
+                video="https://cdn.pixabay.com/video/2017/04/15/8703-213442868_large.mp4",
+                thumbnail=UNSPLASH_THUMB,
+                caption="Dainty earrings, daily shine",
+                display_order=0,
+                is_active=True,
+                is_placeholder=True,
+            ),
+            Story(
+                video="https://cdn.pixabay.com/video/2021/11/13/96186-651410630_large.mp4",
+                thumbnail=UNSPLASH.format(id="1573408301185-9146fe634ad0"),
+                caption="Layered necklaces, layered looks",
+                display_order=1,
+                is_active=True,
+                is_placeholder=True,
+            ),
+            Story(
+                video="https://cdn.pixabay.com/video/2016/05/12/3125-166335844_large.mp4",
+                thumbnail=UNSPLASH.format(id="1611652022419-a9419f74343d"),
+                caption="Bridal rings, forever moments",
+                display_order=2,
+                is_active=True,
+                is_placeholder=True,
+            ),
+            Story(
+                video="https://cdn.pixabay.com/video/2024/07/03/219228_large.mp4",
+                thumbnail=UNSPLASH.format(id="1605100804763-247f67b3557e"),
+                caption="Stacked bangles, festive energy",
+                display_order=3,
+                is_active=True,
+                is_placeholder=True,
+            ),
+        ]
+        db.add_all(stories_seed)
+
         await db.commit()
         print(
             f"\nSeeded 1 admin, {len(CATEGORIES)} categories, "
             f"{len(PRODUCTS)} products, {len(BLOG_POSTS)} blog posts, "
-            f"{len(banners_seed)} banners, and {len(testimonials_seed)} testimonials."
+            f"{len(banners_seed)} banners, {len(testimonials_seed)} testimonials, "
+            f"and {len(stories_seed)} stories."
         )
 
 

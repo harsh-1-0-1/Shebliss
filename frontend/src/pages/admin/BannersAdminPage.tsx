@@ -78,6 +78,12 @@ const PLACEMENTS = [
     helpText: 'Recommended size: 600x600px square format. Use real customer-worn photos.',
   },
   {
+    key: 'home_collection',
+    label: '🛍️ Homepage Collection Block',
+    description: 'A full-width banner ad followed by a sliding product bar on the homepage. Each banner = one repeated block (banner + products).',
+    helpText: 'Recommended size: 1600x640px. Set "Products Tag" to choose which products appear in the sliding bar. Title = the block heading shown above the products.',
+  },
+  {
     key: 'corporate_gifting',
     label: '💼 Corporate Gifting Banner',
     description: 'Promotional banner displayed on the corporate gifting page.',
@@ -104,8 +110,9 @@ const bannerSchema = z
     cta_text: z.string().max(50).optional().or(z.literal('')),
     cta_link: z.string().max(255).optional().or(z.literal('')),
     badge_text: z.string().max(100).optional().or(z.literal('')),
-    placement: z.enum(['hero', 'announcement', 'page', 'themed', 'strip', 'menu_banner', 'mobile_promo', 'corporate_gifting', 'customer_photos', 'product_detail', 'product_spec']),
+    placement: z.enum(['hero', 'announcement', 'page', 'themed', 'strip', 'menu_banner', 'mobile_promo', 'corporate_gifting', 'customer_photos', 'home_collection', 'product_detail', 'product_spec']),
     target_path: z.string().max(255).optional().or(z.literal('')),
+    products_tag: z.string().max(100).optional().or(z.literal('')),
     bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color (e.g. #FFFFFF)'),
     text_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color (e.g. #000000)'),
     is_active: z.boolean(),
@@ -381,6 +388,7 @@ function BannerDrawer({
       badge_text: banner?.badge_text || '',
       placement: (banner?.placement || placement) as BannerFormData['placement'],
       target_path: banner?.target_path || '',
+      products_tag: banner?.products_tag || '',
       bg_color: banner?.bg_color || '#f1e9dc',
       text_color: banner?.text_color || '#0e4d3a',
       is_active: banner?.is_active ?? true,
@@ -465,6 +473,7 @@ function BannerDrawer({
       fd.append('badge_text', data.badge_text || '');
       fd.append('placement', data.placement);
       fd.append('target_path', data.target_path || '');
+      fd.append('products_tag', data.products_tag || '');
       fd.append('bg_color', data.bg_color);
       fd.append('text_color', data.text_color);
       fd.append('is_active', String(data.is_active));
@@ -584,6 +593,27 @@ function BannerDrawer({
               {errors.target_path && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors.target_path.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {watchedPlacement === 'home_collection' && (
+            <div>
+              <label className="text-xs font-semibold text-gray-700 mb-1 block">
+                Products Tag
+              </label>
+              <input
+                {...register('products_tag')}
+                className={inputClass}
+                placeholder="e.g. kundan, bridal, best-seller"
+              />
+              <p className="text-[10px] text-gray-400 mt-0.5">
+                Products carrying this tag are shown in the sliding bar below this banner. Leave blank to skip the product bar.
+              </p>
+              {errors.products_tag && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.products_tag.message}
                 </p>
               )}
             </div>

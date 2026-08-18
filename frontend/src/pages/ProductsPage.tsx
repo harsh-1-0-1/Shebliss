@@ -7,6 +7,7 @@ import ProductCard from '@/components/product/ProductCard';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import type { Product } from '@/types';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Featured' },
@@ -32,6 +33,15 @@ const MATERIAL_TAGS = [
   { label: 'Temple', tag: 'temple' },
 ];
 
+const OCCASION_TAGS = [
+  { label: 'Bridal', tag: 'bridal' },
+  { label: 'Festive', tag: 'festive' },
+  { label: 'Everyday', tag: 'everyday' },
+  { label: 'Party', tag: 'party' },
+  { label: 'Traditional', tag: 'traditional' },
+  { label: 'Minimal', tag: 'minimal' },
+];
+
 function titleCase(s: string) {
   return s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -45,6 +55,9 @@ interface FilterProps {
   onMaxPrice: (v: string) => void;
   selectedTags: string[];
   onTagToggle: (t: string) => void;
+  availableColours: { name: string; hex: string }[];
+  selectedColours: string[];
+  onColourToggle: (hex: string) => void;
   inStock: boolean;
   onInStock: (v: boolean) => void;
   onReset: () => void;
@@ -66,10 +79,26 @@ function AccordionSection({ title, children }: { title: string; children: React.
   );
 }
 
+function TagCheckbox({ label, tag, selectedTags, onTagToggle }: { label: string; tag: string; selectedTags: string[]; onTagToggle: (t: string) => void }) {
+  const active = selectedTags.includes(tag);
+  return (
+    <label className="flex items-center gap-2.5 cursor-pointer group">
+      <span
+        onClick={() => onTagToggle(tag)}
+        className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-colors cursor-pointer ${active ? 'bg-[#1A1A1A] border-[#1A1A1A]' : 'border-[#EFECE6] group-hover:border-[#C6A15E]'}`}
+      >
+        {active && <span className="text-[#F9F8F6] text-[10px]">✓</span>}
+      </span>
+      <span onClick={() => onTagToggle(tag)} className="text-[12px] text-[#2B2421] group-hover:text-[#1A1A1A] transition-colors">{label}</span>
+    </label>
+  );
+}
+
 function FiltersSidebar({
   selectedCategory, onCategory,
   minPrice, maxPrice, onMinPrice, onMaxPrice,
   selectedTags, onTagToggle,
+  availableColours, selectedColours, onColourToggle,
   inStock, onInStock,
   onReset,
 }: FilterProps) {
@@ -131,22 +160,41 @@ function FiltersSidebar({
         </div>
       </AccordionSection>
 
+      <AccordionSection title="Colour">
+        {availableColours.length === 0 ? (
+          <p className="text-[11px] text-[#767676] font-body">No colours on this page</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {availableColours.map((c) => {
+              const active = selectedColours.includes(c.hex);
+              return (
+                <button
+                  key={c.hex}
+                  onClick={() => onColourToggle(c.hex)}
+                  title={c.name}
+                  aria-label={c.name}
+                  className={`w-6 h-6 rounded-full border transition ${active ? 'border-[#1A1A1A] ring-2 ring-[#C6A15E]/40' : 'border-[#EFECE6] hover:border-[#C6A15E]'}`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              );
+            })}
+          </div>
+        )}
+      </AccordionSection>
+
       <AccordionSection title="Material / Finish">
         <div className="space-y-1.5">
-          {MATERIAL_TAGS.map((m) => {
-            const active = selectedTags.includes(m.tag);
-            return (
-              <label key={m.tag} className="flex items-center gap-2.5 cursor-pointer group">
-                <span
-                  onClick={() => onTagToggle(m.tag)}
-                  className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-colors cursor-pointer ${active ? 'bg-[#1A1A1A] border-[#1A1A1A]' : 'border-[#EFECE6] group-hover:border-[#C6A15E]'}`}
-                >
-                  {active && <span className="text-[#F9F8F6] text-[10px]">✓</span>}
-                </span>
-                <span onClick={() => onTagToggle(m.tag)} className="text-[12px] text-[#2B2421] group-hover:text-[#1A1A1A] transition-colors">{m.label}</span>
-              </label>
-            );
-          })}
+          {MATERIAL_TAGS.map((m) => (
+            <TagCheckbox key={m.tag} label={m.label} tag={m.tag} selectedTags={selectedTags} onTagToggle={onTagToggle} />
+          ))}
+        </div>
+      </AccordionSection>
+
+      <AccordionSection title="Occasion / Style">
+        <div className="space-y-1.5">
+          {OCCASION_TAGS.map((o) => (
+            <TagCheckbox key={o.tag} label={o.label} tag={o.tag} selectedTags={selectedTags} onTagToggle={onTagToggle} />
+          ))}
         </div>
       </AccordionSection>
 
@@ -171,6 +219,7 @@ export default function ProductsPage() {
   const [minPrice, setMinPrice] = useState(searchParams.get('min_price') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
   const [inStock, setInStock] = useState(false);
+  const [selectedColours, setSelectedColours] = useState<string[]>([]);
   const topRef = useRef<HTMLDivElement>(null);
 
   useBodyScrollLock(mobileFiltersOpen);
@@ -201,8 +250,14 @@ export default function ProductsPage() {
     updateParams({ tags: next.join(',') });
   }
 
+  function handleColourToggle(hex: string) {
+    setSelectedColours((prev) =>
+      prev.includes(hex) ? prev.filter((c) => c !== hex) : [...prev, hex],
+    );
+  }
+
   function resetFilters() {
-    setMinPrice(''); setMaxPrice(''); setInStock(false);
+    setMinPrice(''); setMaxPrice(''); setInStock(false); setSelectedColours([]);
     setSearchParams({});
   }
 
@@ -221,8 +276,42 @@ export default function ProductsPage() {
     limit: 24,
   });
 
-  const hasFilters = !!(category || minPrice || maxPrice || selectedTags.length || inStock);
+  const hasFilters = !!(category || minPrice || maxPrice || selectedTags.length || inStock || selectedColours.length);
   const pageTitle = search ? `Results for "${search}"` : category ? titleCase(category) : selectedTags.length === 1 ? titleCase(selectedTags[0]) : 'All Jewellery';
+
+  const items = useMemo(() => data?.items ?? [], [data]);
+
+  // Colour options present on the current result page (client-side filter).
+  const availableColours = useMemo(() => {
+    const seen = new Set<string>();
+    const out: { name: string; hex: string }[] = [];
+    for (const p of items) {
+      for (const g of p.variants?.variant_groups ?? []) {
+        if (!/colou?r/i.test(g.label)) continue;
+        for (const o of g.options ?? []) {
+          const hex = o.color_hex || '';
+          if (!hex || seen.has(hex)) continue;
+          seen.add(hex);
+          out.push({ name: o.name, hex });
+        }
+      }
+    }
+    return out;
+  }, [items]);
+
+  function matchesColours(p: Product, colours: string[]): boolean {
+    for (const g of p.variants?.variant_groups ?? []) {
+      if (!/colou?r/i.test(g.label)) continue;
+      for (const o of g.options ?? []) {
+        if (o.color_hex && colours.includes(o.color_hex)) return true;
+      }
+    }
+    return false;
+  }
+
+  const filteredItems = selectedColours.length
+    ? items.filter((p) => matchesColours(p, selectedColours))
+    : items;
 
   const filterProps: FilterProps = {
     selectedCategory: category,
@@ -231,11 +320,10 @@ export default function ProductsPage() {
     onMinPrice: setMinPrice,
     onMaxPrice: setMaxPrice,
     selectedTags, onTagToggle: handleTagToggle,
+    availableColours, selectedColours, onColourToggle: handleColourToggle,
     inStock, onInStock: setInStock,
     onReset: resetFilters,
   };
-
-  const items = data?.items ?? [];
 
   return (
     <div ref={topRef} style={{ backgroundColor: '#F9F8F6' }}>
@@ -309,7 +397,7 @@ export default function ProductsPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
                   {Array.from({ length: 15 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
-              ) : items.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                   <p className="font-display text-2xl text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>No results found</p>
                   <p className="text-[13px] text-[#767676]">Try adjusting your filters or explore a different category.</p>
@@ -319,7 +407,7 @@ export default function ProductsPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
-                  {items.map((product) => (
+                  {filteredItems.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>

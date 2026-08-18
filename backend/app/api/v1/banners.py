@@ -97,6 +97,7 @@ async def create_banner(
     position: int = Form(0),
     placement: str = Form("hero"),
     target_path: Optional[str] = Form(None),
+    products_tag: Optional[str] = Form(None),
     is_active: bool = Form(True),
     valid_from: Optional[str] = Form(None),
     valid_until: Optional[str] = Form(None),
@@ -118,6 +119,7 @@ async def create_banner(
         position=position,
         placement=placement,
         target_path=target_path,
+        products_tag=products_tag,
         is_active=is_active,
         image_url=extract_relative_key(image_url_manual) if image_url_manual else None,
         image_public_id=None,
@@ -150,6 +152,7 @@ async def update_banner(
     position: Optional[int] = Form(None),
     placement: Optional[str] = Form(None),
     target_path: Optional[str] = Form(None),
+    products_tag: Optional[str] = Form(None),
     is_active: Optional[bool] = Form(None),
     valid_from: Optional[str] = Form(None),
     valid_until: Optional[str] = Form(None),
@@ -196,6 +199,7 @@ async def update_banner(
         position=position,
         placement=placement,
         target_path=target_path,
+        products_tag=products_tag,
         is_active=is_active,
     )
     for field, value in updatable.items():

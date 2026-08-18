@@ -74,7 +74,7 @@ export default function Footer() {
   }
 
   return (
-    <footer style={{ backgroundColor: '#1A1A1A', color: '#F9F8F6' }} className="mt-12 sm:mt-20 pb-20 md:pb-0">
+    <footer style={{ backgroundColor: '#14342B', color: '#F9F8F6' }} className="mt-12 sm:mt-20 pb-20 md:pb-0">
       {/* Newsletter band */}
       <div className="border-b border-white/10">
         <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-10 lg:py-12 flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -94,7 +94,7 @@ export default function Footer() {
                 className="flex-1 px-4 py-3 bg-white/8 border border-white/15 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#C6A15E] transition-colors"
                 style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
               />
-              <button type="submit" className="px-5 py-3 bg-[#C6A15E] text-[#1A1A1A] text-xs font-semibold tracking-[0.12em] uppercase hover:bg-[#b8913e] transition-colors flex items-center gap-1.5 whitespace-nowrap">
+              <button type="submit" className="px-5 py-3 bg-rust text-bone text-xs font-semibold tracking-[0.12em] uppercase hover:bg-[#a84326] transition-colors flex items-center gap-1.5 whitespace-nowrap">
                 Subscribe <ArrowRight size={13} />
               </button>
             </form>
