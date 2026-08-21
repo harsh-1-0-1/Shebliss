@@ -120,8 +120,8 @@ export default function AboutSection() {
             >
               Shebliss brings the romance of traditional Indian craftsmanship to
               modern, everyday wear. From{' '}
-              <A to="/products?category=earrings">kundan jhumkas</A> and{' '}
-              <A to="/products?category=chokers">temple chokers</A> to{' '}
+              <A to="/products?category=jumkas">kundan jumkas</A> and{' '}
+              <A to="/products?category=choker-sets">temple choker sets</A> to{' '}
               <A to="/products?category=bridal-sets">complete bridal sets</A>,
               every piece is crafted with care — heirloom in feeling, joyful in
               price. Artificial materials, timeless artistry, delivered right to

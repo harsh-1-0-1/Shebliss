@@ -671,7 +671,7 @@ function BannerDrawer({
               </label>
               <input
                 {...register('cta_link')}
-                placeholder="e.g. /products?category=earrings"
+                placeholder="e.g. /products?category=ear-ring"
                 className={inputClass}
               />
             </div>

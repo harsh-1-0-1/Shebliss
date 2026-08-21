@@ -16,16 +16,16 @@ const FALLBACK_TILES: Tile[] = [
   {
     id: -2,
     type: 'category',
-    label: 'Jhumkas',
+    label: 'Jumkas',
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',
-    link: '/products?category=jhumkas',
+    link: '/products?category=jumkas',
   },
   {
     id: -3,
     type: 'category',
-    label: 'Chokers',
+    label: 'Choker Sets',
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',
-    link: '/products?category=chokers',
+    link: '/products?category=choker-sets',
   },
   {
     id: -4,
@@ -37,9 +37,9 @@ const FALLBACK_TILES: Tile[] = [
   {
     id: -5,
     type: 'category',
-    label: 'Mangalsutra',
+    label: 'Mangal Sutra',
     image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400',
-    link: '/products?category=mangalsutra',
+    link: '/products?category=mangal-sutra',
   },
   {
     id: -6,
@@ -51,16 +51,16 @@ const FALLBACK_TILES: Tile[] = [
   {
     id: -7,
     type: 'category',
-    label: 'Maang Tikkas',
+    label: 'Mang Tikka',
     image: 'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=400',
-    link: '/products?category=maang-tikkas',
+    link: '/products?category=mang-tikka',
   },
   {
     id: -8,
     type: 'category',
-    label: 'Gift Sets',
+    label: 'Gifting.',
     image: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=400',
-    link: '/products?tags=combo',
+    link: '/products?category=gifting',
   },
 ];
 

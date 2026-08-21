@@ -12,7 +12,7 @@ Merges three sources, in confidence order:
 - 🟡 **Verify first** — plausible; agent must (a) grep the repo and (b) confirm on live Bling Bag before building.
 - 🔵 **Separate work item** — real feature with an external dependency (API keys, content pipeline). Not part of the visual pass.
 
----
+---F
 
 ## Ground rules (unchanged)
 

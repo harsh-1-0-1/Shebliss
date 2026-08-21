@@ -4,40 +4,40 @@ import { useCategories } from '@/hooks/useCategories';
 
 const FALLBACK_CATEGORIES = [
   {
-    name: 'Earrings',
-    slug: 'earrings',
+    name: 'Ear Ring',
+    slug: 'ear-ring',
     image: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=earrings',
+    href: '/products?category=ear-ring',
   },
   {
-    name: 'Necklaces',
-    slug: 'necklaces',
+    name: 'Necklaces Sets',
+    slug: 'necklaces-sets',
     image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=necklaces',
+    href: '/products?category=necklaces-sets',
   },
   {
-    name: 'Bangles & Kada',
+    name: 'Bangles',
     slug: 'bangles',
     image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&h=1067&fit=crop&crop=center&q=85',
     href: '/products?category=bangles',
   },
   {
-    name: 'Bridal Sets',
-    slug: 'bridal-sets',
+    name: 'Wedding Jewells',
+    slug: 'wedding-jewells',
     image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=bridal-sets',
+    href: '/products?category=wedding-jewells',
   },
   {
-    name: 'Rings',
-    slug: 'rings',
+    name: 'Chains',
+    slug: 'chains',
     image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=rings',
+    href: '/products?category=chains',
   },
   {
-    name: 'Mangalsutra & Sets',
-    slug: 'mangalsutra',
+    name: 'Best Sellers',
+    slug: 'best-sellers',
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=mangalsutra',
+    href: '/products?category=best-sellers',
   },
 ];
 

@@ -1,4 +1,4 @@
-export const LOGO_PATH = '/favicon.svg';
+export const LOGO_PATH = '/favicon.png';
 
 export const APP_NAME = 'Shebliss';
 

@@ -11,9 +11,9 @@ function optLabel(item: ReturnType<typeof useCartStore.getState>['items'][number
 }
 
 const EMPTY_COLLECTIONS = [
-  { title: 'Earrings', sub: 'Jhumkas & studs', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=earrings' },
-  { title: 'Necklaces', sub: 'Chokers & chains', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=necklaces' },
-  { title: 'Bridal Sets', sub: 'Complete looks', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&q=75', href: '/products?category=bridal-sets' },
+  { title: 'Ear Ring', sub: 'Jumkas & studs', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=ear-ring' },
+  { title: 'Necklaces Sets', sub: 'Choker sets & chains', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=necklaces-sets' },
+  { title: 'Wedding Jewells', sub: 'Complete looks', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&q=75', href: '/products?category=wedding-jewells' },
   { title: 'Sale', sub: 'Up to 50% off', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&h=300&fit=crop&q=75', href: '/products?tags=offers' },
 ];
 
