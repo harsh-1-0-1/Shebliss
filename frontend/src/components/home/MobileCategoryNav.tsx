@@ -2,15 +2,15 @@ import { Link } from 'react-router-dom';
 import { useBanners } from '@/hooks/useBanners';
 
 const FALLBACK_BUBBLES = [
-  { label: 'New In', href: '/products?sort_by=newest', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=240&h=240&fit=crop&q=75' },
-  { label: 'Earrings', href: '/products?category=earrings', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=240&h=240&fit=crop&q=75' },
-  { label: 'Jhumkas', href: '/products?category=jhumkas', img: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=240&h=240&fit=crop&q=75' },
-  { label: 'Necklaces', href: '/products?category=necklaces', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
+  { label: 'New Arrival', href: '/products?category=new-arrival', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=240&h=240&fit=crop&q=75' },
+  { label: 'Ear Ring', href: '/products?category=ear-ring', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=240&h=240&fit=crop&q=75' },
+  { label: 'Jumkas', href: '/products?category=jumkas', img: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=240&h=240&fit=crop&q=75' },
+  { label: 'Necklaces Sets', href: '/products?category=necklaces-sets', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
   { label: 'Bangles', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=240&h=240&fit=crop&q=75' },
-  { label: 'Bridal', href: '/products?category=bridal-sets', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=240&h=240&fit=crop&q=75' },
-  { label: 'Mangalsutra', href: '/products?category=mangalsutra', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
-  { label: 'Rings', href: '/products?category=rings', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=240&h=240&fit=crop&q=75' },
-  { label: 'Gift Sets', href: '/products?tags=combo', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=240&h=240&fit=crop&q=75' },
+  { label: 'Wedding Jewells', href: '/products?category=wedding-jewells', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=240&h=240&fit=crop&q=75' },
+  { label: 'Chains', href: '/products?category=chains', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
+  { label: 'Finger Rings', href: '/products?category=finger-rings', img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=240&h=240&fit=crop&q=75' },
+  { label: 'Gifting.', href: '/products?category=gifting', img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=240&h=240&fit=crop&q=75' },
   { label: 'Sale', href: '/products?tags=offers', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=240&h=240&fit=crop&q=75' },
 ];
 

@@ -8,12 +8,12 @@ const COLUMNS = [
   {
     title: 'Collections',
     links: [
-      { label: 'Earrings', to: '/products?category=earrings' },
-      { label: 'Necklaces', to: '/products?category=necklaces' },
-      { label: 'Bangles & Bracelets', to: '/products?category=bangles' },
-      { label: 'Bridal Sets', to: '/products?category=bridal-sets' },
-      { label: 'Mangalsutra & Sets', to: '/products?category=mangalsutra' },
-      { label: 'Gift Sets', to: '/products?tags=combo' },
+      { label: 'Ear Ring', to: '/products?category=ear-ring' },
+      { label: 'Necklaces Sets', to: '/products?category=necklaces-sets' },
+      { label: 'Bangles', to: '/products?category=bangles' },
+      { label: 'Wedding Jewells', to: '/products?category=wedding-jewells' },
+      { label: 'Chains', to: '/products?category=chains' },
+      { label: 'Pancha Loha Jewells', to: '/products?category=pancha-loha-jewells' },
     ],
   },
   {

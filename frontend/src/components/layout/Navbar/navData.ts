@@ -18,47 +18,34 @@ export interface NavItemDef {
 }
 
 export const NAV_ITEMS: NavItemDef[] = [
+  { label: 'NEW ARRIVAL', href: '/products?category=new-arrival' },
   {
-    label: 'EARRINGS',
-    href: '/products?category=earrings',
+    label: 'NECKLACES SETS',
+    href: '/products?category=necklaces-sets',
     groups: [
       [
         {
           links: [
-            { label: 'Jhumkas', href: '/products?category=jhumkas' },
-            { label: 'Studs', href: '/products?category=studs' },
-            { label: 'Drops & Dangles', href: '/products?category=drops-dangles' },
-            { label: 'Chandbalis', href: '/products?category=chandbalis' },
+            { label: 'Kundan Necklace Sets', href: '/products?category=kundan-necklace-sets' },
+            { label: 'South Indian Sets', href: '/products?category=south-indian-sets' },
+            { label: 'Heritage Necklace Sets', href: '/products?category=heritage-necklace-sets' },
+            { label: 'Antique Jewellery Set', href: '/products?category=antique-jewellery-set' },
+            { label: 'Pendent Necklace', href: '/products?category=pendent-necklace' },
+            { label: 'Temple Jewellery', href: '/products?category=temple-jewellery' },
           ],
         },
       ],
       [
         {
-          title: 'Shop by Occasion',
           links: [
-            { label: 'Bridal', href: '/products?tags=bridal' },
-            { label: 'Daily Wear', href: '/products?tags=daily-wear' },
-            { label: 'Festive', href: '/products?tags=festive' },
+            { label: 'American Diamond Sets', href: '/products?category=american-diamond-sets' },
+            { label: 'Choker Sets', href: '/products?category=choker-sets' },
+            { label: 'Long Sets', href: '/products?category=long-sets' },
+            { label: 'Panchaloha Sets', href: '/products?category=panchaloha-sets' },
+            { label: 'Simple AD Sets', href: '/products?category=simple-ad-sets' },
+            { label: 'Combo Sets', href: '/products?category=combo-sets' },
           ],
         },
-      ],
-    ],
-  },
-  {
-    label: 'NECKLACES',
-    href: '/products?category=necklaces',
-    groups: [
-      [
-        {
-          links: [
-            { label: 'Chokers', href: '/products?category=chokers' },
-            { label: 'Chains', href: '/products?category=chains' },
-            { label: 'Rani Haars', href: '/products?category=rani-haars' },
-            { label: 'Pendants', href: '/products?category=pendants' },
-          ],
-        },
-      ],
-      [
         {
           title: 'Shop by Style',
           links: [
@@ -71,53 +58,131 @@ export const NAV_ITEMS: NavItemDef[] = [
     ],
   },
   {
-    label: 'BANGLES & KADA',
+    label: 'EAR RING',
+    href: '/products?category=ear-ring',
+    groups: [
+      [
+        {
+          links: [
+            { label: 'Jumkas', href: '/products?category=jumkas' },
+            { label: 'Chandbalis', href: '/products?category=chandbalis' },
+            { label: 'Studs', href: '/products?category=studs' },
+          ],
+        },
+      ],
+      [
+        {
+          links: [
+            { label: 'Danglers', href: '/products?category=danglers' },
+            { label: 'Balis', href: '/products?category=balis' },
+            { label: 'Daily Wear', href: '/products?category=daily-wear' },
+          ],
+        },
+        {
+          title: 'Shop by Occasion',
+          links: [
+            { label: 'Bridal', href: '/products?tags=bridal' },
+            { label: 'Daily Wear', href: '/products?tags=daily-wear' },
+            { label: 'Festive', href: '/products?tags=festive' },
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    label: 'BANGLES',
     href: '/products?category=bangles',
     groups: [
       [
         {
           links: [
-            { label: 'Bangles', href: '/products?category=bangles' },
-            { label: 'Kadas', href: '/products?category=kadas' },
-            { label: 'Bracelets', href: '/products?category=bracelets' },
+            { label: 'Set of 2 Bangles', href: '/products?category=set-of-2two-bangles' },
+            { label: 'Set of 4 Bangles', href: '/products?category=set-of-4-bangles' },
+            { label: 'Set of 6/12 Bangles', href: '/products?category=set-of-6-12-bangles' },
+            { label: 'Kada', href: '/products?category=kada' },
+            { label: 'Bracelet', href: '/products?category=bracelet' },
           ],
         },
       ],
     ],
   },
   {
-    label: 'BRIDAL',
-    href: '/products?category=bridal-sets',
+    label: 'CHAINS',
+    href: '/products?category=chains',
+    groups: [
+      [
+        {
+          links: [
+            { label: 'Moppu Chain', href: '/products?category=moppu-chain' },
+            { label: 'Plain', href: '/products?category=plain' },
+            { label: 'Pendent', href: '/products?category=pendent' },
+            { label: 'Beads Chain', href: '/products?category=beads-chain' },
+            { label: 'Mangal Sutra', href: '/products?category=mangal-sutra' },
+            { label: 'Karimani Mala', href: '/products?category=karimani-mala' },
+          ],
+        },
+      ],
+    ],
+  },
+  {
+    label: 'WEDDING JEWELLS',
+    href: '/products?category=wedding-jewells',
     groups: [
       [
         {
           links: [
             { label: 'Bridal Sets', href: '/products?category=bridal-sets' },
-            { label: 'Maang Tikkas', href: '/products?category=maang-tikkas' },
-            { label: 'Nath & Nose Pins', href: '/products?category=nath-nose-pins' },
-            { label: 'Hair Accessories', href: '/products?category=hair-accessories' },
+            { label: 'Mang Tikka', href: '/products?category=mang-tikka' },
+            { label: 'Waist Belt', href: '/products?category=waist-belt' },
+            { label: 'Vanki Arm Band', href: '/products?category=vanki-arm-band' },
+          ],
+        },
+      ],
+      [
+        {
+          links: [
+            { label: 'Finger Rings', href: '/products?category=wedding-finger-rings' },
+            { label: 'Mangal Sutra', href: '/products?category=wedding-mangal-sutra' },
+            { label: 'Gifting.', href: '/products?category=gifting' },
           ],
         },
       ],
     ],
   },
   {
-    label: 'MANGALSUTRA & SETS',
-    href: '/products?category=mangalsutra',
+    label: 'PANCHA LOHA JEWELLS',
+    href: '/products?category=pancha-loha-jewells',
     groups: [
       [
         {
           links: [
-            { label: 'Mangalsutras', href: '/products?category=mangalsutra' },
-            { label: 'Necklace Sets', href: '/products?category=necklace-sets' },
-            { label: 'Temple Jewellery', href: '/products?category=temple-jewellery' },
-            { label: 'Rings', href: '/products?category=rings' },
+            { label: 'Attiga', href: '/products?category=attiga' },
+            { label: 'Necklace', href: '/products?category=necklace' },
+            { label: 'Chain', href: '/products?category=chain' },
+            { label: 'Finger Rings', href: '/products?category=finger-rings' },
           ],
         },
       ],
     ],
   },
-  { label: 'GIFT SETS', href: '/products?tags=combo' },
+  { label: 'FESTIVAL PICK', href: '/products?category=festival-pick' },
+  { label: 'SIGNATURE COLLECTION', href: '/products?category=signature-collection' },
+  { label: 'BEST SELLERS', href: '/products?category=best-sellers' },
+  {
+    label: 'OTHER JEWELLERY',
+    href: '/products?category=other-jewellery',
+    groups: [
+      [
+        {
+          links: [
+            { label: 'Ethnic Templejewellery', href: '/products?category=ethnic-templejewellery' },
+            { label: 'Minimal Ethnic Jewellery', href: '/products?category=minimal-ethnic-jewellery' },
+            { label: 'Bridal Bliss', href: '/products?category=bridal-bliss' },
+          ],
+        },
+      ],
+    ],
+  },
   { label: 'CORPORATE GIFTS', href: '/corporate-gifting' },
   { label: 'BLOG', href: '/blog' },
   { label: 'SALE', href: '/products?tags=offers', highlight: true },
@@ -134,45 +199,52 @@ export interface MobileCollection {
 
 export const MOBILE_COLLECTIONS: MobileCollection[] = [
   {
-    label: 'Earrings',
-    href: '/products?category=earrings',
+    label: 'New Arrival',
+    href: '/products?category=new-arrival',
     image:
       'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
-    label: 'Necklaces',
-    href: '/products?category=necklaces',
+    label: 'Necklaces Sets',
+    href: '/products?category=necklaces-sets',
     image:
       'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
     accent: '#f0e4cf',
   },
   {
-    label: 'Bangles & Kada',
+    label: 'Ear Ring',
+    href: '/products?category=ear-ring',
+    image:
+      'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=280&q=80',
+    accent: '#f3d9cf',
+  },
+  {
+    label: 'Bangles',
     href: '/products?category=bangles',
     image:
       'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=280&q=80',
-    accent: '#f3d9cf',
-  },
-  {
-    label: 'Bridal',
-    href: '/products?category=bridal-sets',
-    image:
-      'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=280&q=80',
     accent: '#f0e4cf',
   },
   {
-    label: 'Mangalsutra & Sets',
-    href: '/products?category=mangalsutra',
+    label: 'Wedding Jewells',
+    href: '/products?category=wedding-jewells',
     image:
-      'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=280&q=80',
+      'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
-    label: 'Gift Sets',
-    href: '/products?tags=combo',
+    label: 'Chains',
+    href: '/products?category=chains',
     image:
-      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=280&q=80',
+      'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=280&q=80',
+    accent: '#f0e4cf',
+  },
+  {
+    label: 'Best Sellers',
+    href: '/products?category=best-sellers',
+    image:
+      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
