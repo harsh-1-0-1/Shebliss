@@ -60,7 +60,7 @@ function RatingBreakdown({
             key={star}
             type="button"
             onClick={() => onSelect(activeRating === star ? undefined : star)}
-            className={`grid w-full grid-cols-[54px_minmax(0,1fr)_42px] items-center gap-2.5 rounded-md px-1.5 py-1 text-left text-[13px] font-medium transition sm:grid-cols-[62px_minmax(0,1fr)_48px] ${
+            className={`grid w-full grid-cols-[54px_minmax(0,1fr)_42px] items-center gap-2.5 rounded-md px-1.5 py-1 text-left text-[14px] font-medium transition sm:grid-cols-[62px_minmax(0,1fr)_48px] ${
               activeRating === star ? 'bg-primary/5 text-primary' : 'text-gray-700 hover:bg-gray-50'
             }`}
             aria-label={`${star} star reviews, ${count} reviews`}
@@ -388,7 +388,7 @@ export default function ProductReviews({ productId }: { productId: number }) {
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="truncate text-sm font-bold text-gray-950">{review.author_name}</p>
                           {review.is_verified_purchase && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[12px] font-bold text-emerald-700">
                               <CheckCircle2 size={12} /> Verified
                             </span>
                           )}

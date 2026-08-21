@@ -23,7 +23,7 @@ function setCookie(name: string, value: string, maxAge: number) {
 }
 
 const Dot = () => (
-  <span className="mx-5 text-[#C6A15E]/50 text-[8px] select-none" aria-hidden>✦</span>
+  <span className="mx-5 text-[#C6A15E]/50 text-[9px] select-none" aria-hidden>✦</span>
 );
 
 export default function AnnouncementBar() {
@@ -44,7 +44,7 @@ export default function AnnouncementBar() {
       {i > 0 && <Dot />}
       <Link
         to={msg.cta_link || '/products'}
-        className="hover:text-[#C6A15E] transition-colors tracking-[0.16em] text-[10px] sm:text-[11px] font-medium uppercase"
+        className="hover:text-[#C6A15E] transition-colors tracking-[0.16em] text-[11px] sm:text-[12px] font-medium uppercase"
       >
         {msg.title}
       </Link>

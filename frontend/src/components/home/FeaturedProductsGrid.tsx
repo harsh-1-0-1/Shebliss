@@ -53,7 +53,7 @@ export default function FeaturedProductsGrid() {
                 <button
                   key={t.label}
                   onClick={() => setActiveTab(i)}
-                  className={`px-4 py-2.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-colors relative whitespace-nowrap ${
+                  className={`px-4 py-2.5 text-[12px] font-bold tracking-[0.12em] uppercase transition-colors relative whitespace-nowrap ${
                     i === activeTab
                       ? 'text-[#1A1A1A]'
                       : 'text-[#767676] hover:text-[#1A1A1A]'
@@ -117,7 +117,7 @@ export default function FeaturedProductsGrid() {
         <div className="mt-8 sm:mt-10 text-center">
           <Link
             to={tab.href}
-            className="inline-flex items-center gap-2 px-8 py-3.5 border border-[#1A1A1A] text-[11px] font-semibold tracking-[0.18em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors duration-300 group/btn"
+            className="inline-flex items-center gap-2 px-8 py-3.5 border border-[#1A1A1A] text-[12px] font-semibold tracking-[0.18em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors duration-300 group/btn"
           >
             View all {tab.label}
             <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />

@@ -135,11 +135,11 @@ function OrderSummary({
           <div key={`${item.product_id}-${JSON.stringify(item.selected_options)}`} className="flex gap-3 items-center">
             <div className="relative h-12 w-12 shrink-0 rounded-lg border border-gray-200 bg-white">
               <img src={item.resolved_image_url || item.product.images?.[0]} alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
-              <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[10px] font-bold text-white">{item.quantity}</span>
+              <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[11px] font-bold text-white">{item.quantity}</span>
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-gray-950 truncate">{item.product.name}</p>
-              {optionSummary(item) && <p className="mt-0.5 text-[10px] text-gray-500 truncate">{optionSummary(item)}</p>}
+              {optionSummary(item) && <p className="mt-0.5 text-[11px] text-gray-500 truncate">{optionSummary(item)}</p>}
             </div>
             <p className="text-xs font-semibold text-gray-950">{money(item.line_total)}</p>
           </div>
@@ -166,7 +166,7 @@ function OrderSummary({
         <div className="flex justify-between"><span>Subtotal</span><span>{money(subtotal)}</span></div>
         <div className="flex justify-between"><span>Shipping</span><span className="text-right text-gray-500">{shipping === 0 ? 'Free' : money(shipping)}</span></div>
         {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Discount ({couponCode})</span><span>-{money(discount)}</span></div>}
-        <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[10px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
+        <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[11px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
       </div>
     </div>
   );
@@ -203,11 +203,11 @@ function DesktopSummary({ items, subtotal, shipping, total, discount, couponCode
           <div key={`${item.product_id}-${JSON.stringify(item.selected_options)}`} className="flex gap-3 items-center">
             <div className="relative h-12 w-12 shrink-0 rounded-lg border border-gray-200 bg-white">
               <img src={item.resolved_image_url || item.product.images?.[0]} alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
-              <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[10px] font-bold text-white">{item.quantity}</span>
+              <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[11px] font-bold text-white">{item.quantity}</span>
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-gray-950 truncate">{item.product.name}</p>
-              {optionSummary(item) && <p className="mt-0.5 text-[10px] text-gray-500 truncate">{optionSummary(item)}</p>}
+              {optionSummary(item) && <p className="mt-0.5 text-[11px] text-gray-500 truncate">{optionSummary(item)}</p>}
             </div>
             <p className="text-xs font-semibold text-gray-950">{money(item.line_total)}</p>
           </div>
@@ -231,7 +231,7 @@ function DesktopSummary({ items, subtotal, shipping, total, discount, couponCode
           <div className="flex justify-between"><span>Subtotal</span><span>{money(subtotal)}</span></div>
           <div className="flex justify-between"><span>Shipping</span><span className="text-right text-gray-500">{shipping === 0 ? 'Free' : money(shipping)}</span></div>
           {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Discount ({couponCode})</span><span>-{money(discount)}</span></div>}
-          <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[10px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
+          <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-bold text-gray-900"><span>Total</span><span><span className="mr-1.5 text-[11px] font-medium text-gray-500">INR</span>{money(total)}</span></div>
         </div>
       </div>
     </aside>
@@ -557,7 +557,7 @@ export default function CheckoutPage() {
             {billingMode === 'different' && <div className="rounded-lg bg-gray-50 p-3.5 text-xs text-gray-600">Billing form can reuse the same fields and API once separate billing storage is added.</div>}
           </section>
 
-          <button disabled={paying || createAddress.isPending} className="mt-6 h-12 w-full bg-[#1A1A1A] text-[11px] font-bold tracking-[0.16em] uppercase text-[#F9F8F6] transition hover:bg-[#2B2421] disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]">
+          <button disabled={paying || createAddress.isPending} className="mt-6 h-12 w-full bg-[#1A1A1A] text-[12px] font-bold tracking-[0.16em] uppercase text-[#F9F8F6] transition hover:bg-[#2B2421] disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.99]">
             {paying || createAddress.isPending ? 'Processing...' : paymentMethod === 'cod' ? 'Place COD Order' : 'Pay Now'}
           </button>
 
@@ -574,7 +574,7 @@ export default function CheckoutPage() {
                   <Icon className="h-7 w-7 shrink-0 text-primary/70 mt-0.5" />
                   <div>
                     <h3 className="text-xs font-semibold text-gray-900">{title as string}</h3>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">{text as string}</p>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">{text as string}</p>
                   </div>
                 </div>
               ))}

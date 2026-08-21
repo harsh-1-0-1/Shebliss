@@ -87,7 +87,7 @@ function OrderDrawer({ order, onClose }: { order: Order; onClose: () => void }) 
           {/* Visual Progress Timeline */}
           {order.status !== 'cancelled' && (
             <div className="bg-white p-4 rounded-xl border border-gray-200">
-              <span className="text-[10px] font-bold text-gray-400 uppercase block mb-3">Order Status Progression</span>
+              <span className="text-[11px] font-bold text-gray-400 uppercase block mb-3">Order Status Progression</span>
               <div className="flex items-center justify-between relative">
                 <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
                 {steps.map((step, idx) => {
@@ -106,7 +106,7 @@ function OrderDrawer({ order, onClose }: { order: Order; onClose: () => void }) 
                       >
                         {isCompleted ? '✓' : idx + 1}
                       </div>
-                      <span className="text-[10px] font-semibold mt-1.5 capitalize text-gray-600">
+                      <span className="text-[11px] font-semibold mt-1.5 capitalize text-gray-600">
                         {step}
                       </span>
                     </div>
@@ -119,23 +119,23 @@ function OrderDrawer({ order, onClose }: { order: Order; onClose: () => void }) 
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="bg-white p-3 rounded-xl border border-gray-100">
-              <span className="text-gray-400 block text-[10px] font-bold uppercase">Current Status</span>
+              <span className="text-gray-400 block text-[11px] font-bold uppercase">Current Status</span>
               <span className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${STATUS_COLORS[order.status] || 'bg-gray-100'}`}>
                 {STATUS_LABELS[order.status]}
               </span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-gray-100">
-              <span className="text-gray-400 block text-[10px] font-bold uppercase">Payment Gateway Status</span>
+              <span className="text-gray-400 block text-[11px] font-bold uppercase">Payment Gateway Status</span>
               <span className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${paymentBadgeClass(order)}`}>
                 {paymentLabel(order)}
               </span>
             </div>
             <div className="bg-white p-3 rounded-xl border border-gray-100">
-              <span className="text-gray-400 block text-[10px] font-bold uppercase">Total Billable Amount</span>
+              <span className="text-gray-400 block text-[11px] font-bold uppercase">Total Billable Amount</span>
               <p className="font-bold text-base text-primary mt-0.5">₹{order.total_amount}</p>
             </div>
             <div className="bg-white p-3 rounded-xl border border-gray-100">
-              <span className="text-gray-400 block text-[10px] font-bold uppercase">Order Placed Date</span>
+              <span className="text-gray-400 block text-[11px] font-bold uppercase">Order Placed Date</span>
               <p className="font-medium text-gray-700 mt-0.5">{new Date(order.created_at).toLocaleString()}</p>
             </div>
           </div>
@@ -184,9 +184,9 @@ function OrderDrawer({ order, onClose }: { order: Order; onClose: () => void }) 
                     )}
                     <div>
                       <span className="font-semibold text-gray-800">{item.product_name || `Product #${item.product_id}`}</span>
-                      <p className="text-[10px] text-gray-400">Product ID: #{item.product_id}</p>
+                      <p className="text-[11px] text-gray-400">Product ID: #{item.product_id}</p>
                       {item.selected_options && (
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-[11px] text-gray-400">
                           {formatSelectedOptions(item.selected_options, null)}
                         </p>
                       )}
@@ -317,15 +317,15 @@ export default function OrdersAdminPage() {
                     <td className="px-5 py-3.5 font-semibold text-gray-900">#{o.id}</td>
                     <td className="px-5 py-3.5">
                       <span className="font-semibold text-gray-800">{customerName}</span>
-                      {o.user?.email && <p className="text-[10px] text-gray-400 mt-0.5">{o.user.email}</p>}
+                      {o.user?.email && <p className="text-[11px] text-gray-400 mt-0.5">{o.user.email}</p>}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
                         {o.status}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${paymentBadgeClass(o)}`}>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded capitalize ${paymentBadgeClass(o)}`}>
                         {paymentLabel(o)}
                       </span>
                     </td>
@@ -359,12 +359,12 @@ export default function OrdersAdminPage() {
                     <span className="text-sm font-semibold text-gray-900">#{o.id}</span>
                     <p className="text-xs text-gray-700 font-medium mt-0.5">{customerName}</p>
                   </div>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
                     {o.status}
                   </span>
                 </div>
                 <div className="flex items-end justify-between mt-2 pt-2 border-t border-gray-100">
-                  <p className="text-[10px] text-gray-400">{new Date(o.created_at).toLocaleDateString()} · {paymentLabel(o)}</p>
+                  <p className="text-[11px] text-gray-400">{new Date(o.created_at).toLocaleDateString()} · {paymentLabel(o)}</p>
                   <p className="text-sm font-bold text-primary">₹{o.total_amount}</p>
                 </div>
               </button>

@@ -111,7 +111,7 @@ export default function Footer() {
               <span className="font-display text-2xl tracking-[0.1em] text-[#F9F8F6]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600 }}>
                 {APP_NAME.toUpperCase()}
               </span>
-              <p className="text-[9px] tracking-[0.3em] uppercase text-[#C6A15E] mt-0.5">Fine Artificial Jewellery</p>
+              <p className="text-[10px] tracking-[0.3em] uppercase text-[#C6A15E] mt-0.5">Fine Artificial Jewellery</p>
             </div>
             <p className="text-sm text-white/50 leading-relaxed mb-6 max-w-xs">
               Handcrafted 18k gold plated & anti-tarnish statement jewellery — designed to feel heirloom.
@@ -130,7 +130,7 @@ export default function Footer() {
           {/* Link columns */}
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C6A15E] mb-4">{col.title}</h4>
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C6A15E] mb-4">{col.title}</h4>
               <ul className="space-y-2.5">
                 {col.links.map((lk) => (
                   <li key={lk.label}>
@@ -158,7 +158,7 @@ export default function Footer() {
           <span>© {new Date().getFullYear()} {APP_NAME}. All rights reserved. Thinking Web Technology</span>
           <div className="flex items-center gap-2">
             {['VISA', 'MASTERCARD', 'UPI', 'RAZORPAY'].map((m) => (
-              <span key={m} className="px-2 py-0.5 border border-white/10 text-[9px] font-bold tracking-wider">{m}</span>
+              <span key={m} className="px-2 py-0.5 border border-white/10 text-[10px] font-bold tracking-wider">{m}</span>
             ))}
           </div>
         </div>

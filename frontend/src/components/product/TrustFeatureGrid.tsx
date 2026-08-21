@@ -9,8 +9,8 @@ export default function TrustFeatureGrid() {
             <item.icon size={17} strokeWidth={1.5} />
           </span>
           <div>
-            <p className="text-[11px] font-semibold text-espresso leading-tight">{item.label}</p>
-            <p className="text-[10px] text-slate mt-0.5">{item.sub}</p>
+            <p className="text-[12px] font-semibold text-espresso leading-tight">{item.label}</p>
+            <p className="text-[11px] text-slate mt-0.5">{item.sub}</p>
           </div>
         </div>
       ))}

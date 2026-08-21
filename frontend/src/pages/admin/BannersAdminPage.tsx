@@ -208,7 +208,7 @@ function SortableBannerRow({
       </div>
 
       <span
-        className={`hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+        className={`hidden sm:inline-flex items-center gap-1 text-[12px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
           banner.is_active
             ? 'bg-green-50 text-green-700'
             : 'bg-gray-100 text-gray-500'
@@ -281,7 +281,7 @@ function BannerPreview({
 }) {
   return (
     <div className="mt-4 p-4 border rounded-xl bg-gray-50">
-      <p className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Live Mockup Preview</p>
+      <p className="text-[12px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Live Mockup Preview</p>
       <div
         className="w-full overflow-hidden rounded-lg border border-gray-200 bg-[#f1e9dc]"
         style={{ height: 200 }}
@@ -560,7 +560,7 @@ function BannerDrawer({
                 className={inputClass}
                 placeholder="e.g. /products, /cart, or * for fallback"
               />
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[11px] text-gray-400 mt-0.5">
                 Exact page path for this banner. Leave blank or use * to make it the fallback banner.
               </p>
               {errors.target_path && (
@@ -593,7 +593,7 @@ function BannerDrawer({
                   placeholder="e.g. electronics, clothing, or * for fallback"
                 />
               )}
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[11px] text-gray-400 mt-0.5">
                 The banner appears on products under this main category. Leave blank or use * as the fallback banner.
               </p>
               {errors.target_path && (
@@ -614,7 +614,7 @@ function BannerDrawer({
                 className={inputClass}
                 placeholder="e.g. kundan, bridal, best-seller"
               />
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[11px] text-gray-400 mt-0.5">
                 Products carrying this tag are shown in the sliding bar below this banner. Leave blank to skip the product bar.
               </p>
               {errors.products_tag && (
@@ -634,7 +634,7 @@ function BannerDrawer({
               className={inputClass}
               placeholder="e.g. Festive Sale"
             />
-            <p className="text-[10px] text-gray-400 mt-0.5">The main text displaying bold over the banner.</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">The main text displaying bold over the banner.</p>
             {errors.title && (
               <p className="text-xs text-red-500 mt-1">
                 {errors.title.message}
@@ -651,7 +651,7 @@ function BannerDrawer({
               className={inputClass}
               placeholder="e.g. Up to 40% off on all festive jewellery collections."
             />
-            <p className="text-[10px] text-gray-400 mt-0.5">Subtext displayed under the main heading.</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">Subtext displayed under the main heading.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -773,7 +773,7 @@ function BannerDrawer({
               <label className="text-xs font-semibold text-gray-700 block">
                 Publish Status
               </label>
-              <span className="text-[10px] text-gray-400">Make it visible immediately on the website</span>
+              <span className="text-[11px] text-gray-400">Make it visible immediately on the website</span>
             </div>
             <button
               type="button"
@@ -868,17 +868,17 @@ function BannerDrawer({
                             <p className="text-xs font-semibold text-gray-700">
                               Upload Banner Image
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
+                            <p className="text-[11px] text-gray-400 mt-0.5">
                               Drag file or click to select
                             </p>
-                            <p className="text-[10px] text-red-600 font-semibold mt-1">
+                            <p className="text-[11px] text-red-600 font-semibold mt-1">
                               {activePlacementDetails.helpText}
                             </p>
                           </div>
                         )}
                       </div>
                       {filePreview && (
-                        <p className="text-[10px] text-red-600 font-semibold mt-1">
+                        <p className="text-[11px] text-red-600 font-semibold mt-1">
                           {activePlacementDetails.helpText}
                         </p>
                       )}
@@ -911,7 +911,7 @@ function BannerDrawer({
                         placeholder="e.g. https://images.unsplash.com/..."
                         className={inputClass}
                       />
-                      <p className="text-[10px] text-red-600 font-semibold mt-1">
+                      <p className="text-[11px] text-red-600 font-semibold mt-1">
                         {activePlacementDetails.helpText}
                       </p>
                       {urlValid === true && (
@@ -945,7 +945,7 @@ function BannerDrawer({
 
           {watchedPlacement === 'page' && (
             <div className="mt-4 p-4 border rounded-xl bg-gray-50">
-              <p className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Page Banner Strip</p>
+              <p className="text-[12px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">Page Banner Strip</p>
               <div
                 className="h-[60px] w-full overflow-hidden rounded-lg border border-gray-200"
                 style={{ backgroundColor: watchedBgColor }}
@@ -1159,7 +1159,7 @@ export default function BannersAdminPage() {
         <div>
           <h3 className="font-bold text-sm text-gray-800">{activePlacementInfo.label}</h3>
           <p className="text-xs text-gray-500 mt-0.5">{activePlacementInfo.description}</p>
-          <p className="text-[11px] text-red-600 font-semibold mt-1.5 flex items-center gap-1">
+          <p className="text-[12px] text-red-600 font-semibold mt-1.5 flex items-center gap-1">
             <Info size={12} /> {activePlacementInfo.helpText}
           </p>
         </div>

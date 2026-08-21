@@ -23,7 +23,7 @@ export default function OrdersPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14" style={{ backgroundColor: '#F9F8F6' }}>
       <div className="mb-8">
-        <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Account</p>
+        <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Account</p>
         <h1 className="text-3xl sm:text-4xl text-[#1A1A1A] leading-none"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, letterSpacing: '0.02em' }}>
           My Orders
@@ -39,9 +39,9 @@ export default function OrdersPage() {
             style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
             No orders yet
           </p>
-          <p className="text-[13px] text-[#767676] font-body">Your completed orders will appear here.</p>
+          <p className="text-[14px] text-[#767676] font-body">Your completed orders will appear here.</p>
           <Link to="/products"
-            className="px-8 py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.16em] uppercase hover:bg-[#2B2421] transition-colors">
+            className="px-8 py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.16em] uppercase hover:bg-[#2B2421] transition-colors">
             Start Shopping
           </Link>
         </div>
@@ -59,19 +59,19 @@ export default function OrdersPage() {
                     <Package size={16} strokeWidth={1.5} className="text-[#C6A15E]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-[#1A1A1A] font-body">Order #{order.id}</p>
-                    <p className="text-[11px] text-[#767676] font-body mt-0.5">
+                    <p className="text-[14px] font-semibold text-[#1A1A1A] font-body">Order #{order.id}</p>
+                    <p className="text-[12px] text-[#767676] font-body mt-0.5">
                       {new Date(order.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
                       {' · '}{order.items.length} item{order.items.length !== 1 ? 's' : ''}
                     </p>
-                    <span className="inline-block mt-1.5 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase"
+                    <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase"
                       style={{ backgroundColor: s.bg, color: s.text }}>
                       {s.label}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <p className="text-[15px] font-bold text-[#1A1A1A] font-body">{format(order.total_amount)}</p>
+                  <p className="text-[16px] font-bold text-[#1A1A1A] font-body">{format(order.total_amount)}</p>
                   <ArrowRight size={14} className="text-[#767676] group-hover:text-[#C6A15E] group-hover:translate-x-0.5 transition-all" />
                 </div>
               </Link>
@@ -86,7 +86,7 @@ export default function OrdersPage() {
             className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] disabled:opacity-30 transition-colors">
             <ChevronLeft size={14} />
           </button>
-          <span className="text-[12px] text-[#767676] font-body px-2">Page {page} of {data.pages}</span>
+          <span className="text-[13px] text-[#767676] font-body px-2">Page {page} of {data.pages}</span>
           <button disabled={page >= data.pages} onClick={() => setPage(page + 1)}
             className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] disabled:opacity-30 transition-colors">
             <ChevronRight size={14} />

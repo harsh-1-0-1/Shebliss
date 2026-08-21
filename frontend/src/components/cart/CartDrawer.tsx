@@ -50,7 +50,7 @@ export default function CartDrawer() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFECE6] shrink-0">
           <div className="flex items-center gap-2">
             <ShoppingBag size={18} strokeWidth={1.5} className="text-[#C6A15E]" />
-            <span className="text-[12px] font-bold tracking-[0.16em] uppercase text-[#1A1A1A]">
+            <span className="text-[13px] font-bold tracking-[0.16em] uppercase text-[#1A1A1A]">
               Your Bag {itemCount > 0 && `(${itemCount})`}
             </span>
           </div>
@@ -67,18 +67,18 @@ export default function CartDrawer() {
                 <ShoppingBag size={22} strokeWidth={1.5} className="text-[#C6A15E]" />
               </div>
               <div>
-                <p className="text-[18px] text-[#1A1A1A]"
+                <p className="text-[19px] text-[#1A1A1A]"
                   style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}>
                   Your bag is empty
                 </p>
-                <p className="text-[12px] text-[#767676] mt-1 font-body">Add something beautiful to get started.</p>
+                <p className="text-[13px] text-[#767676] mt-1 font-body">Add something beautiful to get started.</p>
               </div>
               <button onClick={closeDrawer}
-                className="px-6 py-2.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors">
+                className="px-6 py-2.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors">
                 Continue Shopping
               </button>
               <div className="w-full pt-4 border-t border-[#EFECE6]">
-                <p className="text-[9px] font-bold tracking-[0.22em] uppercase text-[#767676] mb-3">You might like</p>
+                <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#767676] mb-3">You might like</p>
                 <div className="grid grid-cols-2 gap-2">
                   {SUGGESTIONS.map((s) => (
                     <Link key={s.title} to={s.href} onClick={closeDrawer}
@@ -86,7 +86,7 @@ export default function CartDrawer() {
                       <div className="aspect-square overflow-hidden">
                         <img src={s.img} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                       </div>
-                      <p className="text-[11px] font-semibold text-[#1A1A1A] px-2 py-2 font-body">{s.title}</p>
+                      <p className="text-[12px] font-semibold text-[#1A1A1A] px-2 py-2 font-body">{s.title}</p>
                     </Link>
                   ))}
                 </div>
@@ -105,21 +105,21 @@ export default function CartDrawer() {
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link to={`/products/${item.product.slug}`} onClick={closeDrawer}
-                      className="text-[13px] font-medium text-[#1A1A1A] line-clamp-1 hover:text-[#C6A15E] transition-colors"
+                      className="text-[14px] font-medium text-[#1A1A1A] line-clamp-1 hover:text-[#C6A15E] transition-colors"
                       style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                       {item.product.name}
                     </Link>
-                    {optLabel(item) && <p className="text-[10px] text-[#767676] mt-0.5 font-body">{optLabel(item)}</p>}
-                    <p className="text-[13px] font-semibold text-[#1A1A1A] mt-1 font-body">{format(item.unit_price)}</p>
+                    {optLabel(item) && <p className="text-[11px] text-[#767676] mt-0.5 font-body">{optLabel(item)}</p>}
+                    <p className="text-[14px] font-semibold text-[#1A1A1A] mt-1 font-body">{format(item.unit_price)}</p>
                     {item.stock_warning && (
-                      <p className="text-[10px] text-red-500 mt-0.5">Only {item.available_stock} left</p>
+                      <p className="text-[11px] text-red-500 mt-0.5">Only {item.available_stock} left</p>
                     )}
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center border border-[#F9F8F6]" style={{ backgroundColor: '#F9F8F6' }}>
                         <button onClick={() => handleUpdate(item.id, item.quantity - 1)} className="px-2.5 py-1.5 hover:bg-[#EFECE6] transition-colors touch-target">
                           <Minus size={12} strokeWidth={1.5} />
                         </button>
-                        <span className="px-2.5 text-[13px] font-semibold font-body">{item.quantity}</span>
+                        <span className="px-2.5 text-[14px] font-semibold font-body">{item.quantity}</span>
                         <button onClick={() => handleUpdate(item.id, item.quantity + 1)}
                           disabled={item.quantity >= item.available_stock}
                           className="px-2.5 py-1.5 hover:bg-[#EFECE6] transition-colors touch-target disabled:opacity-30">
@@ -131,7 +131,7 @@ export default function CartDrawer() {
                       </button>
                     </div>
                   </div>
-                  <p className="text-[13px] font-bold text-[#1A1A1A] shrink-0 font-body">{format(item.line_total)}</p>
+                  <p className="text-[14px] font-bold text-[#1A1A1A] shrink-0 font-body">{format(item.line_total)}</p>
                 </div>
               ))}
             </div>
@@ -141,21 +141,21 @@ export default function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && (
           <div className="shrink-0 border-t border-[#EFECE6] p-5 space-y-3 safe-bottom">
-            <div className="flex justify-between text-[12px] font-body">
+            <div className="flex justify-between text-[13px] font-body">
               <span className="text-[#767676]">Subtotal</span>
               <span className="font-semibold text-[#1A1A1A]">{format(total)}</span>
             </div>
-            <div className="flex justify-between text-[12px] font-body">
+            <div className="flex justify-between text-[13px] font-body">
               <span className="text-[#767676]">Shipping</span>
               <span className={`font-semibold ${shipping === 0 ? 'text-emerald-600' : 'text-[#1A1A1A]'}`}>
                 {shipping === 0 ? 'Free' : format(shipping)}
               </span>
             </div>
             {shipping > 0 && (
-              <p className="text-[10px] text-[#767676] font-body">Free shipping on orders over {format(999)}</p>
+              <p className="text-[11px] text-[#767676] font-body">Free shipping on orders over {format(999)}</p>
             )}
             <Link to="/cart" onClick={closeDrawer}
-              className="flex items-center justify-between w-full px-5 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors group">
+              className="flex items-center justify-between w-full px-5 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors group">
               <span>View Bag & Checkout</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>

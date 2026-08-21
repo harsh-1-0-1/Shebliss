@@ -393,7 +393,7 @@ function MobileGallery({
       {/* Tap image or this button to open the fullscreen zoom viewer */}
       <button
         onClick={() => setLightboxSrc(list[activeIndex])}
-        className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
+        className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/85 backdrop-blur-sm text-[11px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
         aria-label="Zoom in"
       >
         <ZoomIn size={14} /> Zoom
@@ -431,7 +431,7 @@ function DesktopGallery({
         {/* Zoom hint + open viewer */}
         <button
           onClick={() => setLightboxSrc(list[activeIndex])}
-          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-sm text-[10px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
+          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-sm text-[11px] font-bold tracking-[0.12em] uppercase text-gray-800 hover:bg-white transition-colors"
         >
           <ZoomIn size={13} /> Zoom
         </button>
@@ -481,7 +481,7 @@ function InlineBanner({ banner: b, fallbackImg, naturalSize = false }: {
     return (
       <Link
         to={b.cta_link}
-        className="mt-10 sm:mt-14 rounded-2xl overflow-hidden relative block"
+        className="mt-10 sm:mt-14 overflow-hidden relative block w-screen left-1/2 -translate-x-1/2"
         style={{ backgroundColor: b.bg_color || '#1B4332' }}
       >
         {inner}
@@ -491,7 +491,7 @@ function InlineBanner({ banner: b, fallbackImg, naturalSize = false }: {
 
   return (
     <div
-      className="mt-10 sm:mt-14 rounded-2xl overflow-hidden relative"
+      className="mt-10 sm:mt-14 overflow-hidden relative w-screen left-1/2 -translate-x-1/2"
       style={{ backgroundColor: b.bg_color || '#1B4332' }}
     >
       {inner}
@@ -919,7 +919,7 @@ export default function ProductDetailPage() {
             <div className="flex items-baseline gap-1.5">
               <span className="text-sm font-bold text-espresso">{format(displayPrice)}</span>
               {displayOriginalPrice && displayOriginalPrice > displayPrice && (
-                <span className="text-[11px] text-slate line-through">{format(displayOriginalPrice)}</span>
+                <span className="text-[12px] text-slate line-through">{format(displayOriginalPrice)}</span>
               )}
             </div>
           </div>

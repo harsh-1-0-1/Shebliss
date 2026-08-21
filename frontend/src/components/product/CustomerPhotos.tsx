@@ -25,7 +25,7 @@ export default function CustomerPhotos({ fallbackImages }: { fallbackImages: str
     <section className="mt-10 sm:mt-14" aria-labelledby="customer-photos-title">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="mb-1 text-[12px] font-semibold uppercase tracking-[0.2em] text-primary">
             Worn with love
           </p>
           <h2
@@ -78,7 +78,7 @@ export default function CustomerPhotos({ fallbackImages }: { fallbackImages: str
         ))}
       </div>
       {images.length > 1 && (
-        <p className="mt-1 text-center text-[11px] text-gray-400 sm:hidden">Swipe to see more</p>
+        <p className="mt-1 text-center text-[12px] text-gray-400 sm:hidden">Swipe to see more</p>
       )}
     </section>
   );

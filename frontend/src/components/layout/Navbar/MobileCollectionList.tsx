@@ -106,7 +106,7 @@ function CollectionAccordionRow({
           {navItem!.groups!.flat().map((group, gi) => (
             <div key={gi} className={gi > 0 ? 'mt-3' : ''}>
               {group.title && (
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 pb-1 border-b border-gray-50">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 pb-1 border-b border-gray-50">
                   {group.title}
                 </p>
               )}
@@ -116,7 +116,7 @@ function CollectionAccordionRow({
                     key={link.href}
                     to={link.href}
                     onClick={onNavigate}
-                    className="py-2 text-[13px] text-gray-600 hover:text-secondary active:text-secondary transition-colors truncate"
+                    className="py-2 text-[14px] text-gray-600 hover:text-secondary active:text-secondary transition-colors truncate"
                   >
                     {link.label}
                   </Link>

@@ -32,38 +32,36 @@ export default function CorporateGiftingPage() {
       <CorporateGiftInquiryForm />
       {corporateBanners.length > 0 && (
         <section className="bg-white py-3 sm:py-4">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 xl:px-16">
-            <div className="grid gap-3">
-              {corporateBanners.map((banner) => (
-                <a
-                  key={banner.id}
-                  href={banner.cta_link || '#corporate-inquiry'}
-                  className="group relative block overflow-hidden rounded-2xl bg-[#0a3b2c] shadow-[0_16px_44px_rgba(27,67,50,0.14)]"
-                  style={{ backgroundColor: banner.bg_color }}
-                >
-                  <div className="relative min-h-[150px] sm:min-h-[190px]">
-                    {banner.image_url ? (
-                      <img
-                        src={banner.image_url}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : null}
-                    <div className="relative flex min-h-[150px] max-w-2xl flex-col justify-center px-5 py-6 sm:min-h-[190px] sm:px-8">
-                      {banner.cta_text && (
-                        <span className="mt-4 w-fit rounded-full bg-white px-5 py-2 text-xs font-bold text-primary shadow-sm">
-                          {banner.cta_text}
-                        </span>
-                      )}
-                    </div>
+          <div className="grid gap-3">
+            {corporateBanners.map((banner) => (
+              <a
+                key={banner.id}
+                href={banner.cta_link || '#corporate-inquiry'}
+                className="group relative block overflow-hidden bg-[#0a3b2c]"
+                style={{ backgroundColor: banner.bg_color }}
+              >
+                <div className="relative min-h-[150px] sm:min-h-[190px]">
+                  {banner.image_url ? (
+                    <img
+                      src={banner.image_url}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : null}
+                  <div className="relative flex min-h-[150px] max-w-2xl flex-col justify-center px-5 py-6 sm:min-h-[190px] sm:px-8">
+                    {banner.cta_text && (
+                      <span className="mt-4 w-fit rounded-full bg-white px-5 py-2 text-xs font-bold text-primary shadow-sm">
+                        {banner.cta_text}
+                      </span>
+                    )}
                   </div>
-                </a>
-              ))}
-            </div>
+                </div>
+              </a>
+            ))}
           </div>
         </section>
       )}

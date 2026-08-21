@@ -120,17 +120,17 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Badge stack — named tag, discount, product badge */}
         <div className="absolute top-2 left-2 z-10 flex flex-col items-start gap-1">
           {namedBadge && (
-            <span className={`text-[8px] font-bold px-2 py-1 tracking-[0.14em] uppercase ${namedBadge.className}`}>
+            <span className={`text-[9px] font-bold px-2 py-1 tracking-[0.14em] uppercase ${namedBadge.className}`}>
               {namedBadge.label}
             </span>
           )}
           {discount !== null && discount > 0 && (
-            <span className="bg-rust text-bone text-[8px] font-bold px-2 py-1 tracking-[0.12em] uppercase rounded-sm">
+            <span className="bg-rust text-bone text-[9px] font-bold px-2 py-1 tracking-[0.12em] uppercase rounded-sm">
               −{discount}%
             </span>
           )}
           {product.badge && !discount && (
-            <span className="bg-gold text-ink text-[8px] font-bold px-2 py-1 tracking-wider uppercase">
+            <span className="bg-gold text-ink text-[9px] font-bold px-2 py-1 tracking-wider uppercase">
               {product.badge}
             </span>
           )}
@@ -165,13 +165,13 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Quick add — appears on hover */}
         <div className={`absolute bottom-0 left-0 right-0 z-10 transition-transform duration-300 ease-out ${hovered ? 'translate-y-0' : 'translate-y-full'}`}>
           {product.stock_qty === 0 ? (
-            <div className="w-full py-2.5 bg-[#EFECE6] text-[#767676] text-[10px] font-bold tracking-[0.14em] uppercase text-center">
+            <div className="w-full py-2.5 bg-[#EFECE6] text-[#767676] text-[11px] font-bold tracking-[0.14em] uppercase text-center">
               Out of Stock
             </div>
           ) : (
             <button
               onClick={handleAdd}
-              className="w-full py-2.5 bg-rust text-bone text-[10px] font-bold tracking-[0.14em] uppercase hover:bg-[#a84326] transition-colors"
+              className="w-full py-2.5 bg-rust text-bone text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#a84326] transition-colors"
             >
               {hasVariants ? 'Choose Options' : 'Add to Bag'}
             </button>
@@ -194,7 +194,7 @@ export default function ProductCard({ product }: { product: Product }) {
               />
             ))}
             {totalColors > availableColors.length && (
-              <span className="text-[9px] text-slate font-medium">+{totalColors - availableColors.length}</span>
+              <span className="text-[10px] text-slate font-medium">+{totalColors - availableColors.length}</span>
             )}
           </div>
         )}
@@ -213,7 +213,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Product name */}
         <h3
-          className="text-[14px] sm:text-[15px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors duration-200 font-body"
+          className="text-[15px] sm:text-[16px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors duration-200 font-body"
           style={{ fontWeight: 500, letterSpacing: '0.02em' }}
         >
           {product.name}
@@ -221,12 +221,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Price row */}
         <div className="flex items-baseline gap-2 mt-0.5">
-          <span className="text-[13px] font-semibold text-[#1A1A1A] font-body">
-            {hasVariants && <span className="text-[11px] font-normal text-[#767676] mr-0.5">from </span>}
+          <span className="text-[14px] font-semibold text-[#1A1A1A] font-body">
+            {hasVariants && <span className="text-[12px] font-normal text-[#767676] mr-0.5">from </span>}
             {format(product.price)}
           </span>
           {product.original_price && product.original_price > product.price && (
-            <span className="text-[11px] text-[#767676] line-through font-body">
+            <span className="text-[12px] text-[#767676] line-through font-body">
               {format(product.original_price)}
             </span>
           )}
@@ -234,7 +234,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Stock warning */}
         {product.stock_qty > 0 && product.stock_qty <= 5 && (
-          <p className="text-[10px] text-[#C6A15E] font-semibold">Only {product.stock_qty} left</p>
+          <p className="text-[11px] text-[#C6A15E] font-semibold">Only {product.stock_qty} left</p>
         )}
       </div>
     </Link>

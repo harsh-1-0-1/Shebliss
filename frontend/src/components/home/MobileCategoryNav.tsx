@@ -42,7 +42,7 @@ export default function MobileCategoryNav() {
                 loading="lazy"
               />
             </div>
-            <span className="text-[12px] sm:text-[14px] lg:text-[15px] font-medium text-[#2B2421] text-center tracking-wide leading-tight max-w-[72px] sm:max-w-[110px] lg:max-w-[130px] font-body">
+            <span className="text-[13px] sm:text-[15px] lg:text-[16px] font-medium text-[#2B2421] text-center tracking-wide leading-tight max-w-[72px] sm:max-w-[110px] lg:max-w-[130px] font-body">
               {b.label}
             </span>
           </Link>

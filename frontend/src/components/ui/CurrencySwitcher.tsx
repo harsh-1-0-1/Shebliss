@@ -57,7 +57,7 @@ export default function CurrencySwitcher({ variant = 'compact', className = '' }
               }`}
             >
               <span>{c.symbol} {c.code}</span>
-              <span className="text-[10px] opacity-60">{c.label}</span>
+              <span className="text-[11px] opacity-60">{c.label}</span>
             </button>
           ))}
         </div>

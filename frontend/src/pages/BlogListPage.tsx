@@ -23,12 +23,12 @@ export default function BlogListPage() {
     <div style={{ backgroundColor: '#F9F8F6' }}>
       {/* Header */}
       <div className="border-b border-[#EFECE6] py-12 sm:py-16 text-center px-4">
-        <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">Journal</p>
+        <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">Journal</p>
         <h1 className="text-4xl sm:text-5xl text-[#1A1A1A] leading-none"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, letterSpacing: '0.02em' }}>
           Stories & Style
         </h1>
-        <p className="mt-3 text-[13px] text-[#767676] font-body max-w-md mx-auto">
+        <p className="mt-3 text-[14px] text-[#767676] font-body max-w-md mx-auto">
           Styling guides, care rituals and jewellery stories from the Shebliss atelier.
         </p>
       </div>
@@ -38,7 +38,7 @@ export default function BlogListPage() {
         <div className="flex items-center gap-0 border-b border-[#EFECE6] mb-8 overflow-x-auto scrollbar-none">
           {CATEGORIES.map((cat) => (
             <button key={cat.value} onClick={() => setActiveCategory(cat.value)}
-              className={`px-4 py-3 text-[11px] font-bold tracking-[0.12em] uppercase whitespace-nowrap relative transition-colors ${
+              className={`px-4 py-3 text-[12px] font-bold tracking-[0.12em] uppercase whitespace-nowrap relative transition-colors ${
                 activeCategory === cat.value ? 'text-[#1A1A1A]' : 'text-[#767676] hover:text-[#1A1A1A]'
               }`}
             >
@@ -63,7 +63,7 @@ export default function BlogListPage() {
               No articles found
             </p>
             <button onClick={() => setActiveCategory('')}
-              className="mt-4 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] underline underline-offset-4 transition-colors">
+              className="mt-4 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] underline underline-offset-4 transition-colors">
               Clear filter
             </button>
           </div>
@@ -83,16 +83,16 @@ export default function BlogListPage() {
                 </div>
                 <div className="flex flex-col flex-1 p-4 sm:p-5 gap-2" style={{ backgroundColor: '#EFECE6' }}>
                   {post.category && (
-                    <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{post.category}</span>
+                    <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{post.category}</span>
                   )}
-                  <h3 className="text-[16px] sm:text-[17px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
+                  <h3 className="text-[17px] sm:text-[18px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
                     style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}>
                     {post.title}
                   </h3>
-                  <p className="text-[12px] text-[#767676] line-clamp-2 font-body leading-relaxed">{post.excerpt}</p>
+                  <p className="text-[13px] text-[#767676] line-clamp-2 font-body leading-relaxed">{post.excerpt}</p>
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-[#F9F8F6]">
-                    <span className="text-[10px] text-[#767676] font-body">{formatDate(post.published_at)}</span>
-                    <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#C6A15E]">Read →</span>
+                    <span className="text-[11px] text-[#767676] font-body">{formatDate(post.published_at)}</span>
+                    <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-[#C6A15E]">Read →</span>
                   </div>
                 </div>
               </Link>

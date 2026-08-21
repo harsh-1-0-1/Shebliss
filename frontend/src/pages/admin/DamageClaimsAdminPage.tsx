@@ -104,21 +104,21 @@ function ClaimDrawer({ claim, onClose }: { claim: DamageClaim; onClose: () => vo
             {/* Claim overview */}
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="bg-white p-3 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block text-[10px] font-bold uppercase">Current Status</span>
+                <span className="text-gray-400 block text-[11px] font-bold uppercase">Current Status</span>
                 <span className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full capitalize border ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
                   {STATUS_LABELS[c.status]}
                 </span>
               </div>
               <div className="bg-white p-3 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block text-[10px] font-bold uppercase">Order ID</span>
+                <span className="text-gray-400 block text-[11px] font-bold uppercase">Order ID</span>
                 <p className="font-bold text-base text-primary mt-0.5">#{c.order_id}</p>
               </div>
               <div className="bg-white p-3 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block text-[10px] font-bold uppercase">Issue Type</span>
+                <span className="text-gray-400 block text-[11px] font-bold uppercase">Issue Type</span>
                 <p className="font-medium text-gray-700 mt-0.5">{issueLabel(c.issue_type)}</p>
               </div>
               <div className="bg-white p-3 rounded-xl border border-gray-100">
-                <span className="text-gray-400 block text-[10px] font-bold uppercase">Submitted On</span>
+                <span className="text-gray-400 block text-[11px] font-bold uppercase">Submitted On</span>
                 <p className="font-medium text-gray-700 mt-0.5">{new Date(c.created_at).toLocaleString()}</p>
               </div>
             </div>
@@ -182,7 +182,7 @@ function ClaimDrawer({ claim, onClose }: { claim: DamageClaim; onClose: () => vo
                     <div key={item.id} className="py-2.5 flex justify-between items-center text-xs gap-3">
                       <div>
                         <span className="font-semibold text-gray-800">{item.product_name || `Product #${item.product_id}`}</span>
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-[11px] text-gray-400">
                           {item.selected_options
                             ? Object.values(item.selected_options).join(', ')
                             : ''}
@@ -311,13 +311,13 @@ export default function DamageClaimsAdminPage() {
                   <td className="px-5 py-3.5 font-semibold text-gray-900">{c.ticket_id}</td>
                   <td className="px-5 py-3.5">
                     <span className="font-semibold text-gray-800">{c.user?.full_name || c.order?.address?.full_name || `Customer #${c.user_id}`}</span>
-                    {c.user?.email && <p className="text-[10px] text-gray-400 mt-0.5">{c.user.email}</p>}
+                    {c.user?.email && <p className="text-[11px] text-gray-400 mt-0.5">{c.user.email}</p>}
                   </td>
                   <td className="px-5 py-3.5 text-gray-700">#{c.order_id}</td>
                   <td className="px-5 py-3.5 text-gray-700">{issueLabel(c.issue_type)}</td>
                   <td className="px-5 py-3.5 text-gray-500">{c.photo_urls.length}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
+                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
                       {STATUS_LABELS[c.status]}
                     </span>
                   </td>
@@ -347,13 +347,13 @@ export default function DamageClaimsAdminPage() {
                   <span className="text-sm font-semibold text-gray-900">{c.ticket_id}</span>
                   <p className="text-xs text-gray-700 font-medium mt-0.5">{c.user?.full_name || c.order?.address?.full_name || `Customer #${c.user_id}`}</p>
                 </div>
-                <span className={`text-[9px] font-bold px-2 py-0.5 rounded border capitalize ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border capitalize ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
                   {STATUS_LABELS[c.status]}
                 </span>
               </div>
               <div className="flex items-end justify-between mt-2 pt-2 border-t border-gray-100">
-                <p className="text-[10px] text-gray-400">Order #{c.order_id} · {c.photo_urls.length} photo(s)</p>
-                <p className="text-[10px] font-semibold text-primary">{issueLabel(c.issue_type)}</p>
+                <p className="text-[11px] text-gray-400">Order #{c.order_id} · {c.photo_urls.length} photo(s)</p>
+                <p className="text-[11px] font-semibold text-primary">{issueLabel(c.issue_type)}</p>
               </div>
             </button>
           ))

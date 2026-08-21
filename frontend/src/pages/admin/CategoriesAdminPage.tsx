@@ -111,7 +111,7 @@ function CategoryNode({ cat, onDelete, onRename, onToggleActive, onMove }: Categ
         <span className="text-xs text-gray-400 hidden sm:inline shrink-0 font-medium">/{cat.slug}</span>
 
         {!cat.is_active && (
-          <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5 shrink-0">
+          <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5 shrink-0">
             Hidden
           </span>
         )}
@@ -364,13 +364,13 @@ export default function CategoriesAdminPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-[9px] text-gray-400 mt-1">If this is a subcategory, select its parent here.</p>
+              <p className="text-[10px] text-gray-400 mt-1">If this is a subcategory, select its parent here.</p>
             </div>
 
             {/* Category Image Options */}
             <div className="pt-2 border-t space-y-2">
               <label className="text-xs font-semibold text-gray-700 block">Category Thumbnail / Image</label>
-              <div className="flex gap-3 text-[10px] font-bold text-gray-500 mb-2">
+              <div className="flex gap-3 text-[11px] font-bold text-gray-500 mb-2">
                 <label className="flex items-center gap-1 cursor-pointer">
                   <input type="radio" checked={imageMode === 'none'} onChange={() => setImageMode('none')} />
                   No Image
@@ -394,11 +394,11 @@ export default function CategoriesAdminPage() {
                     ) : (
                       <div className="text-gray-400">
                         <Upload size={20} className="mx-auto mb-1" />
-                        <span className="text-[10px] font-semibold block text-gray-700">Choose image file</span>
+                        <span className="text-[11px] font-semibold block text-gray-700">Choose image file</span>
                       </div>
                     )}
                   </div>
-                  <p className="text-[10px] text-red-600 font-semibold">
+                  <p className="text-[11px] text-red-600 font-semibold">
                     Recommended size: 600x600px square. Center the product/category so it looks clean on mobile circles and desktop tiles.
                   </p>
                 </div>
@@ -414,11 +414,11 @@ export default function CategoriesAdminPage() {
                     placeholder="https://..."
                     className="w-full px-2.5 py-1.5 text-xs border rounded-lg focus:outline-none"
                   />
-                  <p className="text-[10px] text-red-600 font-semibold">
+                  <p className="text-[11px] text-red-600 font-semibold">
                     Recommended size: 600x600px square. Center the product/category so it looks clean on mobile circles and desktop tiles.
                   </p>
                   {urlValid === true && (
-                    <p className="text-[10px] text-green-600 flex items-center gap-1 font-semibold">
+                    <p className="text-[11px] text-green-600 flex items-center gap-1 font-semibold">
                       <CheckCircle size={11} /> Image loaded
                     </p>
                   )}
@@ -462,7 +462,7 @@ export default function CategoriesAdminPage() {
               ))}
             </div>
           )}
-          <p className="text-[10px] text-gray-400 mt-3 border-t pt-2">
+          <p className="text-[11px] text-gray-400 mt-3 border-t pt-2">
             Tip: hover a category to see rename (pencil), reorder (arrows), hide/show (eye), and delete actions.
           </p>
         </div>

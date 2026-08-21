@@ -68,10 +68,10 @@ function StoryCard({ story, onClick }: { story: Story; onClick: () => void }) {
             />
           )}
           <div className="flex-1 min-w-0 text-left">
-            <div className="font-semibold text-gray-900 text-[11px] truncate">
+            <div className="font-semibold text-gray-900 text-[12px] truncate">
               {story.linked_product.name}
             </div>
-            <div className="font-bold text-green-800 text-[11px]">
+            <div className="font-bold text-green-800 text-[12px]">
               ₹{story.linked_product.price}
             </div>
           </div>
