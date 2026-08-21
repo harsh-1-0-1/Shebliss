@@ -50,7 +50,7 @@ export default function UsersAdminPage() {
           </div>
           <div>
             <span className="text-xs font-bold text-gray-800 block">Standard Customer Role</span>
-            <p className="text-[11px] text-gray-500 mt-0.5">Can place orders, add products to carts, manage delivery addresses, and leave reviews.</p>
+            <p className="text-[12px] text-gray-500 mt-0.5">Can place orders, add products to carts, manage delivery addresses, and leave reviews.</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -59,7 +59,7 @@ export default function UsersAdminPage() {
           </div>
           <div>
             <span className="text-xs font-bold text-purple-900 block">Administrator Staff Role</span>
-            <p className="text-[11px] text-gray-500 mt-0.5">Full backend privileges. Can configure products, design banners, and process orders.</p>
+            <p className="text-[12px] text-gray-500 mt-0.5">Full backend privileges. Can configure products, design banners, and process orders.</p>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function UsersAdminPage() {
                   <td className="px-5 py-3.5 text-gray-700">{u.email}</td>
                   <td className="px-5 py-3.5 text-gray-500">{u.phone || '—'}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
                       u.is_admin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-700'
                     }`}>
                       {u.is_admin ? <Shield size={10} /> : <UserIcon size={10} />}
@@ -100,7 +100,7 @@ export default function UsersAdminPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
                       u.is_active ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
                     }`}>
                       {u.is_active ? <Unlock size={10} /> : <Lock size={10} />}
@@ -112,7 +112,7 @@ export default function UsersAdminPage() {
                   </td>
                   <td className="px-5 py-3.5">
                     {u.id === currentUserId ? (
-                      <span className="text-[10px] text-gray-400 font-medium">This is you</span>
+                      <span className="text-[11px] text-gray-400 font-medium">This is you</span>
                     ) : (
                       <div className="flex items-center justify-end gap-1.5">
                         <button
@@ -160,12 +160,12 @@ export default function UsersAdminPage() {
             <div key={u.id} className="bg-white rounded-xl border p-3 shadow-sm space-y-1.5">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-gray-900">{u.full_name || 'Anonymous User'}</p>
-                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${u.is_admin ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.is_admin ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
                   {u.is_admin ? 'Admin' : 'User'}
                 </span>
               </div>
               <p className="text-xs text-gray-500 truncate">{u.email}</p>
-              <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-100 text-[10px] text-gray-400 font-medium">
+              <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-gray-100 text-[11px] text-gray-400 font-medium">
                 <span>📞 {u.phone || 'No phone'}</span>
                 <span>Created {u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</span>
               </div>
@@ -174,7 +174,7 @@ export default function UsersAdminPage() {
                   <button
                     onClick={() => handleUpdate(u.id, { is_admin: !u.is_admin })}
                     disabled={updateUser.isPending}
-                    className={`flex-1 py-1.5 rounded-lg border text-[10px] font-bold transition disabled:opacity-40 ${
+                    className={`flex-1 py-1.5 rounded-lg border text-[11px] font-bold transition disabled:opacity-40 ${
                       u.is_admin
                         ? 'bg-purple-50 text-purple-700 border-purple-200'
                         : 'bg-gray-50 text-gray-500 border-gray-200'
@@ -186,7 +186,7 @@ export default function UsersAdminPage() {
                   <button
                     onClick={() => handleUpdate(u.id, { is_active: !u.is_active })}
                     disabled={updateUser.isPending}
-                    className={`flex-1 py-1.5 rounded-lg border text-[10px] font-bold transition disabled:opacity-40 ${
+                    className={`flex-1 py-1.5 rounded-lg border text-[11px] font-bold transition disabled:opacity-40 ${
                       u.is_active
                         ? 'bg-gray-50 text-gray-500 border-gray-200'
                         : 'bg-green-50 text-green-700 border-green-200'

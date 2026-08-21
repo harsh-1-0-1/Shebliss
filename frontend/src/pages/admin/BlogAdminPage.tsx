@@ -195,7 +195,7 @@ export default function BlogAdminPage() {
                         )}
                         <div>
                           <p className="font-semibold text-gray-900 max-w-[200px] sm:max-w-xs truncate">{post.title}</p>
-                          <p className="text-[10px] text-gray-400 font-medium mt-0.5">{new Date(post.created_at).toLocaleDateString()}</p>
+                          <p className="text-[11px] text-gray-400 font-medium mt-0.5">{new Date(post.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
                     </td>
@@ -263,7 +263,7 @@ export default function BlogAdminPage() {
               <div className="flex items-center gap-6">
                 <div>
                   <h2 className="text-base font-bold text-gray-900">{editingPost ? 'Edit Blog Publication' : 'Write New Article'}</h2>
-                  <p className="text-[11px] text-gray-500 mt-0.5">Draft visual educational stories for your readers</p>
+                  <p className="text-[12px] text-gray-500 mt-0.5">Draft visual educational stories for your readers</p>
                 </div>
                 <div className="flex border rounded-lg overflow-hidden bg-gray-50 p-0.5 shrink-0 text-xs font-bold text-gray-600">
                   <button
@@ -301,7 +301,7 @@ export default function BlogAdminPage() {
                     placeholder="e.g. 5 Styling Tips for Wearing Statement Earrings"
                     className={inputClass}
                   />
-                  <p className="text-[10px] text-gray-400 mt-1">Make your header catchy to attract clicks.</p>
+                  <p className="text-[11px] text-gray-400 mt-1">Make your header catchy to attract clicks.</p>
                 </div>
 
                 {/* Excerpt */}
@@ -315,7 +315,7 @@ export default function BlogAdminPage() {
                     className={inputClass}
                     placeholder="Provide a 1-2 sentence description summarizing this post..."
                   />
-                  <p className="text-[10px] text-[#0e4d3a] font-semibold mt-1 flex items-center gap-1">
+                  <p className="text-[11px] text-[#0e4d3a] font-semibold mt-1 flex items-center gap-1">
                     <HelpCircle size={12} /> Excerpt acts as SEO meta description. Keep under 160 characters for best display on Google.
                   </p>
                 </div>
@@ -331,7 +331,7 @@ export default function BlogAdminPage() {
                     className={`${inputClass} font-mono text-xs`}
                     placeholder="Type article content. You can write paragraphs, paste lists, or HTML tags."
                   />
-                  <p className="text-[10px] text-gray-400 mt-1">Tip: Use blank lines between paragraphs to make reading easy.</p>
+                  <p className="text-[11px] text-gray-400 mt-1">Tip: Use blank lines between paragraphs to make reading easy.</p>
                 </div>
 
                 {/* Category & Author */}
@@ -373,7 +373,7 @@ export default function BlogAdminPage() {
                           onChange={handleImageChange}
                           className="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border file:text-xs file:font-semibold file:bg-primary-light/10 file:text-primary file:border-primary-light/20 hover:file:bg-primary-light/20 cursor-pointer"
                         />
-                        <p className="text-[10px] text-red-600 font-semibold mt-1">
+                        <p className="text-[11px] text-red-600 font-semibold mt-1">
                           Recommended size: 1200x600px landscape. Keep the subject centered for mobile and desktop crops.
                         </p>
                       </div>
@@ -390,7 +390,7 @@ export default function BlogAdminPage() {
                 <div className="flex items-center justify-between pt-3 border-t">
                   <div>
                     <label className="text-xs font-semibold text-gray-800 block">Publication Visibility</label>
-                    <span className="text-[10px] text-gray-400">Make this article immediately readable in the blog section.</span>
+                    <span className="text-[11px] text-gray-400">Make this article immediately readable in the blog section.</span>
                   </div>
                   <button
                     type="button"
@@ -416,7 +416,7 @@ export default function BlogAdminPage() {
                 <div className="max-w-2xl mx-auto space-y-4">
                   
                   {/* category */}
-                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded">
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded">
                     {CATEGORIES.find(c => c.value === category)?.label || category}
                   </span>
                   

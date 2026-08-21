@@ -25,13 +25,13 @@ function Logo({ onClick }: { onClick?: () => void }) {
   return (
     <Link to="/" onClick={onClick} className="flex flex-col items-center group select-none">
       <span
-        className="font-display text-[22px] sm:text-[26px] leading-none tracking-[0.12em] text-[#1A1A1A] group-hover:text-[#C6A15E] transition-colors duration-300"
+        className="font-display text-[34px] sm:text-[40px] leading-none tracking-[0.12em] text-[#1A1A1A] group-hover:text-[#C6A15E] transition-colors duration-300"
         style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 600 }}
       >
         {APP_NAME.toUpperCase()}
       </span>
       <span
-        className="text-[7px] tracking-[0.35em] uppercase text-[#767676] mt-0.5 font-body"
+        className="text-[8px] tracking-[0.35em] uppercase text-[#767676] mt-0.5 font-body"
         style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         Fine Artificial Jewellery
@@ -229,7 +229,7 @@ export default function Navbar() {
                 <Link
                   to={item.href}
                   className={clsx(
-                    'flex items-center gap-1 px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors group relative whitespace-nowrap',
+                    'flex items-center gap-1 px-4 py-2 text-[12px] font-semibold tracking-[0.14em] uppercase transition-colors group relative whitespace-nowrap',
                     item.highlight ? 'text-[#C6A15E]' : active ? 'text-[#1A1A1A]' : 'text-[#2B2421]/70 hover:text-[#1A1A1A]',
                   )}
                 >
@@ -256,7 +256,7 @@ export default function Navbar() {
                         {col.map((grp, gi) => (
                           <div key={gi}>
                             {grp.title && (
-                              <p className="text-[9px] font-bold text-[#767676] uppercase tracking-[0.2em] mb-2 pb-1.5 border-b border-[#EFECE6]">
+                              <p className="text-[10px] font-bold text-[#767676] uppercase tracking-[0.2em] mb-2 pb-1.5 border-b border-[#EFECE6]">
                                 {grp.title}
                               </p>
                             )}
@@ -264,7 +264,7 @@ export default function Navbar() {
                               <Link
                                 key={lk.href} to={lk.href}
                                 onClick={() => setActiveDropdown(null)}
-                                className="flex items-center gap-2 py-1.5 text-[12px] text-[#2B2421]/70 hover:text-[#1A1A1A] hover:translate-x-1 transition-all duration-150"
+                                className="flex items-center gap-2 py-1.5 text-[13px] text-[#2B2421]/70 hover:text-[#1A1A1A] hover:translate-x-1 transition-all duration-150"
                               >
                                 <span className="w-1 h-1 rounded-full bg-[#C6A15E]/50 shrink-0" />
                                 {lk.label}
@@ -300,7 +300,7 @@ export default function Navbar() {
             >
               <Heart size={19} strokeWidth={1.5} />
               {wishlistCount > 0 && (
-                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {wishlistCount > 9 ? '9+' : wishlistCount}
                 </span>
               )}
@@ -367,7 +367,7 @@ export default function Navbar() {
             >
               <ShoppingBag size={19} strokeWidth={1.5} />
               {itemCount > 0 && (
-                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-1 right-1 bg-[#C6A15E] text-[#1A1A1A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
@@ -451,7 +451,7 @@ export default function Navbar() {
                       <img src={mobilePromoBanner.image_url} alt="" className="w-11 h-11 object-cover shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold text-[#C6A15E] uppercase tracking-wider">{mobilePromoBanner.badge_text || 'Limited Offer'}</p>
+                      <p className="text-[11px] font-bold text-[#C6A15E] uppercase tracking-wider">{mobilePromoBanner.badge_text || 'Limited Offer'}</p>
                       <p className="text-xs font-semibold text-[#1A1A1A] truncate mt-0.5">{mobilePromoBanner.title}</p>
                     </div>
                     <ChevronRight size={14} className="text-[#767676] shrink-0" />
@@ -469,14 +469,14 @@ export default function Navbar() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-[#1A1A1A] truncate">{user.full_name || 'Account'}</p>
-                        <p className="text-[10px] text-[#767676] truncate">{user.email}</p>
+                        <p className="text-[11px] text-[#767676] truncate">{user.email}</p>
                       </div>
                     </div>
-                    <button onClick={() => { logout(); closeDrawer(); }} className="text-[10px] font-bold text-red-500 bg-red-50 px-2.5 py-1.5 shrink-0">Logout</button>
+                    <button onClick={() => { logout(); closeDrawer(); }} className="text-[11px] font-bold text-red-500 bg-red-50 px-2.5 py-1.5 shrink-0">Logout</button>
                   </div>
                 ) : (
                   <button onClick={() => { closeDrawer(); openAuthModal(); }}
-                    className="w-full py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.12em] uppercase hover:bg-[#2B2421] transition-colors"
+                    className="w-full py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.12em] uppercase hover:bg-[#2B2421] transition-colors"
                   >
                     Login / Register
                   </button>
@@ -495,7 +495,7 @@ export default function Navbar() {
                       >
                         <div className="flex items-center gap-3">
                           <img src={item.img} alt="" className="w-8 h-8 object-cover rounded-full border border-[#EFECE6] shrink-0" loading="lazy" />
-                          <span className="text-[13px] font-medium text-[#2B2421] group-hover:text-[#1A1A1A]">{item.label}</span>
+                          <span className="text-[14px] font-medium text-[#2B2421] group-hover:text-[#1A1A1A]">{item.label}</span>
                         </div>
                         {subs && <ChevronRight size={13} className="text-[#767676]" />}
                       </Link>
@@ -505,7 +505,7 @@ export default function Navbar() {
 
                 {/* Footer links */}
                 <div className="px-5 py-4 border-t border-[#EFECE6] space-y-3">
-                  <p className="text-[9px] font-bold text-[#767676] uppercase tracking-[0.2em]">Help & Support</p>
+                  <p className="text-[10px] font-bold text-[#767676] uppercase tracking-[0.2em]">Help & Support</p>
                   {[
                     { label: 'About Us', href: '/#about-us' },
                     { label: 'Track Order', href: '/orders' },
@@ -514,7 +514,7 @@ export default function Navbar() {
                     { label: 'FAQs', href: '/faqs' },
                   ].map((lk) => {
                     const isExt = lk.href.startsWith('http');
-                    const cls = 'flex items-center justify-between text-[12px] font-medium text-[#767676] hover:text-[#1A1A1A] transition-colors py-1.5';
+                    const cls = 'flex items-center justify-between text-[13px] font-medium text-[#767676] hover:text-[#1A1A1A] transition-colors py-1.5';
                     return isExt ? (
                       <a key={lk.label} href={lk.href} target="_blank" rel="noopener noreferrer" onClick={closeDrawer} className={cls}>
                         <span>{lk.label}</span><ChevronRight size={11} />
@@ -526,7 +526,7 @@ export default function Navbar() {
                     );
                   })}
                   {user?.is_admin && (
-                    <Link to="/admin" onClick={closeDrawer} className="flex items-center gap-2 text-[12px] font-semibold text-[#C6A15E] py-1.5">
+                    <Link to="/admin" onClick={closeDrawer} className="flex items-center gap-2 text-[13px] font-semibold text-[#C6A15E] py-1.5">
                       <Settings size={13} /> Admin Panel
                     </Link>
                   )}
@@ -539,19 +539,19 @@ export default function Navbar() {
               <div className="flex items-center justify-between px-4 py-4 border-b border-[#EFECE6] shrink-0">
                 <button onClick={() => setActiveSubmenu(null)} className="flex items-center gap-1 text-[#767676] hover:text-[#1A1A1A] transition-colors">
                   <ChevronLeft size={16} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Back</span>
+                  <span className="text-[12px] font-bold uppercase tracking-wider">Back</span>
                 </button>
                 <button onClick={closeDrawer} className="w-8 h-8 flex items-center justify-center text-[#767676]"><X size={16} strokeWidth={1.5} /></button>
               </div>
               {activeSubmenu && (
                 <div className="px-3 py-3 border-b border-[#EFECE6] shrink-0">
-                  <h3 className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1A1A1A]">{activeSubmenu}</h3>
+                  <h3 className="text-[12px] font-bold uppercase tracking-[0.18em] text-[#1A1A1A]">{activeSubmenu}</h3>
                 </div>
               )}
               <div className="flex-1 overflow-y-auto scrollbar-none py-2">
                 {activeSubmenu && getSubcategories(activeSubmenu)?.map((sub) => (
                   <Link key={sub.label} to={sub.href} onClick={closeDrawer}
-                    className="flex items-center justify-between px-4 py-3 text-[13px] font-medium text-[#2B2421] hover:text-[#1A1A1A] hover:bg-[#EFECE6] transition-colors border-b border-[#EFECE6]/50 last:border-0"
+                    className="flex items-center justify-between px-4 py-3 text-[14px] font-medium text-[#2B2421] hover:text-[#1A1A1A] hover:bg-[#EFECE6] transition-colors border-b border-[#EFECE6]/50 last:border-0"
                   >
                     <span>{sub.label}</span>
                     <ChevronRight size={12} className="text-[#767676]" />

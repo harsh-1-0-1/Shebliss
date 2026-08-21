@@ -40,7 +40,7 @@ export default function BlogSection() {
       <div className="mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="flex items-end justify-between mb-8 sm:mb-10">
           <div>
-            <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">From the journal</p>
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">From the journal</p>
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl leading-none text-[#1A1A1A]"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, letterSpacing: '0.03em' }}
@@ -48,7 +48,7 @@ export default function BlogSection() {
               Stories & Style
             </h2>
           </div>
-          <Link to="/blog" className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors">
+          <Link to="/blog" className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors">
             All articles <ArrowRight size={12} />
           </Link>
         </div>
@@ -70,23 +70,23 @@ export default function BlogSection() {
               </div>
               <div className="flex flex-col flex-1 p-4 sm:p-5 gap-2">
                 {post.category && (
-                  <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{post.category}</span>
+                  <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{post.category}</span>
                 )}
                 <h3
-                  className="text-[16px] sm:text-[17px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
+                  className="text-[17px] sm:text-[18px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
                   style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}
                 >
                   {post.title}
                 </h3>
-                <p className="text-[12px] text-[#767676] line-clamp-2 font-body leading-relaxed">{post.excerpt}</p>
-                <p className="text-[10px] text-[#767676]/60 font-body mt-auto pt-2">{formatDate(post.published_at)}</p>
+                <p className="text-[13px] text-[#767676] line-clamp-2 font-body leading-relaxed">{post.excerpt}</p>
+                <p className="text-[11px] text-[#767676]/60 font-body mt-auto pt-2">{formatDate(post.published_at)}</p>
               </div>
             </Link>
           ))}
         </div>
 
         <div className="sm:hidden mt-6 text-center">
-          <Link to="/blog" className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#767676] hover:text-[#1A1A1A] underline underline-offset-4 transition-colors">
+          <Link to="/blog" className="text-[12px] font-bold tracking-[0.18em] uppercase text-[#767676] hover:text-[#1A1A1A] underline underline-offset-4 transition-colors">
             View all articles
           </Link>
         </div>

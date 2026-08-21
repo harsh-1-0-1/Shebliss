@@ -69,7 +69,7 @@ function AccordionSection({ title, children }: { title: string; children: React.
     <div className="border-b border-[#EFECE6]">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between py-3.5 text-[11px] font-bold tracking-[0.16em] uppercase text-[#1A1A1A] hover:text-[#C6A15E] transition-colors"
+        className="w-full flex items-center justify-between py-3.5 text-[12px] font-bold tracking-[0.16em] uppercase text-[#1A1A1A] hover:text-[#C6A15E] transition-colors"
       >
         {title}
         <ChevronDown size={13} className={`transition-transform duration-200 text-[#767676] ${open ? 'rotate-180' : ''}`} />
@@ -87,9 +87,9 @@ function TagCheckbox({ label, tag, selectedTags, onTagToggle }: { label: string;
         onClick={() => onTagToggle(tag)}
         className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-colors cursor-pointer ${active ? 'bg-[#1A1A1A] border-[#1A1A1A]' : 'border-[#EFECE6] group-hover:border-[#C6A15E]'}`}
       >
-        {active && <span className="text-[#F9F8F6] text-[10px]">✓</span>}
+        {active && <span className="text-[#F9F8F6] text-[11px]">✓</span>}
       </span>
-      <span onClick={() => onTagToggle(tag)} className="text-[12px] text-[#2B2421] group-hover:text-[#1A1A1A] transition-colors">{label}</span>
+      <span onClick={() => onTagToggle(tag)} className="text-[13px] text-[#2B2421] group-hover:text-[#1A1A1A] transition-colors">{label}</span>
     </label>
   );
 }
@@ -121,24 +121,24 @@ function FiltersSidebar({
   return (
     <div className="space-y-0">
       <div className="flex items-center justify-between py-3 border-b border-[#EFECE6]">
-        <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A]">Filters</span>
-        <button onClick={onReset} className="text-[10px] font-semibold text-[#767676] hover:text-[#C6A15E] transition-colors uppercase tracking-wider">Clear all</button>
+        <span className="text-[12px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A]">Filters</span>
+        <button onClick={onReset} className="text-[11px] font-semibold text-[#767676] hover:text-[#C6A15E] transition-colors uppercase tracking-wider">Clear all</button>
       </div>
 
       <AccordionSection title="Price Range">
         <div className="space-y-1.5">
           {PRICE_RANGES.map((r) => (
             <button key={r.label} onClick={() => selectPriceRange(r)}
-              className={`w-full text-left text-[12px] px-3 py-2 transition-colors ${activePriceRange?.label === r.label ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
+              className={`w-full text-left text-[13px] px-3 py-2 transition-colors ${activePriceRange?.label === r.label ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
             >
               {r.label}
             </button>
           ))}
           <div className="flex gap-2 mt-2">
             <input type="number" placeholder="Min" value={minPrice} onChange={(e) => onMinPrice(e.target.value)}
-              className="w-full px-2.5 py-2 text-[12px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white transition-colors" />
+              className="w-full px-2.5 py-2 text-[13px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white transition-colors" />
             <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => onMaxPrice(e.target.value)}
-              className="w-full px-2.5 py-2 text-[12px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white transition-colors" />
+              className="w-full px-2.5 py-2 text-[13px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white transition-colors" />
           </div>
         </div>
       </AccordionSection>
@@ -146,13 +146,13 @@ function FiltersSidebar({
       <AccordionSection title="Category">
         <div className="space-y-0.5 max-h-56 overflow-y-auto scrollbar-none">
           <button onClick={() => onCategory('')}
-            className={`block w-full text-left text-[12px] px-3 py-2 transition-colors ${!selectedCategory ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
+            className={`block w-full text-left text-[13px] px-3 py-2 transition-colors ${!selectedCategory ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
           >
             All Jewellery
           </button>
           {allCats.map((c) => (
             <button key={c.slug} onClick={() => onCategory(c.slug)}
-              className={`block w-full text-left text-[12px] px-3 py-2 transition-colors ${selectedCategory === c.slug ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
+              className={`block w-full text-left text-[13px] px-3 py-2 transition-colors ${selectedCategory === c.slug ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
             >
               {c.parent_id ? <span className="pl-3">{c.name}</span> : c.name}
             </button>
@@ -162,7 +162,7 @@ function FiltersSidebar({
 
       <AccordionSection title="Colour">
         {availableColours.length === 0 ? (
-          <p className="text-[11px] text-[#767676] font-body">No colours on this page</p>
+          <p className="text-[12px] text-[#767676] font-body">No colours on this page</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {availableColours.map((c) => {
@@ -204,9 +204,9 @@ function FiltersSidebar({
             onClick={() => onInStock(!inStock)}
             className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-colors cursor-pointer ${inStock ? 'bg-[#1A1A1A] border-[#1A1A1A]' : 'border-[#EFECE6] group-hover:border-[#C6A15E]'}`}
           >
-            {inStock && <span className="text-[#F9F8F6] text-[10px]">✓</span>}
+            {inStock && <span className="text-[#F9F8F6] text-[11px]">✓</span>}
           </span>
-          <span className="text-[12px] text-[#2B2421]">In Stock Only</span>
+          <span className="text-[13px] text-[#2B2421]">In Stock Only</span>
         </label>
       </AccordionSection>
     </div>
@@ -331,7 +331,7 @@ export default function ProductsPage() {
 
         {/* Page header */}
         <div className="mb-6 sm:mb-8">
-          <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Collection</p>
+          <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Collection</p>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <h1
               className="text-3xl sm:text-4xl text-[#1A1A1A] leading-none"
@@ -339,7 +339,7 @@ export default function ProductsPage() {
             >
               {pageTitle}
             </h1>
-            <p className="text-[12px] text-[#767676] font-body shrink-0">
+            <p className="text-[13px] text-[#767676] font-body shrink-0">
               {data ? `Showing ${(page - 1) * 24 + 1}–${Math.min(page * 24, data.total)} of ${data.total} results` : ''}
             </p>
           </div>
@@ -348,7 +348,7 @@ export default function ProductsPage() {
         {/* Mobile control bar */}
         <div className="lg:hidden flex items-center gap-3 mb-5 pb-4 border-b border-[#EFECE6]">
           <button onClick={() => setMobileFiltersOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-[#1A1A1A] text-[11px] font-bold tracking-[0.12em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.12em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors"
           >
             <SlidersHorizontal size={14} />
             Filter
@@ -356,7 +356,7 @@ export default function ProductsPage() {
           </button>
           <div className="relative flex-1">
             <select value={sort} onChange={(e) => updateParams({ sort_by: e.target.value })}
-              className="w-full appearance-none border border-[#EFECE6] bg-white text-[12px] font-medium text-[#2B2421] py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#C6A15E] transition-colors"
+              className="w-full appearance-none border border-[#EFECE6] bg-white text-[13px] font-medium text-[#2B2421] py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#C6A15E] transition-colors"
             >
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -380,10 +380,10 @@ export default function ProductsPage() {
             {/* Desktop sort row */}
             <div className="hidden lg:flex items-center justify-end mb-5 pb-4 border-b border-[#EFECE6]">
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-[#767676] uppercase tracking-wider font-body">Sort by</span>
+                <span className="text-[12px] text-[#767676] uppercase tracking-wider font-body">Sort by</span>
                 <div className="relative">
                   <select value={sort} onChange={(e) => updateParams({ sort_by: e.target.value })}
-                    className="appearance-none border border-[#EFECE6] bg-white text-[12px] font-medium text-[#2B2421] py-2 pl-3 pr-7 focus:outline-none focus:border-[#C6A15E] transition-colors"
+                    className="appearance-none border border-[#EFECE6] bg-white text-[13px] font-medium text-[#2B2421] py-2 pl-3 pr-7 focus:outline-none focus:border-[#C6A15E] transition-colors"
                   >
                     {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
@@ -400,8 +400,8 @@ export default function ProductsPage() {
               ) : filteredItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
                   <p className="font-display text-2xl text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>No results found</p>
-                  <p className="text-[13px] text-[#767676]">Try adjusting your filters or explore a different category.</p>
-                  <button onClick={resetFilters} className="mt-2 px-6 py-2.5 border border-[#1A1A1A] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors">
+                  <p className="text-[14px] text-[#767676]">Try adjusting your filters or explore a different category.</p>
+                  <button onClick={resetFilters} className="mt-2 px-6 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors">
                     Clear filters
                   </button>
                 </div>
@@ -428,7 +428,7 @@ export default function ProductsPage() {
                     <span key={p} className="flex items-center gap-1.5">
                       {idx > 0 && arr[idx - 1] !== p - 1 && <span className="text-[#EFECE6] text-sm">…</span>}
                       <button onClick={() => setPage(p)}
-                        className={`w-9 h-9 text-[12px] font-semibold border transition-colors ${p === page ? 'bg-[#1A1A1A] text-[#F9F8F6] border-[#1A1A1A]' : 'border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'}`}
+                        className={`w-9 h-9 text-[13px] font-semibold border transition-colors ${p === page ? 'bg-[#1A1A1A] text-[#F9F8F6] border-[#1A1A1A]' : 'border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'}`}
                       >
                         {p}
                       </button>
@@ -451,7 +451,7 @@ export default function ProductsPage() {
           <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setMobileFiltersOpen(false)} />
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#F9F8F6] max-h-[88vh] flex flex-col lg:hidden animate-slide-up">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#EFECE6] shrink-0">
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A] flex items-center gap-2">
+              <span className="text-[12px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A] flex items-center gap-2">
                 <SlidersHorizontal size={14} /> Filters
               </span>
               <button onClick={() => setMobileFiltersOpen(false)} className="w-8 h-8 flex items-center justify-center text-[#767676] hover:text-[#1A1A1A]">
@@ -463,7 +463,7 @@ export default function ProductsPage() {
             </div>
             <div className="shrink-0 px-5 py-4 border-t border-[#EFECE6] safe-bottom">
               <button onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors"
+                className="w-full py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors"
               >
                 Apply Filters
               </button>

@@ -714,7 +714,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                     placeholder="e.g., Gold Plated Jhumka Earrings"
                     className={inputClass}
                   />
-                  <p className="text-[11px] text-gray-400 mt-1">This is the title customers will see on the website.</p>
+                  <p className="text-[12px] text-gray-400 mt-1">This is the title customers will see on the website.</p>
                   {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
                 </div>
 
@@ -729,7 +729,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                         </option>
                       ))}
                     </select>
-                    <p className="text-[11px] text-gray-400 mt-1">Select the collection this product belongs to.</p>
+                    <p className="text-[12px] text-gray-400 mt-1">Select the collection this product belongs to.</p>
                     {errors.category_id && <p className="text-xs text-red-500 mt-1">{errors.category_id.message}</p>}
                   </div>
                   <div>
@@ -739,7 +739,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       placeholder="e.g., Bestseller, New Arrival, Sale"
                       className={inputClass}
                     />
-                    <p className="text-[11px] text-gray-400 mt-1">A colorful label shown over the product image.</p>
+                    <p className="text-[12px] text-gray-400 mt-1">A colorful label shown over the product image.</p>
                   </div>
                 </div>
 
@@ -751,7 +751,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                     placeholder="Describe the piece — materials, style, occasion, craftsmanship..."
                     className={inputClass}
                   />
-                  <p className="text-[11px] text-gray-400 mt-1">Use blank lines for paragraphs and start lines with - for bullet points.</p>
+                  <p className="text-[12px] text-gray-400 mt-1">Use blank lines for paragraphs and start lines with - for bullet points.</p>
                 </div>
               </div>
             )}
@@ -779,7 +779,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       className={inputClass}
                       placeholder="699"
                     />
-                    <p className="text-[11px] text-gray-400 mt-1">Active price customers will pay.</p>
+                    <p className="text-[12px] text-gray-400 mt-1">Active price customers will pay.</p>
                     {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price.message}</p>}
                   </div>
                   <div>
@@ -791,7 +791,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       className={inputClass}
                       placeholder="999"
                     />
-                    <p className="text-[11px] text-gray-400 mt-1">Shows a strikethrough sale price (e.g. <del>₹999</del>).</p>
+                    <p className="text-[12px] text-gray-400 mt-1">Shows a strikethrough sale price (e.g. <del>₹999</del>).</p>
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-gray-700 mb-1 block">Base Stock Quantity *</label>
@@ -802,7 +802,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       placeholder="10"
                       disabled={hasVariants}
                     />
-                    <p className="text-[11px] text-gray-400 mt-1">
+                    <p className="text-[12px] text-gray-400 mt-1">
                       {hasVariants
                         ? 'Stock is managed per variant combination below.'
                         : 'Total units available for this product.'}
@@ -829,7 +829,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-1.5 block">Upload Images (Files)</label>
-                  <p className="text-[10px] text-red-600 font-semibold mb-2">
+                  <p className="text-[11px] text-red-600 font-semibold mb-2">
                     Recommended size: 1200x1200px square. Keep jewellery centered with padding so it looks good in product cards, desktop gallery, and mobile gallery.
                   </p>
                   <div className="border-2 border-dashed border-gray-200 hover:border-primary/50 rounded-xl p-6 text-center transition-colors cursor-pointer relative">
@@ -842,7 +842,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                     />
                     <Upload size={28} className="mx-auto text-gray-400 mb-2" />
                     <p className="text-xs font-medium text-gray-700">Click or drag images here to upload</p>
-                    <p className="text-[10px] text-gray-400 mt-1">Supports JPG, PNG, WEBP. Max 5MB per file.</p>
+                    <p className="text-[11px] text-gray-400 mt-1">Supports JPG, PNG, WEBP. Max 5MB per file.</p>
                   </div>
 
                   {filePreviews.length > 0 && (
@@ -883,7 +883,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       Add URL
                     </button>
                   </div>
-                  <p className="text-[11px] text-gray-400 mt-1">You can also paste links from Unsplash, ImageKit, or external hosting.</p>
+                  <p className="text-[12px] text-gray-400 mt-1">You can also paste links from Unsplash, ImageKit, or external hosting.</p>
 
                   {productImages.length > 0 && (
                     <div className="grid grid-cols-4 gap-3 mt-4">
@@ -925,7 +925,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <label className="text-xs font-semibold text-gray-700 block">Product FAQs</label>
-                      <p className="text-[11px] text-gray-400">Questions & answers shown on the product page. Leave empty to show default FAQs.</p>
+                      <p className="text-[12px] text-gray-400">Questions & answers shown on the product page. Leave empty to show default FAQs.</p>
                     </div>
                     <button
                       type="button"
@@ -1041,7 +1041,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                           </span>
                         </label>
                         {/size/i.test(group.label) && !group.always_show_options && (
-                          <span className="text-[10px] font-medium text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5">
+                          <span className="text-[11px] font-medium text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5">
                             Tip: this label looks like a size group — tick the box so sizes always appear
                           </span>
                         )}
@@ -1085,12 +1085,12 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                                   ) : opt.image_urls[0] ? (
                                     <>
                                       <img src={opt.image_urls[0]} alt={opt.name || 'option'} className="h-full w-full object-cover" />
-                                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">{opt.image_urls.length}</span>
+                                      <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">{opt.image_urls.length}</span>
                                     </>
                                   ) : (
                                     <div className="flex flex-col items-center gap-0.5 text-primary/60">
                                       <Upload size={13} />
-                                      <span className="text-[8px] font-medium leading-none">Image</span>
+                                      <span className="text-[9px] font-medium leading-none">Image</span>
                                     </div>
                                   )}
                                   <input
@@ -1116,7 +1116,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                                   className={`${inputClass} flex-1`}
                                 />
                                 {isColourGroup && (
-                                  <span className="text-[10px] text-gray-400 pl-1">
+                                  <span className="text-[11px] text-gray-400 pl-1">
                                     {opt.color_hex ? opt.color_hex : 'Click the circle to pick a colour'}
                                   </span>
                                 )}
@@ -1159,7 +1159,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                               {/* Colour variants: quick add-photo button (full management in table below) */}
                               {isColourGroup && (
                                 <label
-                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border bg-gray-50 text-[11px] font-medium text-primary cursor-pointer hover:bg-green-50 shrink-0 ${uploadingOptionImage === opt.id ? 'opacity-60 pointer-events-none' : ''}`}
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border bg-gray-50 text-[12px] font-medium text-primary cursor-pointer hover:bg-green-50 shrink-0 ${uploadingOptionImage === opt.id ? 'opacity-60 pointer-events-none' : ''}`}
                                   title="Recommended size: 1200x1200px square. Center the jewellery for mobile and desktop views."
                                 >
                                   {uploadingOptionImage === opt.id
@@ -1218,11 +1218,11 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-xs font-semibold text-gray-700 block">Variant Combinations &amp; Images</span>
-                          <p className="text-[10px] text-gray-400 mt-0.5">
+                          <p className="text-[11px] text-gray-400 mt-0.5">
                             Upload a photo for each combination — shown in the gallery when that exact combo is selected.
                             Combinations without a photo fall back to the colour option's image, then the default image.
                           </p>
-                          <p className="text-[10px] text-red-600 font-semibold mt-1">
+                          <p className="text-[11px] text-red-600 font-semibold mt-1">
                             Recommended size: 1200x1200px square. Keep the exact variant centered for mobile and desktop galleries.
                           </p>
                         </div>
@@ -1301,7 +1301,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                                                 <button
                                                   type="button"
                                                   onClick={() => handleRemoveComboImage(row.key, idx)}
-                                                  className="p-0.5 text-red-400 hover:text-red-300 bg-black/40 rounded text-[9px] leading-none"
+                                                  className="p-0.5 text-red-400 hover:text-red-300 bg-black/40 rounded text-[10px] leading-none"
                                                   title="Remove"
                                                 >✕</button>
                                               </div>
@@ -1310,11 +1310,11 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                                         </div>
                                       )}
                                       {imgs.length === 0 && (
-                                        <p className="text-[10px] text-gray-400 italic">No image — will use fallback</p>
+                                        <p className="text-[11px] text-gray-400 italic">No image — will use fallback</p>
                                       )}
                                       {keys.length < 8 && (
                                         <label
-                                          className={`inline-flex items-center gap-1 px-2 py-1 rounded border bg-white text-[11px] font-medium text-primary cursor-pointer hover:bg-green-50 self-start transition ${uploadingComboKey === row.key ? 'opacity-60 pointer-events-none' : ''}`}
+                                          className={`inline-flex items-center gap-1 px-2 py-1 rounded border bg-white text-[12px] font-medium text-primary cursor-pointer hover:bg-green-50 self-start transition ${uploadingComboKey === row.key ? 'opacity-60 pointer-events-none' : ''}`}
                                         >
                                           {uploadingComboKey === row.key
                                             ? <Loader2 size={10} className="animate-spin" />
@@ -1343,7 +1343,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                 {/* Default Fallback Image */}
                 <div className="border-t pt-4 space-y-2">
                   <label className="text-xs font-semibold text-gray-700 block">Default Variant Image</label>
-                  <p className="text-[10px] text-red-600 font-semibold">
+                  <p className="text-[11px] text-red-600 font-semibold">
                     Recommended size: 1200x1200px square. Fallback shown if a selected option has no image of its own.
                   </p>
                   <div className="flex gap-3 items-center">
@@ -1392,7 +1392,7 @@ function ProductModal({ onClose, editProduct }: { onClose: () => void; editProdu
                   <div className="flex items-center justify-between mb-1.5">
                     <div>
                       <label className="text-xs font-semibold text-gray-700">Search Tags</label>
-                      <p className="text-[11px] text-gray-400">Add words customers might search (e.g. "gold", "bridal", "kundan").</p>
+                      <p className="text-[12px] text-gray-400">Add words customers might search (e.g. "gold", "bridal", "kundan").</p>
                     </div>
                     <button
                       type="button"
@@ -1608,7 +1608,7 @@ export default function ProductsAdminPage() {
                       <div>
                         <span className="font-semibold text-gray-900 block">{p.name}</span>
                         {p.badge && (
-                          <span className="inline-block mt-0.5 text-[9px] font-bold bg-[#E6F3EE] text-primary px-1.5 py-0.5 rounded">
+                          <span className="inline-block mt-0.5 text-[10px] font-bold bg-[#E6F3EE] text-primary px-1.5 py-0.5 rounded">
                             {p.badge}
                           </span>
                         )}
@@ -1623,7 +1623,7 @@ export default function ProductsAdminPage() {
                   </td>
                   <td className="px-5 py-3">{getStockBadge(p.stock_qty)}</td>
                   <td className="px-5 py-3">
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${p.is_active ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    <span className={`text-[12px] font-semibold px-2 py-0.5 rounded-full ${p.is_active ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                       {p.is_active ? 'Published' : 'Hidden'}
                     </span>
                   </td>
@@ -1685,7 +1685,7 @@ export default function ProductsAdminPage() {
                     <Trash2 size={15} />
                   </button>
                 </div>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${p.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${p.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                   {p.is_active ? 'Active' : 'Hidden'}
                 </span>
               </div>

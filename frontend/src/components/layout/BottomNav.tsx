@@ -79,12 +79,12 @@ export default function BottomNav() {
                 <div className="relative">
                   <item.icon size={21} strokeWidth={active ? 2 : 1.5} color={color} />
                   {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1.5 bg-[#C6A15E] text-[#1A1A1A] text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1.5 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                       {itemCount > 9 ? '9+' : itemCount}
                     </span>
                   )}
                 </div>
-                <span className="text-[9px] font-medium" style={{ color }}>{item.label}</span>
+                <span className="text-[10px] font-medium" style={{ color }}>{item.label}</span>
               </button>
             );
           }
@@ -96,12 +96,12 @@ export default function BottomNav() {
                 <div className="relative">
                   <item.icon size={21} strokeWidth={active ? 2 : 1.5} color={color} fill={active ? GOLD : 'none'} />
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1.5 bg-[#C6A15E] text-[#1A1A1A] text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1.5 bg-[#C6A15E] text-[#1A1A1A] text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                       {wishlistCount > 9 ? '9+' : wishlistCount}
                     </span>
                   )}
                 </div>
-                <span className="text-[9px] font-medium" style={{ color }}>{item.label}</span>
+                <span className="text-[10px] font-medium" style={{ color }}>{item.label}</span>
               </Link>
             );
           }
@@ -114,7 +114,7 @@ export default function BottomNav() {
                 className="flex flex-1 flex-col items-center justify-center gap-0.5 touch-target"
               >
                 <item.icon size={21} strokeWidth={active ? 2 : 1.5} color={color} />
-                <span className="text-[9px] font-medium" style={{ color }}>{item.label}</span>
+                <span className="text-[10px] font-medium" style={{ color }}>{item.label}</span>
               </button>
             );
           }
@@ -122,7 +122,7 @@ export default function BottomNav() {
           return (
             <Link key={item.to} to={item.to} className="flex flex-1 flex-col items-center justify-center gap-0.5 touch-target">
               <item.icon size={21} strokeWidth={active ? 2 : 1.5} color={color} />
-              <span className="text-[9px] font-medium" style={{ color }}>{item.label}</span>
+              <span className="text-[10px] font-medium" style={{ color }}>{item.label}</span>
             </Link>
           );
         })}

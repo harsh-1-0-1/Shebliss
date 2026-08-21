@@ -82,7 +82,7 @@ function CategoryCard({ cat }: { cat: CatItem }) {
         >
           {cat.name}
         </p>
-        <span className="mt-1.5 inline-flex items-center text-[9px] font-bold tracking-[0.2em] uppercase text-[#C6A15E] gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="mt-1.5 inline-flex items-center text-[10px] font-bold tracking-[0.2em] uppercase text-[#C6A15E] gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           Shop now →
         </span>
       </div>
@@ -110,7 +110,7 @@ export default function CategoryHighlightGrid() {
       <div className="mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
         {/* Section header */}
         <div className="mb-6 sm:mb-10 text-center">
-          <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">
             Browse by category
           </p>
           <h2
@@ -132,7 +132,7 @@ export default function CategoryHighlightGrid() {
         <div className="mt-8 sm:mt-10 text-center">
           <Link
             to="/products"
-            className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] hover:text-rust transition-colors group/btn"
+            className="inline-flex items-center gap-2 text-[12px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] hover:text-rust transition-colors group/btn"
           >
             View all categories
             <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />

@@ -40,14 +40,14 @@ export default function CartPage() {
           <h1 className="text-3xl text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}>
             Your bag is empty
           </h1>
-          <p className="text-[13px] text-[#767676] font-body max-w-xs">
+          <p className="text-[14px] text-[#767676] font-body max-w-xs">
             Explore our collections and discover pieces made to be treasured.
           </p>
-          <Link to="/products" className="px-8 py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.16em] uppercase hover:bg-[#2B2421] transition-colors">
+          <Link to="/products" className="px-8 py-3 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.16em] uppercase hover:bg-[#2B2421] transition-colors">
             Explore Collection
           </Link>
         </div>
-        <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#767676] mb-5 text-center">You might love</p>
+        <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#767676] mb-5 text-center">You might love</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {EMPTY_COLLECTIONS.map((c) => (
             <Link key={c.title} to={c.href}
@@ -56,8 +56,8 @@ export default function CartPage() {
                 <img src={c.img} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600" loading="lazy" />
               </div>
               <div className="p-3">
-                <p className="text-[13px] font-medium text-[#1A1A1A] font-body">{c.title}</p>
-                <p className="text-[10px] text-[#C6A15E] font-semibold mt-0.5 font-body">{c.sub}</p>
+                <p className="text-[14px] font-medium text-[#1A1A1A] font-body">{c.title}</p>
+                <p className="text-[11px] text-[#C6A15E] font-semibold mt-0.5 font-body">{c.sub}</p>
               </div>
             </Link>
           ))}
@@ -73,7 +73,7 @@ export default function CartPage() {
     <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-8 sm:py-12" style={{ backgroundColor: '#F9F8F6' }}>
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[9px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Shopping</p>
+        <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#C6A15E] mb-1">Shopping</p>
         <h1 className="text-3xl sm:text-4xl text-[#1A1A1A] leading-none"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500, letterSpacing: '0.02em' }}>
           Your Bag <span className="text-[#767676] text-2xl">({itemCount})</span>
@@ -94,31 +94,31 @@ export default function CartPage() {
               </Link>
               <div className="flex-1 min-w-0">
                 <Link to={`/products/${item.product.slug}`}
-                  className="text-[15px] font-medium text-[#1A1A1A] hover:text-[#C6A15E] transition-colors line-clamp-1"
+                  className="text-[16px] font-medium text-[#1A1A1A] hover:text-[#C6A15E] transition-colors line-clamp-1"
                   style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                   {item.product.name}
                 </Link>
-                {optLabel(item) && <p className="text-[11px] text-[#767676] mt-0.5 font-body">{optLabel(item)}</p>}
-                <p className="text-[14px] font-semibold text-[#1A1A1A] mt-1 font-body">{format(item.unit_price)}</p>
-                {item.stock_warning && <p className="text-[11px] text-red-500 mt-0.5">Only {item.available_stock} left</p>}
+                {optLabel(item) && <p className="text-[12px] text-[#767676] mt-0.5 font-body">{optLabel(item)}</p>}
+                <p className="text-[15px] font-semibold text-[#1A1A1A] mt-1 font-body">{format(item.unit_price)}</p>
+                {item.stock_warning && <p className="text-[12px] text-red-500 mt-0.5">Only {item.available_stock} left</p>}
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center border border-[#F9F8F6]" style={{ backgroundColor: '#F9F8F6' }}>
                     <button onClick={() => handleUpdate(item.id, item.quantity - 1)} className="px-3 py-2 hover:bg-[#EFECE6] transition-colors touch-target">
                       <Minus size={13} strokeWidth={1.5} />
                     </button>
-                    <span className="px-3 text-[13px] font-semibold font-body min-w-[2rem] text-center">{item.quantity}</span>
+                    <span className="px-3 text-[14px] font-semibold font-body min-w-[2rem] text-center">{item.quantity}</span>
                     <button onClick={() => handleUpdate(item.id, item.quantity + 1)}
                       disabled={item.quantity >= item.available_stock}
                       className="px-3 py-2 hover:bg-[#EFECE6] transition-colors touch-target disabled:opacity-30">
                       <Plus size={13} strokeWidth={1.5} />
                     </button>
                   </div>
-                  <button onClick={() => handleRemove(item.id)} className="flex items-center gap-1.5 text-[11px] text-[#767676] hover:text-red-500 transition-colors touch-target font-body">
+                  <button onClick={() => handleRemove(item.id)} className="flex items-center gap-1.5 text-[12px] text-[#767676] hover:text-red-500 transition-colors touch-target font-body">
                     <Trash2 size={13} strokeWidth={1.5} /> <span className="hidden sm:inline">Remove</span>
                   </button>
                 </div>
               </div>
-              <p className="text-[14px] font-bold text-[#1A1A1A] shrink-0 font-body">{format(item.line_total)}</p>
+              <p className="text-[15px] font-bold text-[#1A1A1A] shrink-0 font-body">{format(item.line_total)}</p>
             </div>
           ))}
         </div>
@@ -126,26 +126,26 @@ export default function CartPage() {
         {/* Order summary — desktop sticky */}
         <div className="lg:col-span-1">
           <div className="border border-[#EFECE6] p-6 space-y-4 lg:sticky lg:top-24" style={{ backgroundColor: '#EFECE6' }}>
-            <h2 className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A]">Order Summary</h2>
-            <div className="space-y-2.5 text-[13px] font-body">
+            <h2 className="text-[12px] font-bold tracking-[0.2em] uppercase text-[#1A1A1A]">Order Summary</h2>
+            <div className="space-y-2.5 text-[14px] font-body">
               <div className="flex justify-between"><span className="text-[#767676]">Subtotal</span><span className="font-medium text-[#1A1A1A]">{format(total)}</span></div>
               <div className="flex justify-between"><span className="text-[#767676]">Shipping</span>
                 <span className={`font-medium ${shipping === 0 ? 'text-emerald-600' : 'text-[#1A1A1A]'}`}>{shipping === 0 ? 'Free' : format(shipping)}</span>
               </div>
-              {shipping > 0 && <p className="text-[10px] text-[#767676]">Free shipping on orders above {format(999)}</p>}
+              {shipping > 0 && <p className="text-[11px] text-[#767676]">Free shipping on orders above {format(999)}</p>}
             </div>
             <div className="border-t border-[#F9F8F6] pt-3 flex justify-between">
-              <span className="text-[13px] font-bold text-[#1A1A1A] font-body">Total</span>
-              <span className="text-[16px] font-bold text-[#1A1A1A] font-body">{format(grandTotal)}</span>
+              <span className="text-[14px] font-bold text-[#1A1A1A] font-body">Total</span>
+              <span className="text-[17px] font-bold text-[#1A1A1A] font-body">{format(grandTotal)}</span>
             </div>
             {/* Promo code */}
             <div className="flex gap-0">
               <input type="text" placeholder="Promo code"
-                className="flex-1 px-3 py-2.5 text-[12px] border border-[#F9F8F6] bg-[#F9F8F6] focus:outline-none focus:border-[#C6A15E] transition-colors font-body" />
-              <button className="px-4 py-2.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-wider hover:bg-[#2B2421] transition-colors font-body whitespace-nowrap">Apply</button>
+                className="flex-1 px-3 py-2.5 text-[13px] border border-[#F9F8F6] bg-[#F9F8F6] focus:outline-none focus:border-[#C6A15E] transition-colors font-body" />
+              <button className="px-4 py-2.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-wider hover:bg-[#2B2421] transition-colors font-body whitespace-nowrap">Apply</button>
             </div>
             <Link to="/checkout"
-              className="flex items-center justify-between w-full px-5 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors group">
+              className="flex items-center justify-between w-full px-5 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors group">
               <span>Proceed to Checkout</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -154,14 +154,14 @@ export default function CartPage() {
 
         {/* Mobile summary */}
         <div className="lg:hidden border border-[#EFECE6] p-4 space-y-3" style={{ backgroundColor: '#EFECE6' }}>
-          <div className="flex justify-between text-[12px] font-body"><span className="text-[#767676]">Subtotal</span><span>{format(total)}</span></div>
-          <div className="flex justify-between text-[12px] font-body"><span className="text-[#767676]">Shipping</span>
+          <div className="flex justify-between text-[13px] font-body"><span className="text-[#767676]">Subtotal</span><span>{format(total)}</span></div>
+          <div className="flex justify-between text-[13px] font-body"><span className="text-[#767676]">Shipping</span>
             <span className={shipping === 0 ? 'text-emerald-600' : ''}>{shipping === 0 ? 'Free' : format(shipping)}</span>
           </div>
-          <div className="flex justify-between font-bold text-[14px] border-t border-[#F9F8F6] pt-2 font-body">
+          <div className="flex justify-between font-bold text-[15px] border-t border-[#F9F8F6] pt-2 font-body">
             <span>Total</span><span>{format(grandTotal)}</span>
           </div>
-          <Link to="/checkout" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors">
+          <Link to="/checkout" className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors">
             Checkout — {format(grandTotal)} <ArrowRight size={13} />
           </Link>
         </div>

@@ -293,7 +293,7 @@ export default function DamageReplacementPage() {
             <>
               {/* Selected order summary */}
               <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm space-y-1.5">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">
+                <p className="text-[12px] font-bold text-gray-400 uppercase tracking-wide mb-2">
                   Order Summary
                 </p>
                 {selectedOrder.items.map((item) => (
@@ -444,7 +444,7 @@ export default function DamageReplacementPage() {
                       <p className="text-sm font-bold text-gray-700">
                         {photoPreviews.length > 0 ? 'Add more photos' : 'Upload Damage Photos'}
                       </p>
-                      <p className="text-[11px] text-gray-400 max-w-xs">
+                      <p className="text-[12px] text-gray-400 max-w-xs">
                         PNG, JPG, JPEG or WebP · Max 5 MB each · Up to {5 - photoFiles.length} more
                       </p>
                     </div>

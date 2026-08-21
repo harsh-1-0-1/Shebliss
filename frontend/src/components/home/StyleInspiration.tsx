@@ -60,7 +60,7 @@ function ReelCard({ story, onOpen }: { story: Story; onOpen: () => void }) {
 
       {/* Placeholder transparency badge */}
       {story.is_placeholder && (
-        <span className="absolute top-2.5 right-2.5 rounded-full bg-white/90 px-2 py-0.5 text-[8px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A]">
+        <span className="absolute top-2.5 right-2.5 rounded-full bg-white/90 px-2 py-0.5 text-[9px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A]">
           Editorial
         </span>
       )}
@@ -86,7 +86,7 @@ function ReelCard({ story, onOpen }: { story: Story; onOpen: () => void }) {
           >
             {story.caption}
           </p>
-          <span className="mt-1 inline-flex items-center gap-1 text-[9px] font-bold tracking-[0.2em] uppercase text-[#C6A15E] opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.2em] uppercase text-[#C6A15E] opacity-0 group-hover:opacity-100 transition-opacity">
             Watch →
           </span>
         </div>
@@ -111,7 +111,7 @@ export default function StyleInspiration() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex items-end justify-between">
           <div>
-            <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2">
               Reels
             </p>
             <h2
@@ -121,13 +121,13 @@ export default function StyleInspiration() {
               {heading}
             </h2>
             {subtitle && (
-              <p className="mt-2 text-[13px] text-[#767676] font-body max-w-md">{subtitle}</p>
+              <p className="mt-2 text-[14px] text-[#767676] font-body max-w-md">{subtitle}</p>
             )}
           </div>
           {banners?.[0]?.cta_link && (
             <Link
               to={banners[0].cta_link}
-              className="hidden sm:flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
+              className="hidden sm:flex items-center gap-2 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
             >
               View all
             </Link>

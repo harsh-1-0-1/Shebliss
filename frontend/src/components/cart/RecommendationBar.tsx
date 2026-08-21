@@ -55,7 +55,7 @@ export default function RecommendationBar({ lastAddedProduct, cartItems }: Recom
       {/* Heading */}
       <div className="flex items-center gap-1.5 mb-2.5 px-1">
         <Sparkles size={13} className="text-[#a34a2f]" />
-        <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+        <p className="text-[12px] font-bold uppercase tracking-widest text-gray-500">
           Complete your order
         </p>
       </div>
@@ -77,7 +77,7 @@ export default function RecommendationBar({ lastAddedProduct, cartItems }: Recom
                 loading="lazy"
               />
               {product.original_price && product.original_price > product.price && (
-                <span className="absolute top-1 left-1 text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none">
+                <span className="absolute top-1 left-1 text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none">
                   {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% OFF
                 </span>
               )}
@@ -85,16 +85,16 @@ export default function RecommendationBar({ lastAddedProduct, cartItems }: Recom
 
             {/* Info */}
             <div className="p-2 flex flex-col flex-1">
-              <p className="text-[11px] font-medium text-gray-800 line-clamp-2 leading-tight mb-1">
+              <p className="text-[12px] font-medium text-gray-800 line-clamp-2 leading-tight mb-1">
                 {product.name}
               </p>
-              <p className="text-[11px] font-bold text-[#a34a2f] mb-2">₹{product.price}</p>
+              <p className="text-[12px] font-bold text-[#a34a2f] mb-2">₹{product.price}</p>
 
               {/* Quick Add button */}
               <button
                 onClick={(e) => handleQuickAdd(e, product)}
                 disabled={addingId === product.id}
-                className="mt-auto flex items-center justify-center gap-1 w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition-all active:scale-95 disabled:opacity-60"
+                className="mt-auto flex items-center justify-center gap-1 w-full py-1.5 rounded-lg text-[12px] font-semibold text-white transition-all active:scale-95 disabled:opacity-60"
                 style={{ backgroundColor: '#a34a2f' }}
                 aria-label={`Add ${product.name} to cart`}
               >

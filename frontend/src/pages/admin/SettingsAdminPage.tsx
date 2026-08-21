@@ -24,7 +24,7 @@ function SectionHeader({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="border-b pb-2">
       <h3 className="text-sm font-bold text-gray-800">{title}</h3>
-      <p className="text-[10px] text-gray-400 mt-0.5">{desc}</p>
+      <p className="text-[11px] text-gray-400 mt-0.5">{desc}</p>
     </div>
   );
 }
@@ -132,7 +132,7 @@ function SettingsForm({
                     placeholder="917083883105"
                     className={INPUT}
                   />
-                  <p className="text-[9px] text-gray-400 mt-1">E.164 without +, e.g. 917083883105</p>
+                  <p className="text-[10px] text-gray-400 mt-1">E.164 without +, e.g. 917083883105</p>
                 </div>
               </div>
               <div>
@@ -157,11 +157,11 @@ function SettingsForm({
               <div className="pt-2 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-gray-800">Enable Cash on Delivery (COD)</p>
-                  <p className="text-[9px] text-gray-400">Allow customers to choose COD at checkout.</p>
+                  <p className="text-[10px] text-gray-400">Allow customers to choose COD at checkout.</p>
                 </div>
                 <Toggle value={form.cod_enabled} onChange={(v) => set('cod_enabled', v)} />
               </div>
-              <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-100 text-[11px] text-amber-800 leading-relaxed">
+              <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-100 text-[12px] text-amber-800 leading-relaxed">
                 <span className="font-bold">Razorpay API keys</span> are configured via{' '}
                 <code className="font-mono bg-amber-100 px-1 rounded">RAZORPAY_KEY_ID</code> and{' '}
                 <code className="font-mono bg-amber-100 px-1 rounded">RAZORPAY_KEY_SECRET</code> env vars
@@ -188,7 +188,7 @@ function SettingsForm({
                     required
                     className={INPUT}
                   />
-                  <p className="text-[9px] text-gray-400 mt-1">Orders at or above this total get free delivery.</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Orders at or above this total get free delivery.</p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-gray-700">Flat Shipping Charge (₹)</label>
@@ -200,7 +200,7 @@ function SettingsForm({
                     required
                     className={INPUT}
                   />
-                  <p className="text-[9px] text-gray-400 mt-1">Charged on orders below the minimum.</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Charged on orders below the minimum.</p>
                 </div>
               </div>
             </div>
@@ -217,14 +217,14 @@ function SettingsForm({
                 <div className="flex items-center justify-between py-1.5">
                   <div>
                     <p className="text-xs font-semibold text-gray-800">Customer Order Confirmation Emails</p>
-                    <p className="text-[9px] text-gray-400">Send an order summary email to the customer immediately after purchase.</p>
+                    <p className="text-[10px] text-gray-400">Send an order summary email to the customer immediately after purchase.</p>
                   </div>
                   <Toggle value={form.notify_new_order} onChange={(v) => set('notify_new_order', v)} />
                 </div>
                 <div className="flex items-center justify-between py-1.5 border-t">
                   <div>
                     <p className="text-xs font-semibold text-gray-800">Low-Stock Alerts</p>
-                    <p className="text-[9px] text-gray-400">Receive an alert when product stock drops below safe levels.</p>
+                    <p className="text-[10px] text-gray-400">Receive an alert when product stock drops below safe levels.</p>
                   </div>
                   <Toggle value={form.notify_low_stock} onChange={(v) => set('notify_low_stock', v)} />
                 </div>
@@ -246,7 +246,7 @@ function SettingsForm({
                   onChange={(e) => set('meta_title', e.target.value)}
                   className={INPUT}
                 />
-                <p className="text-[9px] text-gray-400 mt-1">Recommended: 50–60 characters.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Recommended: 50–60 characters.</p>
               </div>
               <div>
                 <label className="text-xs font-semibold text-gray-700">Homepage Meta Description</label>
@@ -256,7 +256,7 @@ function SettingsForm({
                   onChange={(e) => set('meta_description', e.target.value)}
                   className={INPUT}
                 />
-                <p className="text-[9px] text-gray-400 mt-1">Recommended: 120–160 characters.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Recommended: 120–160 characters.</p>
               </div>
             </div>
           )}
@@ -307,7 +307,7 @@ function SettingsForm({
 
           {/* Save */}
           <div className="pt-4 border-t flex items-center justify-between">
-            <p className="text-[10px] text-gray-400">
+            <p className="text-[11px] text-gray-400">
               Last saved:{' '}
               {new Date(savedAt).toLocaleString('en-IN', {
                 dateStyle: 'medium',

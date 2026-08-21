@@ -104,7 +104,7 @@ export default function AboutSection() {
                       >
                         {stat.number}
                       </p>
-                      <p className="text-[13px] text-gray-500 mt-1">{stat.label}</p>
+                      <p className="text-[14px] text-gray-500 mt-1">{stat.label}</p>
                     </div>
                   </div>
                 ))}
@@ -133,7 +133,7 @@ export default function AboutSection() {
               {PILLS.map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center px-4 py-2 text-[13px] rounded-full"
+                  className="inline-flex items-center px-4 py-2 text-[14px] rounded-full"
                   style={{
                     border: '1.5px solid #c97b63',
                     color: '#a34a2f',

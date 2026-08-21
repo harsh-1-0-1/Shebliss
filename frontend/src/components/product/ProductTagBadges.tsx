@@ -44,8 +44,8 @@ export default function ProductTagBadges({
 
   const sizeClasses =
     size === 'md'
-      ? 'text-[10px] sm:text-xs px-2.5 py-0.75 sm:px-3 sm:py-1'
-      : 'text-[9px] sm:text-[10px] px-2 py-0.5 sm:px-2.5 sm:py-0.75';
+      ? 'text-[11px] sm:text-xs px-2.5 py-0.75 sm:px-3 sm:py-1'
+      : 'text-[10px] sm:text-[11px] px-2 py-0.5 sm:px-2.5 sm:py-0.75';
 
   const baseClass = `inline-flex items-center font-semibold rounded-full leading-none tracking-wide whitespace-nowrap transition-colors shadow-[0_1px_2px_rgba(0,0,0,0.03)] ${sizeClasses}`;
 

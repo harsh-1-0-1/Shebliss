@@ -28,7 +28,7 @@ export default function TestimonialsSection() {
     <section className="w-full py-10 sm:py-16 bg-white">
       <div className="mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="text-center mb-8 sm:mb-12">
-          <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">
             Real Reviews From Real Women
           </p>
           <h2
@@ -47,21 +47,21 @@ export default function TestimonialsSection() {
             >
               <Stars rating={t.rating} />
               <blockquote
-                className="text-[13px] sm:text-[14px] leading-relaxed text-[#3D3D3D] font-body"
+                className="text-[14px] sm:text-[15px] leading-relaxed text-[#3D3D3D] font-body"
               >
                 “{t.quote}”
               </blockquote>
               <figcaption className="mt-auto pt-2 flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-[13px] font-semibold text-[#1A1A1A]">{t.name}</p>
+                  <p className="text-[14px] font-semibold text-[#1A1A1A]">{t.name}</p>
                   {t.is_verified && (
-                    <p className="text-[10px] font-semibold text-[#15803D] mt-0.5">
+                    <p className="text-[11px] font-semibold text-[#15803D] mt-0.5">
                       ✓ Verified Buyer
                     </p>
                   )}
                 </div>
                 {t.item_purchased && (
-                  <span className="text-[10px] text-[#767676] text-right leading-tight pt-1">
+                  <span className="text-[11px] text-[#767676] text-right leading-tight pt-1">
                     {t.item_purchased}
                   </span>
                 )}

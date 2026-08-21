@@ -34,7 +34,7 @@ export default function BlogDetailPage() {
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
           Article not found
         </p>
-        <Link to="/blog" className="text-[11px] font-bold tracking-[0.14em] uppercase text-[#C6A15E] hover:underline">
+        <Link to="/blog" className="text-[12px] font-bold tracking-[0.14em] uppercase text-[#C6A15E] hover:underline">
           ← Back to Journal
         </Link>
       </div>
@@ -56,19 +56,19 @@ export default function BlogDetailPage() {
       {/* Article body */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <Link to="/blog"
-          className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors mb-8">
+          className="inline-flex items-center gap-1.5 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors mb-8">
           <ArrowLeft size={12} /> Back to Journal
         </Link>
 
         {/* Meta */}
         <div className="flex flex-wrap items-center gap-3 mb-5">
           {post.category && (
-            <span className="text-[9px] font-bold tracking-[0.24em] uppercase text-[#C6A15E]">{post.category}</span>
+            <span className="text-[10px] font-bold tracking-[0.24em] uppercase text-[#C6A15E]">{post.category}</span>
           )}
           {post.published_at && (
-            <span className="text-[11px] text-[#767676] font-body">{formatDate(post.published_at)}</span>
+            <span className="text-[12px] text-[#767676] font-body">{formatDate(post.published_at)}</span>
           )}
-          <span className="text-[11px] text-[#767676] font-body">by {post.author_name}</span>
+          <span className="text-[12px] text-[#767676] font-body">by {post.author_name}</span>
         </div>
 
         <h1 className="text-[2.2rem] sm:text-[2.8rem] leading-[1.08] text-[#1A1A1A] mb-6"
@@ -77,7 +77,7 @@ export default function BlogDetailPage() {
         </h1>
 
         {post.excerpt && (
-          <p className="text-[15px] text-[#767676] leading-relaxed font-body mb-8 pb-8 border-b border-[#EFECE6] italic">
+          <p className="text-[16px] text-[#767676] leading-relaxed font-body mb-8 pb-8 border-b border-[#EFECE6] italic">
             {post.excerpt}
           </p>
         )}
@@ -86,8 +86,8 @@ export default function BlogDetailPage() {
         <div className="prose max-w-none
           prose-headings:font-display prose-headings:text-[#1A1A1A] prose-headings:tracking-wide
           prose-h2:text-2xl prose-h3:text-xl
-          prose-p:text-[#767676] prose-p:leading-relaxed prose-p:font-body prose-p:text-[14px]
-          prose-li:text-[#767676] prose-li:font-body prose-li:text-[14px]
+          prose-p:text-[#767676] prose-p:leading-relaxed prose-p:font-body prose-p:text-[15px]
+          prose-li:text-[#767676] prose-li:font-body prose-li:text-[15px]
           prose-strong:text-[#1A1A1A]
           prose-a:text-[#C6A15E] prose-a:no-underline hover:prose-a:underline
           prose-img:border prose-img:border-[#EFECE6]"
@@ -105,7 +105,7 @@ export default function BlogDetailPage() {
                 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}>
                 More from the Journal
               </h2>
-              <Link to="/blog" className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors">
+              <Link to="/blog" className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors">
                 All articles <ArrowRight size={12} />
               </Link>
             </div>
@@ -119,8 +119,8 @@ export default function BlogDetailPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
                   </div>
                   <div className="p-4" style={{ backgroundColor: '#F9F8F6' }}>
-                    {rp.category && <span className="text-[9px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{rp.category}</span>}
-                    <h3 className="mt-1.5 text-[15px] text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
+                    {rp.category && <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#C6A15E]">{rp.category}</span>}
+                    <h3 className="mt-1.5 text-[16px] text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors"
                       style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 500 }}>
                       {rp.title}
                     </h3>

@@ -63,7 +63,7 @@ export default function PromoCTASection() {
                   {card.subtitle}
                 </p>
                 {card.cta_text && (
-                  <span className="mt-5 inline-flex w-fit items-center border border-[#d9b36c] px-7 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d9b36c] transition-colors duration-300 group-hover:bg-[#d9b36c] group-hover:text-[#0e4d3a]">
+                  <span className="mt-5 inline-flex w-fit items-center border border-[#d9b36c] px-7 py-2.5 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#d9b36c] transition-colors duration-300 group-hover:bg-[#d9b36c] group-hover:text-[#0e4d3a]">
                     {card.cta_text}
                   </span>
                 )}

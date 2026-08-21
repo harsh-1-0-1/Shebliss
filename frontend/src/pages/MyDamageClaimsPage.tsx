@@ -62,7 +62,7 @@ function ClaimCard({ claim }: { claim: DamageClaim }) {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-bold text-gray-900">{claim.ticket_id}</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLORS[claim.status] || 'bg-gray-100'}`}>
+            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLORS[claim.status] || 'bg-gray-100'}`}>
               {STATUS_LABELS[claim.status] ?? claim.status}
             </span>
           </div>
@@ -85,7 +85,7 @@ function ClaimCard({ claim }: { claim: DamageClaim }) {
 
           {claim.photo_urls.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1">
+              <p className="text-[12px] font-bold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1">
                 <ImageIcon size={13} /> Submitted Photos ({claim.photo_urls.length})
               </p>
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -111,7 +111,7 @@ function ClaimCard({ claim }: { claim: DamageClaim }) {
             </div>
           )}
 
-          <p className="text-[11px] text-gray-400">
+          <p className="text-[12px] text-gray-400">
             Last updated: {new Date(claim.updated_at).toLocaleString()}
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function MyDamageClaimsPage() {
         </>
       )}
 
-      <p className="flex items-center gap-1.5 text-[11px] text-gray-400 mt-8 justify-center">
+      <p className="flex items-center gap-1.5 text-[12px] text-gray-400 mt-8 justify-center">
         <AlertCircle size={12} /> Expect a response within 24–48 hours of submitting your claim.
       </p>
     </div>

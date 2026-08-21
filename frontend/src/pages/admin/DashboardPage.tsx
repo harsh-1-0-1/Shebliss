@@ -55,7 +55,7 @@ export default function DashboardPage() {
       {/* Welcome Banner */}
       <div className="bg-[#0e4d3a] rounded-2xl p-6 text-white relative overflow-hidden shadow-md">
         <div className="relative z-10 space-y-1">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[#E6F3EE] bg-white/10 px-2.5 py-1 rounded-full">
+          <span className="text-[11px] uppercase font-bold tracking-widest text-[#E6F3EE] bg-white/10 px-2.5 py-1 rounded-full">
             Store Performance
           </span>
           <h1 className="text-xl sm:text-2xl font-bold pt-1">Welcome back to the Shebliss Admin Panel!</h1>
@@ -110,14 +110,14 @@ export default function DashboardPage() {
           <div key={c.label} className="bg-white rounded-xl border p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{c.label}</span>
+                <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{c.label}</span>
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${c.color}`}>
                   <c.icon size={15} />
                 </div>
               </div>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">{c.value}</p>
             </div>
-            <p className="text-[10px] text-gray-400 mt-2.5 pt-1.5 border-t border-gray-50 leading-relaxed">
+            <p className="text-[11px] text-gray-400 mt-2.5 pt-1.5 border-t border-gray-50 leading-relaxed">
               {c.description}
             </p>
           </div>
@@ -131,8 +131,8 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {Object.entries(stats.orders_by_status).map(([status, count]) => (
               <div key={status} className="p-3 bg-gray-50/50 border border-gray-100 rounded-xl flex flex-col justify-between">
-                <span className="capitalize text-[10px] font-bold text-gray-400 tracking-wider block">{status}</span>
-                <span className="text-base font-bold text-primary mt-1">{count as number} <span className="text-[10px] text-gray-400 font-normal">units</span></span>
+                <span className="capitalize text-[11px] font-bold text-gray-400 tracking-wider block">{status}</span>
+                <span className="text-base font-bold text-primary mt-1">{count as number} <span className="text-[11px] text-gray-400 font-normal">units</span></span>
               </div>
             ))}
           </div>
@@ -167,12 +167,12 @@ export default function DashboardPage() {
                   <td className="px-5 py-3 font-semibold text-gray-900">#{o.id}</td>
                   <td className="px-5 py-3 font-medium text-gray-700">{o.address?.full_name || `Customer #${o.user_id}`}</td>
                   <td className="px-5 py-3">
-                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
+                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border capitalize ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
                       {o.status}
                     </span>
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded capitalize ${
                       o.payment_status === 'paid' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
                     }`}>
                       {o.payment_status}
@@ -199,11 +199,11 @@ export default function DashboardPage() {
             <div key={o.id} className="flex items-center justify-between p-3 bg-gray-50 border rounded-xl shadow-xs">
               <div>
                 <p className="text-sm font-semibold text-gray-900">#{o.id}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">{new Date(o.created_at).toLocaleDateString()}</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">{new Date(o.created_at).toLocaleDateString()}</p>
               </div>
               <div className="text-right space-y-1">
                 <p className="text-sm font-bold text-primary">₹{o.total_amount}</p>
-                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full capitalize border ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize border ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>
                   {o.status}
                 </span>
               </div>

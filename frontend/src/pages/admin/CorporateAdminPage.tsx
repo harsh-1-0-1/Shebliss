@@ -126,7 +126,7 @@ export default function CorporateAdminPage() {
                   <td className="px-5 py-4 text-gray-700 font-medium">{inq.company_name}</td>
                   <td className="px-5 py-4 text-gray-950 font-bold">{inq.qty_requested ? `${inq.qty_requested} units` : '—'}</td>
                   <td className="px-5 py-4">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[inq.status]}`}>
+                    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[inq.status]}`}>
                       {STATUS_LABELS[inq.status]}
                     </span>
                   </td>
@@ -166,7 +166,7 @@ export default function CorporateAdminPage() {
 
               {/* Contact Card */}
               <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
-                <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Company Contact</span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase block mb-1">Company Contact</span>
                 <p className="text-base font-bold text-gray-900 flex items-center gap-1.5"><Building size={16} className="text-gray-400" /> {selectedInquiry.company_name}</p>
                 <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5"><User size={15} className="text-gray-400" /> {selectedInquiry.full_name}</p>
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t text-xs text-gray-600">
@@ -177,7 +177,7 @@ export default function CorporateAdminPage() {
 
               {/* Requirement Card */}
               <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
-                <span className="text-[10px] font-bold text-gray-400 uppercase block">Requirements</span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase block">Requirements</span>
                 <p className="text-xs text-gray-800 font-bold">Volume Requested: {selectedInquiry.qty_requested ? `${selectedInquiry.qty_requested} units` : 'Not specified'}</p>
                 {selectedInquiry.customisation && (
                   <div className="bg-gray-50 p-3 rounded-lg border text-xs text-gray-600 leading-normal flex gap-1.5">
@@ -189,7 +189,7 @@ export default function CorporateAdminPage() {
 
               {/* Status Update Panel */}
               <div className="bg-white p-4 rounded-xl border border-gray-200 space-y-3">
-                <span className="text-[10px] font-bold text-gray-400 uppercase block">Change Deal Stage</span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase block">Change Deal Stage</span>
                 <div className="grid grid-cols-1 gap-2">
                   {Object.entries(STATUS_LABELS).map(([key, label]) => (
                     <button

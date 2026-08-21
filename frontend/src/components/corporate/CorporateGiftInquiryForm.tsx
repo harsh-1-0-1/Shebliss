@@ -109,7 +109,7 @@ export default function CorporateGiftInquiryForm() {
                 autoComplete={field.autoComplete}
                 aria-invalid={Boolean(errors[field.name])}
                 {...register(field.name)}
-                className="w-full rounded-2xl border border-gray-200 bg-[#f8f4ec] px-4 py-3.5 text-[15px] text-gray-900 outline-none transition duration-200 placeholder:text-gray-400 hover:border-primary-light/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary-light/20"
+                className="w-full rounded-2xl border border-gray-200 bg-[#f8f4ec] px-4 py-3.5 text-[16px] text-gray-900 outline-none transition duration-200 placeholder:text-gray-400 hover:border-primary-light/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary-light/20"
               />
               {errors[field.name] && (
                 <p className="mt-1.5 text-xs font-medium text-red-600">{errors[field.name]?.message}</p>
@@ -125,7 +125,7 @@ export default function CorporateGiftInquiryForm() {
               id="customisation"
               rows={4}
               {...register('customisation')}
-              className="w-full resize-none rounded-2xl border border-gray-200 bg-[#f8f4ec] px-4 py-3.5 text-[15px] text-gray-900 outline-none transition duration-200 placeholder:text-gray-400 hover:border-primary-light/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary-light/20"
+              className="w-full resize-none rounded-2xl border border-gray-200 bg-[#f8f4ec] px-4 py-3.5 text-[16px] text-gray-900 outline-none transition duration-200 placeholder:text-gray-400 hover:border-primary-light/70 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary-light/20"
             />
             {errors.customisation && (
               <p className="mt-1.5 text-xs font-medium text-red-600">{errors.customisation.message}</p>

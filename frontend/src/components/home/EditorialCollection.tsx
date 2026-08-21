@@ -35,7 +35,7 @@ export default function EditorialCollection() {
 
   return (
     <section className="w-full py-10 sm:py-16 lg:py-20" style={{ backgroundColor: banner?.bg_color || '#EFECE6' }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
+      <div className="mx-auto">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
           {/* Left — large editorial photo */}
           <div className="relative overflow-hidden aspect-[3/4] lg:aspect-auto lg:h-[600px] xl:h-[680px]">
@@ -51,9 +51,9 @@ export default function EditorialCollection() {
           </div>
 
           {/* Right — copy + CTA */}
-          <div className="flex flex-col justify-center gap-6 lg:gap-8 py-4">
+          <div className="flex flex-col justify-center gap-6 lg:gap-8 py-4 px-4 sm:px-6 lg:px-10 xl:px-16">
             <div>
-              <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">
+              <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">
                 {banner?.badge_text || 'Featured Collection'}
               </p>
               <h2
@@ -67,7 +67,7 @@ export default function EditorialCollection() {
                   </span>
                 ))}
               </h2>
-              <p className="mt-4 text-[14px] text-[#767676] leading-relaxed max-w-sm font-body">
+              <p className="mt-4 text-[15px] text-[#767676] leading-relaxed max-w-sm font-body">
                 {banner?.subtitle ||
                   'Each piece is designed to move with you — lightweight, enduring, and finished to feel like a family heirloom. Crafted on an 18k gold plated anti-tarnish base.'}
               </p>
@@ -75,7 +75,7 @@ export default function EditorialCollection() {
 
             <Link
               to={banner?.cta_link || '/products?tags=best-seller'}
-              className="inline-flex items-center gap-3 w-fit px-8 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[11px] font-semibold tracking-[0.18em] uppercase hover:bg-[#2B2421] transition-colors group/btn"
+              className="inline-flex items-center gap-3 w-fit px-8 py-3.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-semibold tracking-[0.18em] uppercase hover:bg-[#2B2421] transition-colors group/btn"
             >
               {banner?.cta_text || 'Shop the Collection'}
               <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
@@ -96,7 +96,7 @@ export default function EditorialCollection() {
           <div className="flex items-center gap-3">
             <Link
               to={banner?.cta_link || '/products?tags=best-seller'}
-              className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
+              className="hidden sm:inline-flex items-center gap-1 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
             >
               View all
             </Link>

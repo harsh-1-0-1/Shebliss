@@ -25,50 +25,48 @@ function CollectionBlock({ banner }: { banner: Banner }) {
 
   return (
     <section className="w-full py-10 sm:py-16" style={{ backgroundColor: '#F9F8F6' }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-10 xl:px-16">
-        {/* Banner ad */}
-        <Link
-          to={banner.cta_link || '/products'}
-          className="group relative block w-full overflow-hidden bg-[#14342B]"
-          style={{ aspectRatio: '16/7', minHeight: '220px' }}
-        >
-          {banner.image_url && (
-            <img
-              src={banner.image_url}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-700"
-              loading="lazy"
-            />
+      {/* Banner ad — full bleed */}
+      <Link
+        to={banner.cta_link || '/products'}
+        className="group relative block w-full overflow-hidden bg-[#14342B]"
+        style={{ aspectRatio: '16/7', minHeight: '220px' }}
+      >
+        {banner.image_url && (
+          <img
+            src={banner.image_url}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-700"
+            loading="lazy"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10" />
+        <div className="relative z-10 h-full flex flex-col justify-center px-5 sm:px-10 lg:px-14 max-w-2xl">
+          {banner.badge_text && (
+            <span className="w-fit text-[11px] sm:text-[12px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2 sm:mb-3">
+              {banner.badge_text}
+            </span>
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10" />
-          <div className="relative z-10 h-full flex flex-col justify-center px-5 sm:px-10 lg:px-14 max-w-2xl">
-            {banner.badge_text && (
-              <span className="w-fit text-[9px] sm:text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-2 sm:mb-3">
-                {banner.badge_text}
-              </span>
-            )}
-            {banner.subtitle && (
-              <h3
-                className="text-[#F9F8F6] leading-tight"
-                style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontWeight: 500,
-                  fontSize: 'clamp(1.4rem, 3.4vw, 2.8rem)',
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {banner.subtitle}
-              </h3>
-            )}
-            {banner.cta_text && (
-              <span className="mt-4 sm:mt-6 inline-flex items-center gap-2 w-fit px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-semibold tracking-[0.18em] uppercase bg-rust text-bone hover:bg-[#a84326] transition-colors group/btn">
-                {banner.cta_text}
-                <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
-              </span>
-            )}
-          </div>
-        </Link>
-      </div>
+          {banner.subtitle && (
+            <h3
+              className="text-[#F9F8F6] leading-tight"
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontWeight: 500,
+                fontSize: 'clamp(1.4rem, 3.4vw, 2.8rem)',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {banner.subtitle}
+            </h3>
+          )}
+          {banner.cta_text && (
+            <span className="mt-4 sm:mt-6 inline-flex items-center gap-2 w-fit px-5 sm:px-7 py-2.5 sm:py-3 text-[12px] sm:text-[13px] font-semibold tracking-[0.18em] uppercase bg-rust text-bone hover:bg-[#a84326] transition-colors group/btn">
+              {banner.cta_text}
+              <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
+            </span>
+          )}
+        </div>
+      </Link>
 
       {/* Sliding product bar */}
       {banner.products_tag && products.length > 0 && (
@@ -84,7 +82,7 @@ function CollectionBlock({ banner }: { banner: Banner }) {
               {banner.cta_link && (
                 <Link
                   to={banner.cta_link}
-                  className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1 text-[12px] font-bold tracking-[0.14em] uppercase text-[#767676] hover:text-[#1A1A1A] transition-colors"
                 >
                   View all
                 </Link>

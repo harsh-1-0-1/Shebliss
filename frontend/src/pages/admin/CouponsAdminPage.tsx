@@ -89,7 +89,7 @@ export default function CouponsAdminPage() {
           </div>
           <div>
             <span className="font-bold text-primary">Percentage Discount (%)</span>
-            <p className="text-[11px] text-gray-500 mt-0.5">Deducts a slice off the total bill. Example: <strong>15% OFF</strong> on ₹1,000 saves ₹150 for the customer.</p>
+            <p className="text-[12px] text-gray-500 mt-0.5">Deducts a slice off the total bill. Example: <strong>15% OFF</strong> on ₹1,000 saves ₹150 for the customer.</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -98,7 +98,7 @@ export default function CouponsAdminPage() {
           </div>
           <div>
             <span className="font-bold text-primary">Fixed Flat Discount (₹)</span>
-            <p className="text-[11px] text-gray-500 mt-0.5">Deducts a precise flat rupee amount. Example: <strong>₹200 OFF</strong> reduces a ₹1,500 order down to ₹1,300.</p>
+            <p className="text-[12px] text-gray-500 mt-0.5">Deducts a precise flat rupee amount. Example: <strong>₹200 OFF</strong> reduces a ₹1,500 order down to ₹1,300.</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function CouponsAdminPage() {
                 required
                 className="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none uppercase"
               />
-              <p className="text-[9px] text-gray-400 mt-1">Codes are auto-capitalized. Do not include spaces.</p>
+              <p className="text-[10px] text-gray-400 mt-1">Codes are auto-capitalized. Do not include spaces.</p>
             </div>
 
             <div>
@@ -177,11 +177,11 @@ export default function CouponsAdminPage() {
                 onChange={(e) => setUsageLimit(e.target.value)}
                 className={inputClass}
               />
-              <p className="text-[9px] text-gray-400 mt-1">Maximum number of redemptions. Leave empty for unlimited.</p>
+              <p className="text-[10px] text-gray-400 mt-1">Maximum number of redemptions. Leave empty for unlimited.</p>
             </div>
 
             {/* Formula Preview Box */}
-            <div className="rounded-lg bg-gray-50 border p-3 text-[10px] text-gray-500 leading-normal">
+            <div className="rounded-lg bg-gray-50 border p-3 text-[11px] text-gray-500 leading-normal">
               {type === 'percent' ? (
                 <p>💡 Formula: Orders above ₹{minAmount || 'X'} will get {value || 'Y'}% deducted from the subtotal.</p>
               ) : (
@@ -240,7 +240,7 @@ export default function CouponsAdminPage() {
                       <td className="p-3 text-center">
                         <button
                           onClick={() => handleToggle(c.id)}
-                          className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                             c.is_active
                               ? 'bg-green-50 text-green-700 border-green-200'
                               : 'bg-gray-100 text-gray-500 border-gray-200'

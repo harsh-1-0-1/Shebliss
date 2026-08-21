@@ -66,7 +66,7 @@ export default function AdminLayout() {
               className={`flex flex-col items-center justify-center gap-0.5 w-16 touch-target ${isActive(n.to) ? 'text-primary' : 'text-gray-400'}`}
             >
               <n.icon size={20} strokeWidth={isActive(n.to) ? 2.5 : 1.5} />
-              <span className="text-[10px] font-medium">{n.label}</span>
+              <span className="text-[11px] font-medium">{n.label}</span>
             </Link>
           ))}
           <button
@@ -74,7 +74,7 @@ export default function AdminLayout() {
             className={`flex flex-col items-center justify-center gap-0.5 w-16 touch-target ${MORE_ITEMS.some((m) => isActive(m.to)) ? 'text-primary' : 'text-gray-400'}`}
           >
             <MoreHorizontal size={20} />
-            <span className="text-[10px] font-medium">More</span>
+            <span className="text-[11px] font-medium">More</span>
           </button>
         </div>
       </div>

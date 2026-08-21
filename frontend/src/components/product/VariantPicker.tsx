@@ -166,16 +166,16 @@ export default function VariantPicker({ groups, stockMap, selectedOptions, onSel
                             </div>
                           )}
                         </div>
-                        <span className={`text-[11px] font-semibold text-center leading-tight line-clamp-2 ${isSelected ? 'text-primary' : 'text-gray-800'}`}>
+                        <span className={`text-[12px] font-semibold text-center leading-tight line-clamp-2 ${isSelected ? 'text-primary' : 'text-gray-800'}`}>
                           {opt.name}
                         </span>
                         {priceDelta > 0 && (
-                          <span className={`text-[10px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
+                          <span className={`text-[11px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
                             +₹{priceDelta}
                           </span>
                         )}
                         {priceDelta === 0 && (
-                          <span className={`text-[10px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
+                          <span className={`text-[11px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
                             Included
                           </span>
                         )}
