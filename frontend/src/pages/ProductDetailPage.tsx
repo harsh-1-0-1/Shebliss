@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, ShoppingCart, ShoppingBag, ChevronLeft, ChevronRight, AlertTriangle, ZoomIn } from 'lucide-react';
 import { ZoomableImage, ImageLightbox } from '@/components/product/ImageZoom';
+import OptimizedImage from '@/components/common/OptimizedImage';
 import toast from 'react-hot-toast';
 import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
@@ -26,6 +27,7 @@ import { useStories } from '@/hooks/useStories';
 import { StoriesCarousel } from '@/components/stories/StoriesCarousel';
 import { getApiErrorDetail } from '@/lib/apiError';
 import { buildComboRows } from '@/lib/variants';
+import { getVariantUrl, MAX_BASE_WIDTH } from '@/utils/image';
 
 
 function findCategoryName(categories: Category[] | undefined, categoryId: number): string {
@@ -354,12 +356,11 @@ function MobileGallery({
             aria-hidden={i !== activeIndex}
             className="w-full shrink-0"
           >
-            <img
+            <OptimizedImage
               src={img}
               alt={`Product image ${i + 1}`}
               className="w-full aspect-square object-cover"
-              loading="lazy"
-              draggable={false}
+              sizes="100vw"
               onClick={() => setLightboxSrc(img)}
             />
           </div>
@@ -444,7 +445,7 @@ function DesktopGallery({
               onClick={() => onActiveChange(i)}
               className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition ${i === activeIndex ? 'border-primary' : 'border-transparent'}`}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+              <OptimizedImage src={img} alt="" className="w-full h-full object-cover" widths={[200]} sizes="64px" />
             </button>
           ))}
         </div>

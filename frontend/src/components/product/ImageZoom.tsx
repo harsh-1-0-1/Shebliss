@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { X, ZoomIn, ZoomOut } from 'lucide-react';
+import { getVariantUrl } from '@/utils/image';
 
 // Desktop hover-magnifier for a single image. Scales toward the cursor.
 export function ZoomableImage({
@@ -27,6 +28,9 @@ export function ZoomableImage({
     img.style.transformOrigin = `${x}% ${y}%`;
   }
 
+  // Use 1200w variant for zoom detail view, falling back to original for legacy images
+  const zoomSrc = src.includes('_w.webp') ? getVariantUrl(src, 1200) : src;
+
   return (
     <div
       ref={containerRef}
@@ -40,7 +44,7 @@ export function ZoomableImage({
     >
       <img
         ref={imgRef}
-        src={src}
+        src={zoomSrc}
         alt={alt}
         draggable={false}
         className="w-full h-full object-cover transition-transform duration-150 ease-out will-change-transform"
@@ -62,6 +66,9 @@ export function ImageLightbox({
   onClose: () => void;
 }) {
   const [zoomed, setZoomed] = useState(false);
+
+  // Use 1200w variant for lightbox view (already ~50KB vs 2MB original)
+  const lightboxSrc = src.includes('_w.webp') ? getVariantUrl(src, 1200) : src;
 
   return (
     <div
@@ -89,7 +96,7 @@ export function ImageLightbox({
         style={{ touchAction: 'pan-x pan-y' }}
       >
         <img
-          src={src}
+          src={lightboxSrc}
           alt={alt}
           draggable={false}
           className="select-none transition-[width] duration-200"

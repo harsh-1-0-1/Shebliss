@@ -21,7 +21,7 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.core.tasks import cleanup_abandoned_orders
-from app.utils.image_upload import ImageStorageUnavailableError
+from app.utils.image_upload import CACHE_CONTROL_IMMUTABLE, ImageStorageUnavailableError
 from app.utils.redis import close_redis, init_redis
 from app.utils.variant_pricing import StockMapMissingError
 
@@ -81,6 +81,23 @@ async def log_requests(request: Request, call_next):
         status=response.status_code,
         dur=duration_ms,
     )
+    return response
+
+
+# Long-cache headers for locally-served static images (dev/staging only;
+# in production images are served directly from the Cloudflare CDN edge).
+_STATIC_CACHE_EXTS = frozenset({".webp", ".jpg", ".jpeg", ".png", ".mp4", ".webm"})
+
+
+@app.middleware("http")
+async def static_image_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    if (
+        request.url.path.startswith("/static/")
+        and response.status_code == 200
+        and os.path.splitext(request.url.path)[1].lower() in _STATIC_CACHE_EXTS
+    ):
+        response.headers["Cache-Control"] = CACHE_CONTROL_IMMUTABLE
     return response
 
 

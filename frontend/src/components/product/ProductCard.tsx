@@ -7,6 +7,7 @@ import { useWishlistStore } from '@/store/wishlistStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import { useQuickViewStore } from '@/store/useQuickViewStore';
 import { PLACEHOLDER_IMAGE } from '@/lib/branding';
+import OptimizedImage from '@/components/common/OptimizedImage';
 import type { Product } from '@/types';
 
 // High-contrast named badges derived from product tags (overrides the muted
@@ -98,21 +99,21 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       {/* Image — strict 3:4 aspect ratio, object-fit:cover */}
       <div className="relative overflow-hidden bg-[#EFECE6]" style={{ aspectRatio: '3/4' }}>
-        {/* Primary image */}
-        <img
+        {/* Primary image - responsive WebP with srcset */}
+        <OptimizedImage
           src={product.images?.[0] || PLACEHOLDER_IMAGE}
           alt={product.name}
           className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered && secondaryImage ? 'opacity-0' : 'opacity-100'}`}
-          loading="lazy"
+          sizes="(min-width: 768px) 50vw, 100vw"
           onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
         />
-        {/* Secondary (hover) image */}
+        {/* Secondary (hover) image - responsive WebP */}
         {secondaryImage && (
-          <img
+          <OptimizedImage
             src={secondaryImage}
             alt={`${product.name} — alternate view`}
             className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered ? 'opacity-100' : 'opacity-0'}`}
-            loading="lazy"
+            sizes="(min-width: 768px) 50vw, 100vw"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}

@@ -61,7 +61,10 @@ Thumbs.db
 .idea/
 .vscode/
 
-# ── Planning / scratch docs (GOgreen planning docs, not Shebliss code) ───────
+# ── Planning / scratch docs ───────────────────────────────────────────────────
+docs/
+
+# ── Legacy planning docs (GOgreen, not Shebliss code) ───────────────────────
 CURRENT_VARIANT_LIST.md
 DB-DRIVEN-MENU-PLAN.txt
 FLEXIBLE_VARIANT_IMPLEMENTATION_PLAN.md
