@@ -13,7 +13,7 @@ from app.schemas.blog import (
     BlogPostUpdate,
 )
 from app.services import blog_service
-from app.utils.image_upload import delete_image_file, extract_relative_key, upload_image_file
+from app.utils.image_upload import delete_image_file, upload_image_file
 from app.utils.redis import cache_get, cache_set
 
 router = APIRouter(prefix="/blog", tags=["blog"])
@@ -97,18 +97,36 @@ async def create_post(
 @router.put("/{slug}", response_model=BlogPostResponse)
 async def update_post(
     slug: str,
-    body: BlogPostUpdate,
+    title: Annotated[str | None, Form()] = None,
+    excerpt: Annotated[str | None, Form()] = None,
+    content: Annotated[str | None, Form()] = None,
+    category: Annotated[str | None, Form()] = None,
+    author_name: Annotated[str | None, Form()] = None,
+    is_published: Annotated[bool | None, Form()] = None,
+    cover_image: UploadFile | None = File(default=None),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
     post = await blog_service.get_post_by_slug(db, slug)
     if not post:
         raise HTTPException(status_code=404, detail="Blog post not found")
-    if body.cover_image_url is not None:
-        new_key = extract_relative_key(body.cover_image_url)
-        if new_key != post.cover_image_url:
-            await delete_image_file(post.cover_image_url)
-        body = body.model_copy(update={"cover_image_url": new_key})
+
+    # Upload new cover image if provided, deleting the old one
+    if cover_image and cover_image.filename:
+        old_key = post.cover_image_url
+        new_key = await upload_image_file(cover_image, folder="blog", entity_id=post.id)
+        if old_key and old_key != new_key:
+            await delete_image_file(old_key)
+        post.cover_image_url = new_key
+
+    body = BlogPostUpdate(
+        title=title,
+        excerpt=excerpt,
+        content=content,
+        category=category,
+        author_name=author_name,
+        is_published=is_published,
+    )
     post = await blog_service.update_post(db, post, body)
     return post
 

@@ -54,6 +54,18 @@ async def admin_list_testimonials(
     return result.scalars().all()
 
 
+@router.get("/admin/{testimonial_id}", response_model=TestimonialOut)
+async def admin_get_testimonial(
+    testimonial_id: int,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    testimonial = await db.get(Testimonial, testimonial_id)
+    if not testimonial:
+        raise HTTPException(404, "Testimonial not found")
+    return testimonial
+
+
 @router.post("/admin", response_model=TestimonialOut)
 async def create_testimonial(
     name: str = Form(...),

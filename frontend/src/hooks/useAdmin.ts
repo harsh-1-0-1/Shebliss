@@ -197,18 +197,31 @@ export function useUpdateBlogPost() {
     mutationFn: async ({
       slug,
       body,
+      coverImage,
     }: {
       slug: string;
       body: {
-        title: string;
-        excerpt: string;
-        content: string;
-        category: string;
-        author_name: string;
-        is_published: boolean;
+        title?: string;
+        excerpt?: string;
+        content?: string;
+        category?: string;
+        author_name?: string;
+        is_published?: boolean;
       };
+      coverImage?: File | null;
     }) => {
-      const { data } = await api.put(`/blog/${slug}`, body);
+      const fd = new FormData();
+      if (body.title !== undefined) fd.append('title', body.title);
+      if (body.excerpt !== undefined) fd.append('excerpt', body.excerpt);
+      if (body.content !== undefined) fd.append('content', body.content);
+      if (body.category !== undefined) fd.append('category', body.category);
+      if (body.author_name !== undefined) fd.append('author_name', body.author_name);
+      if (body.is_published !== undefined) fd.append('is_published', String(body.is_published));
+      if (coverImage) fd.append('cover_image', coverImage);
+
+      const { data } = await api.put(`/blog/${slug}`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return data;
     },
     onSuccess: () => {

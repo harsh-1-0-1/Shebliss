@@ -110,6 +110,7 @@ export default function BlogAdminPage() {
             author_name: authorName,
             is_published: isPublished,
           },
+          coverImage: coverImage ?? undefined,
         });
         toast.success('Article updated successfully!');
       } else {
@@ -361,30 +362,30 @@ export default function BlogAdminPage() {
                   </div>
                 </div>
 
-                {/* Cover Image Upload (only for new creation since backend edit page uses JSON and lacks image file handler) */}
-                {!editingPost && (
-                  <div className="pt-2 border-t">
-                    <label className="text-xs font-semibold text-gray-700 block mb-1.5">Article Cover Image</label>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border file:text-xs file:font-semibold file:bg-primary-light/10 file:text-primary file:border-primary-light/20 hover:file:bg-primary-light/20 cursor-pointer"
-                        />
-                        <p className="text-[11px] text-red-600 font-semibold mt-1">
-                          Recommended size: 1200x600px landscape. Keep the subject centered for mobile and desktop crops.
-                        </p>
-                      </div>
-                      {coverImagePreview && (
-                        <div className="h-12 w-20 border rounded-lg overflow-hidden shrink-0 bg-gray-50">
-                          <img src={coverImagePreview} alt="" className="h-full w-full object-cover" />
-                        </div>
-                      )}
+                {/* Cover Image Upload */}
+                <div className="pt-2 border-t">
+                  <label className="text-xs font-semibold text-gray-700 block mb-1.5">
+                    Article Cover Image {editingPost ? '(optional — replaces existing)' : ''}
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border file:text-xs file:font-semibold file:bg-primary-light/10 file:text-primary file:border-primary-light/20 hover:file:bg-primary-light/20 cursor-pointer"
+                      />
+                      <p className="text-[11px] text-red-600 font-semibold mt-1">
+                        Recommended size: 1200x600px landscape. Keep the subject centered for mobile and desktop crops.
+                      </p>
                     </div>
+                    {coverImagePreview && (
+                      <div className="h-12 w-20 border rounded-lg overflow-hidden shrink-0 bg-gray-50">
+                        <img src={coverImagePreview} alt="" className="h-full w-full object-cover" />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
 
                 {/* Publish Toggle */}
                 <div className="flex items-center justify-between pt-3 border-t">

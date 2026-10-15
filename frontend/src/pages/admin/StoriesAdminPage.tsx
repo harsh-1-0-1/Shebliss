@@ -31,8 +31,8 @@ function StoryForm({
   const { data: story, isLoading: isLoadingStory } = useQuery<Story>({
     queryKey: ['admin-story', storyId],
     queryFn: async () => {
-      const { data } = await api.get('/stories/admin');
-      return data.find((s: Story) => s.id === storyId);
+      const { data } = await api.get(`/stories/admin/${storyId}`);
+      return data;
     },
     enabled: !!storyId,
   });

@@ -61,6 +61,18 @@ async def admin_list_stories(
     return result.scalars().all()
 
 
+@router.get("/admin/{story_id}", response_model=StoryResponse)
+async def admin_get_story(
+    story_id: int,
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    story = await db.get(Story, story_id, options=[selectinload(Story.linked_product)])
+    if not story:
+        raise HTTPException(404, "Story not found")
+    return story
+
+
 @router.post("/admin", response_model=StoryResponse)
 async def create_story(
     video: UploadFile = File(...),
