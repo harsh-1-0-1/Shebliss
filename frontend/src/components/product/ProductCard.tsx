@@ -15,9 +15,13 @@ import type { Product } from '@/types';
 const NAMED_BADGES: Record<string, { label: string; className: string }> = {
   'new': { label: 'NEW', className: 'bg-forest text-bone' },
   'new-arrival': { label: 'NEW', className: 'bg-forest text-bone' },
-  'best-seller': { label: 'HOT SELLER', className: 'bg-rust text-white' },
-  'bestseller': { label: 'HOT SELLER', className: 'bg-rust text-white' },
-  'trending': { label: 'TRENDING', className: 'bg-forest text-bone' },
+  'best-seller': { label: 'BESTSELLER', className: 'bg-rust text-bone' },
+  'bestseller': { label: 'BESTSELLER', className: 'bg-rust text-bone' },
+  'best seller': { label: 'BESTSELLER', className: 'bg-rust text-bone' },
+  'trending': { label: 'TRENDING', className: 'bg-rust text-bone' },
+  'hot': { label: 'HOT', className: 'bg-rust text-bone' },
+  'hot-seller': { label: 'HOT SELLER', className: 'bg-rust text-bone' },
+  'sale': { label: 'SALE', className: 'bg-rust text-bone' },
 };
 
 function getNamedBadge(tags: string[] | undefined) {
@@ -104,7 +108,7 @@ export default function ProductCard({ product }: { product: Product }) {
           src={product.images?.[0] || PLACEHOLDER_IMAGE}
           alt={product.name}
           className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered && secondaryImage ? 'opacity-0' : 'opacity-100'}`}
-          sizes="(min-width: 768px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
           onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
         />
         {/* Secondary (hover) image - responsive WebP */}
@@ -113,7 +117,7 @@ export default function ProductCard({ product }: { product: Product }) {
             src={secondaryImage}
             alt={`${product.name} — alternate view`}
             className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${hovered ? 'opacity-100' : 'opacity-0'}`}
-            sizes="(min-width: 768px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         )}
@@ -127,7 +131,7 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
           {discount !== null && discount > 0 && (
             <span className="bg-rust text-bone text-[9px] font-bold px-2 py-1 tracking-[0.12em] uppercase rounded-sm">
-              −{discount}%
+              Flat {discount}% Off
             </span>
           )}
           {product.badge && !discount && (

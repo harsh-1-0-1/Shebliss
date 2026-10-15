@@ -51,6 +51,8 @@ export interface VariantOption {
   stock?: number;
   images?: string[];
   color_hex?: string;
+  /** Color family slug for filtering (e.g., 'emerald', 'rani-pink') */
+  color_family?: string;
 }
 
 export interface VariantGroup {

@@ -93,10 +93,11 @@ def make_list_cache_key(
     max_price: float | None,
     tags: str | None,
     sort_by: str | None,
+    colors: str | None,
     page: int,
     limit: int,
 ) -> str:
-    raw = f"{category_slug}:{search}:{min_price}:{max_price}:{tags}:{sort_by}:{page}:{limit}"
+    raw = f"{category_slug}:{search}:{min_price}:{max_price}:{tags}:{sort_by}:{colors}:{page}:{limit}"
     h = hashlib.md5(raw.encode()).hexdigest()[:12]
     return f"products:{h}"
 
@@ -105,6 +106,50 @@ def _tag_filter(db: AsyncSession, tag: str):
     if db.bind and db.bind.dialect.name == "postgresql":
         return cast(Product.tags, JSONB).contains([tag])
     return Product.tags.contains(tag)
+
+
+def _color_filter(db: AsyncSession, color_slugs: list[str]):
+    """Filter products by color family slugs.
+    
+    Since we don't have a color_families column yet, we filter by checking
+    the variants JSON for matching color_family values.
+    """
+    from sqlalchemy import or_
+    
+    # Normalize color slugs
+    normalized = [c.strip().lower() for c in color_slugs if c.strip()]
+    if not normalized:
+        return None
+    
+    # For now, do client-side filtering in Python after fetching
+    # This is less efficient but doesn't require migration
+    # A proper implementation would use a color_families column
+    return None  # Placeholder - actual filtering done in-memory for now
+
+
+def _filter_by_color_in_memory(products: list[Product], color_slugs: list[str]) -> list[Product]:
+    """Filter products by checking their variants for color_family matches."""
+    normalized = [c.strip().lower() for c in color_slugs if c.strip()]
+    if not normalized:
+        return products
+    
+    filtered = []
+    for product in products:
+        if not product.variants:
+            continue
+        variant_groups = product.variants.get("variant_groups", [])
+        for group in variant_groups:
+            if not group.get("options"):
+                continue
+            for option in group["options"]:
+                color_family = option.get("color_family", "").lower()
+                if color_family in normalized:
+                    filtered.append(product)
+                    break
+            else:
+                continue
+            break
+    return filtered
 
 
 async def list_products(
@@ -116,6 +161,7 @@ async def list_products(
     max_price: float | None = None,
     tags: str | None = None,
     sort_by: str | None = None,
+    colors: str | None = None,
     page: int = 1,
     limit: int = 20,
 ) -> tuple[list[Product], int, int]:
@@ -158,6 +204,13 @@ async def list_products(
             query = query.where(filt)
             count_q = count_q.where(filt)
 
+    # Store colors for later filtering (if color_families column doesn't exist)
+    color_filter_slugs = None
+    if colors:
+        color_list = [c.strip() for c in colors.split(",") if c.strip()]
+        if color_list:
+            color_filter_slugs = color_list
+
     match sort_by:
         case "price_asc":
             query = query.order_by(Product.price.asc())
@@ -176,7 +229,13 @@ async def list_products(
     pages = max(1, math.ceil(total / limit))
     query = query.offset((page - 1) * limit).limit(limit)
     result = await db.execute(query)
-    return list(result.scalars().all()), total, pages
+    items = list(result.scalars().all())
+    
+    # Apply in-memory color filtering if color_families column doesn't exist
+    if color_filter_slugs:
+        items = _filter_by_color_in_memory(items, color_filter_slugs)
+    
+    return items, total, pages
 
 
 async def get_product_by_slug(db: AsyncSession, slug: str) -> Product | None:
