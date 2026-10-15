@@ -8,6 +8,7 @@ from app.api.v1 import (
     blog,
     cart,
     categories,
+    color_families,
     corporate_inquiries,
     coupons,
     damage_claims,
@@ -25,6 +26,7 @@ api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(categories.router)
+api_router.include_router(color_families.router)
 api_router.include_router(products.router)
 api_router.include_router(reviews.router)
 api_router.include_router(cart.router)

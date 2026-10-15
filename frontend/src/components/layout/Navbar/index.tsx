@@ -191,7 +191,7 @@ export default function Navbar() {
         hidden && '-translate-y-full',
       )}
     >
-      {/* ── Main header row ── */}
+      {/* ── Main header row (logo + icons) ── */}
       <div className={clsx(
         'mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 flex items-center relative transition-all duration-300',
         scrolled ? 'h-[60px] sm:h-[68px]' : 'h-[72px] sm:h-[80px] lg:h-[88px]',
@@ -207,79 +207,13 @@ export default function Navbar() {
           </button>
         )}
 
-        {/* Logo — centred on mobile, left-flow on desktop */}
-        <div className="absolute left-1/2 -translate-x-1/2 lg:relative lg:left-auto lg:translate-x-0 z-10">
+        {/* Logo — centred on mobile, centred on desktop too */}
+        <div className="absolute left-1/2 -translate-x-1/2 z-10">
           <Logo />
         </div>
 
-        {/* Desktop nav — centre */}
-        {!isAdminPath && <nav className="hidden lg:flex items-center gap-0 mx-auto">
-          {NAV_ITEMS.map((item) => {
-            const hasDD = !!(item.groups?.length);
-            const isOpen = activeDropdown === item.label;
-            const active = isNavActive(item);
-            const isWide = (item.groups?.length ?? 0) > 1;
-            return (
-              <div
-                key={item.label}
-                className="relative"
-                onMouseEnter={hasDD ? () => handleDropdownEnter(item.label) : undefined}
-                onMouseLeave={hasDD ? handleDropdownLeave : undefined}
-              >
-                <Link
-                  to={item.href}
-                  className={clsx(
-                    'flex items-center gap-1 px-4 py-2 text-[12px] font-semibold tracking-[0.14em] uppercase transition-colors group relative whitespace-nowrap',
-                    item.highlight ? 'text-[#C6A15E]' : active ? 'text-[#1A1A1A]' : 'text-[#2B2421]/70 hover:text-[#1A1A1A]',
-                  )}
-                >
-                  {item.label}
-                  {hasDD && <ChevronDown size={10} className={clsx('opacity-50 transition-transform', isOpen && 'rotate-180')} />}
-                  <span className={clsx(
-                    'absolute bottom-0 left-4 right-4 h-[1.5px] bg-[#C6A15E] transition-transform origin-left duration-200',
-                    active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100',
-                  )} />
-                </Link>
-
-                {/* Mega dropdown */}
-                {hasDD && isOpen && (
-                  <div
-                    className={clsx(
-                      'absolute top-full left-0 bg-[#F9F8F6] border border-[#EFECE6] shadow-2xl z-50 animate-dropdown',
-                      isWide ? 'grid grid-cols-2 gap-6 p-6 w-[480px]' : 'p-5 w-56',
-                    )}
-                    onMouseEnter={() => { clearTimeout(hoverTimeoutRef.current); setActiveDropdown(item.label); }}
-                    onMouseLeave={handleDropdownLeave}
-                  >
-                    {item.groups!.map((col, ci) => (
-                      <div key={ci} className="space-y-4">
-                        {col.map((grp, gi) => (
-                          <div key={gi}>
-                            {grp.title && (
-                              <p className="text-[10px] font-bold text-[#767676] uppercase tracking-[0.2em] mb-2 pb-1.5 border-b border-[#EFECE6]">
-                                {grp.title}
-                              </p>
-                            )}
-                            {grp.links.map((lk) => (
-                              <Link
-                                key={lk.href} to={lk.href}
-                                onClick={() => setActiveDropdown(null)}
-                                className="flex items-center gap-2 py-1.5 text-[13px] text-[#2B2421]/70 hover:text-[#1A1A1A] hover:translate-x-1 transition-all duration-150"
-                              >
-                                <span className="w-1 h-1 rounded-full bg-[#C6A15E]/50 shrink-0" />
-                                {lk.label}
-                              </Link>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>}
+        {/* Desktop nav placeholder — keeps logo centred by mirroring icons width on desktop */}
+        {!isAdminPath && <div className="hidden lg:block flex-1" />}
 
         {/* Right icons */}
         <div className="flex items-center gap-0 ml-auto shrink-0">
@@ -375,6 +309,77 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* ── Desktop category nav row ── */}
+      {!isAdminPath && (
+        <nav className="hidden lg:flex flex-wrap justify-center items-center gap-0 border-t border-[#EFECE6] px-4 sm:px-6 lg:px-10 xl:px-16">
+          {NAV_ITEMS.map((item) => {
+            const hasDD = !!(item.groups?.length);
+            const isOpen = activeDropdown === item.label;
+            const active = isNavActive(item);
+            const isWide = (item.groups?.length ?? 0) > 1;
+            return (
+              <div
+                key={item.label}
+                className="relative"
+                onMouseEnter={hasDD ? () => handleDropdownEnter(item.label) : undefined}
+                onMouseLeave={hasDD ? handleDropdownLeave : undefined}
+              >
+                <Link
+                  to={item.href}
+                  className={clsx(
+                    'flex items-center gap-1 px-4 py-2.5 text-[12px] font-semibold tracking-[0.14em] uppercase transition-colors group relative whitespace-nowrap',
+                    item.highlight ? 'text-[#C6A15E]' : active ? 'text-[#1A1A1A]' : 'text-[#2B2421]/70 hover:text-[#1A1A1A]',
+                  )}
+                >
+                  {item.label}
+                  {hasDD && <ChevronDown size={10} className={clsx('opacity-50 transition-transform', isOpen && 'rotate-180')} />}
+                  <span className={clsx(
+                    'absolute bottom-0 left-4 right-4 h-[1.5px] bg-[#C6A15E] transition-transform origin-left duration-200',
+                    active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100',
+                  )} />
+                </Link>
+
+                {/* Mega dropdown */}
+                {hasDD && isOpen && (
+                  <div
+                    className={clsx(
+                      'absolute top-full left-0 bg-[#F9F8F6] border border-[#EFECE6] shadow-2xl z-50 animate-dropdown',
+                      isWide ? 'grid grid-cols-2 gap-6 p-6 w-[480px]' : 'p-5 w-56',
+                    )}
+                    onMouseEnter={() => { clearTimeout(hoverTimeoutRef.current); setActiveDropdown(item.label); }}
+                    onMouseLeave={handleDropdownLeave}
+                  >
+                    {item.groups!.map((col, ci) => (
+                      <div key={ci} className="space-y-4">
+                        {col.map((grp, gi) => (
+                          <div key={gi}>
+                            {grp.title && (
+                              <p className="text-[10px] font-bold text-[#767676] uppercase tracking-[0.2em] mb-2 pb-1.5 border-b border-[#EFECE6]">
+                                {grp.title}
+                              </p>
+                            )}
+                            {grp.links.map((lk) => (
+                              <Link
+                                key={lk.href} to={lk.href}
+                                onClick={() => setActiveDropdown(null)}
+                                className="flex items-center gap-2 py-1.5 text-[13px] text-[#2B2421]/70 hover:text-[#1A1A1A] hover:translate-x-1 transition-all duration-150"
+                              >
+                                <span className="w-1 h-1 rounded-full bg-[#C6A15E]/50 shrink-0" />
+                                {lk.label}
+                              </Link>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      )}
 
       {/* ── Search bar ── */}
       <div

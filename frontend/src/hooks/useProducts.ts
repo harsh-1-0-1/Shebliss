@@ -11,6 +11,7 @@ interface ProductFilters {
   sort_by?: string;
   page?: number;
   limit?: number;
+  colors?: string;
 }
 
 export function useProducts(filters: ProductFilters = {}) {

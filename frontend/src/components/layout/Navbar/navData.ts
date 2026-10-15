@@ -17,33 +17,38 @@ export interface NavItemDef {
   groups?: DropdownGroup[][];
 }
 
+// Helper to generate category URLs using the new route pattern
+function catUrl(slug: string): string {
+  return `/category/${slug}`;
+}
+
 export const NAV_ITEMS: NavItemDef[] = [
-  { label: 'NEW ARRIVAL', href: '/products?category=new-arrival' },
+  { label: 'NEW ARRIVAL', href: catUrl('new-arrival') },
   {
     label: 'NECKLACES SETS',
-    href: '/products?category=necklaces-sets',
+    href: catUrl('necklaces-sets'),
     groups: [
       [
         {
           links: [
-            { label: 'Kundan Necklace Sets', href: '/products?category=kundan-necklace-sets' },
-            { label: 'South Indian Sets', href: '/products?category=south-indian-sets' },
-            { label: 'Heritage Necklace Sets', href: '/products?category=heritage-necklace-sets' },
-            { label: 'Antique Jewellery Set', href: '/products?category=antique-jewellery-set' },
-            { label: 'Pendent Necklace', href: '/products?category=pendent-necklace' },
-            { label: 'Temple Jewellery', href: '/products?category=temple-jewellery' },
+            { label: 'Kundan Necklace Sets', href: catUrl('kundan-necklace-sets') },
+            { label: 'South Indian Sets', href: catUrl('south-indian-sets') },
+            { label: 'Heritage Necklace Sets', href: catUrl('heritage-necklace-sets') },
+            { label: 'Antique Jewellery Set', href: catUrl('antique-jewellery-set') },
+            { label: 'Pendent Necklace', href: catUrl('pendent-necklace') },
+            { label: 'Temple Jewellery', href: catUrl('temple-jewellery') },
           ],
         },
       ],
       [
         {
           links: [
-            { label: 'American Diamond Sets', href: '/products?category=american-diamond-sets' },
-            { label: 'Choker Sets', href: '/products?category=choker-sets' },
-            { label: 'Long Sets', href: '/products?category=long-sets' },
-            { label: 'Panchaloha Sets', href: '/products?category=panchaloha-sets' },
-            { label: 'Simple AD Sets', href: '/products?category=simple-ad-sets' },
-            { label: 'Combo Sets', href: '/products?category=combo-sets' },
+            { label: 'American Diamond Sets', href: catUrl('american-diamond-sets') },
+            { label: 'Choker Sets', href: catUrl('choker-sets') },
+            { label: 'Long Sets', href: catUrl('long-sets') },
+            { label: 'Panchaloha Sets', href: catUrl('panchaloha-sets') },
+            { label: 'Simple AD Sets', href: catUrl('simple-ad-sets') },
+            { label: 'Combo Sets', href: catUrl('combo-sets') },
           ],
         },
         {
@@ -59,23 +64,23 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   {
     label: 'EAR RING',
-    href: '/products?category=ear-ring',
+    href: catUrl('ear-ring'),
     groups: [
       [
         {
           links: [
-            { label: 'Jumkas', href: '/products?category=jumkas' },
-            { label: 'Chandbalis', href: '/products?category=chandbalis' },
-            { label: 'Studs', href: '/products?category=studs' },
+            { label: 'Jumkas', href: catUrl('jumkas') },
+            { label: 'Chandbalis', href: catUrl('chandbalis') },
+            { label: 'Studs', href: catUrl('studs') },
           ],
         },
       ],
       [
         {
           links: [
-            { label: 'Danglers', href: '/products?category=danglers' },
-            { label: 'Balis', href: '/products?category=balis' },
-            { label: 'Daily Wear', href: '/products?category=daily-wear' },
+            { label: 'Danglers', href: catUrl('danglers') },
+            { label: 'Balis', href: catUrl('balis') },
+            { label: 'Daily Wear', href: catUrl('daily-wear') },
           ],
         },
         {
@@ -91,16 +96,16 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   {
     label: 'BANGLES',
-    href: '/products?category=bangles',
+    href: catUrl('bangles'),
     groups: [
       [
         {
           links: [
-            { label: 'Set of 2 Bangles', href: '/products?category=set-of-2two-bangles' },
-            { label: 'Set of 4 Bangles', href: '/products?category=set-of-4-bangles' },
-            { label: 'Set of 6/12 Bangles', href: '/products?category=set-of-6-12-bangles' },
-            { label: 'Kada', href: '/products?category=kada' },
-            { label: 'Bracelet', href: '/products?category=bracelet' },
+            { label: 'Set of 2 Bangles', href: catUrl('set-of-2two-bangles') },
+            { label: 'Set of 4 Bangles', href: catUrl('set-of-4-bangles') },
+            { label: 'Set of 6/12 Bangles', href: catUrl('set-of-6-12-bangles') },
+            { label: 'Kada', href: catUrl('kada') },
+            { label: 'Bracelet', href: catUrl('bracelet') },
           ],
         },
       ],
@@ -108,17 +113,17 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   {
     label: 'CHAINS',
-    href: '/products?category=chains',
+    href: catUrl('chains'),
     groups: [
       [
         {
           links: [
-            { label: 'Moppu Chain', href: '/products?category=moppu-chain' },
-            { label: 'Plain', href: '/products?category=plain' },
-            { label: 'Pendent', href: '/products?category=pendent' },
-            { label: 'Beads Chain', href: '/products?category=beads-chain' },
-            { label: 'Mangal Sutra', href: '/products?category=mangal-sutra' },
-            { label: 'Karimani Mala', href: '/products?category=karimani-mala' },
+            { label: 'Moppu Chain', href: catUrl('moppu-chain') },
+            { label: 'Plain', href: catUrl('plain') },
+            { label: 'Pendent', href: catUrl('pendent') },
+            { label: 'Beads Chain', href: catUrl('beads-chain') },
+            { label: 'Mangal Sutra', href: catUrl('mangal-sutra') },
+            { label: 'Karimani Mala', href: catUrl('karimani-mala') },
           ],
         },
       ],
@@ -126,24 +131,24 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   {
     label: 'WEDDING JEWELLS',
-    href: '/products?category=wedding-jewells',
+    href: catUrl('wedding-jewells'),
     groups: [
       [
         {
           links: [
-            { label: 'Bridal Sets', href: '/products?category=bridal-sets' },
-            { label: 'Mang Tikka', href: '/products?category=mang-tikka' },
-            { label: 'Waist Belt', href: '/products?category=waist-belt' },
-            { label: 'Vanki Arm Band', href: '/products?category=vanki-arm-band' },
+            { label: 'Bridal Sets', href: catUrl('bridal-sets') },
+            { label: 'Mang Tikka', href: catUrl('mang-tikka') },
+            { label: 'Waist Belt', href: catUrl('waist-belt') },
+            { label: 'Vanki Arm Band', href: catUrl('vanki-arm-band') },
           ],
         },
       ],
       [
         {
           links: [
-            { label: 'Finger Rings', href: '/products?category=wedding-finger-rings' },
-            { label: 'Mangal Sutra', href: '/products?category=wedding-mangal-sutra' },
-            { label: 'Gifting.', href: '/products?category=gifting' },
+            { label: 'Finger Rings', href: catUrl('wedding-finger-rings') },
+            { label: 'Mangal Sutra', href: catUrl('wedding-mangal-sutra') },
+            { label: 'Gifting', href: catUrl('gifting') },
           ],
         },
       ],
@@ -151,33 +156,33 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   {
     label: 'PANCHA LOHA JEWELLS',
-    href: '/products?category=pancha-loha-jewells',
+    href: catUrl('pancha-loha-jewells'),
     groups: [
       [
         {
           links: [
-            { label: 'Attiga', href: '/products?category=attiga' },
-            { label: 'Necklace', href: '/products?category=necklace' },
-            { label: 'Chain', href: '/products?category=chain' },
-            { label: 'Finger Rings', href: '/products?category=finger-rings' },
+            { label: 'Attiga', href: catUrl('attiga') },
+            { label: 'Necklace', href: catUrl('necklace') },
+            { label: 'Chain', href: catUrl('chain') },
+            { label: 'Finger Rings', href: catUrl('finger-rings') },
           ],
         },
       ],
     ],
   },
-  { label: 'FESTIVAL PICK', href: '/products?category=festival-pick' },
-  { label: 'SIGNATURE COLLECTION', href: '/products?category=signature-collection' },
-  { label: 'BEST SELLERS', href: '/products?category=best-sellers' },
+  { label: 'FESTIVAL PICK', href: catUrl('festival-pick') },
+  { label: 'SIGNATURE COLLECTION', href: catUrl('signature-collection') },
+  { label: 'BEST SELLERS', href: catUrl('best-sellers') },
   {
     label: 'OTHER JEWELLERY',
-    href: '/products?category=other-jewellery',
+    href: catUrl('other-jewellery'),
     groups: [
       [
         {
           links: [
-            { label: 'Ethnic Templejewellery', href: '/products?category=ethnic-templejewellery' },
-            { label: 'Minimal Ethnic Jewellery', href: '/products?category=minimal-ethnic-jewellery' },
-            { label: 'Bridal Bliss', href: '/products?category=bridal-bliss' },
+            { label: 'Ethnic Templejewellery', href: catUrl('ethnic-templejewellery') },
+            { label: 'Minimal Ethnic Jewellery', href: catUrl('minimal-ethnic-jewellery') },
+            { label: 'Bridal Bliss', href: catUrl('bridal-bliss') },
           ],
         },
       ],
@@ -185,6 +190,7 @@ export const NAV_ITEMS: NavItemDef[] = [
   },
   { label: 'CORPORATE GIFTS', href: '/corporate-gifting' },
   { label: 'BLOG', href: '/blog' },
+  { label: 'SHOP BY COLOR', href: '/shop-by-color' },
   { label: 'SALE', href: '/products?tags=offers', highlight: true },
 ];
 
@@ -200,72 +206,62 @@ export interface MobileCollection {
 export const MOBILE_COLLECTIONS: MobileCollection[] = [
   {
     label: 'New Arrival',
-    href: '/products?category=new-arrival',
-    image:
-      'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
+    href: catUrl('new-arrival'),
+    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
     label: 'Necklaces Sets',
-    href: '/products?category=necklaces-sets',
-    image:
-      'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
+    href: catUrl('necklaces-sets'),
+    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=280&q=80',
     accent: '#f0e4cf',
   },
   {
     label: 'Ear Ring',
-    href: '/products?category=ear-ring',
-    image:
-      'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=280&q=80',
+    href: catUrl('ear-ring'),
+    image: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
     label: 'Bangles',
-    href: '/products?category=bangles',
-    image:
-      'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=280&q=80',
+    href: catUrl('bangles'),
+    image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=280&q=80',
     accent: '#f0e4cf',
   },
   {
     label: 'Wedding Jewells',
-    href: '/products?category=wedding-jewells',
-    image:
-      'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=280&q=80',
+    href: catUrl('wedding-jewells'),
+    image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
     label: 'Chains',
-    href: '/products?category=chains',
-    image:
-      'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=280&q=80',
+    href: catUrl('chains'),
+    image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=280&q=80',
     accent: '#f0e4cf',
   },
   {
     label: 'Best Sellers',
-    href: '/products?category=best-sellers',
-    image:
-      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=280&q=80',
+    href: catUrl('best-sellers'),
+    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
     label: 'Corporate Gifts',
     href: '/corporate-gifting',
-    image:
-      'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=280&q=80',
+    image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=280&q=80',
     accent: '#d6e5dd',
   },
   {
     label: 'Blog',
     href: '/blog',
-    image:
-      'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=280&q=80',
+    image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=280&q=80',
     accent: '#f3d9cf',
   },
   {
     label: 'Sale',
     href: '/products?tags=offers',
-    image:
-      'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=280&q=80',
+    image: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=280&q=80',
     accent: '#f0e4cf',
   },
 ];
@@ -280,7 +276,7 @@ export function bannerToCollection(b: Banner): MobileCollection {
 }
 
 export function categoryLink(c: Category): string {
-  return `/products?category=${c.slug}`;
+  return `/category/${c.slug}`;
 }
 
 export function sortByMenuOrder<T extends { sort_order?: number }>(items: T[]): T[] {

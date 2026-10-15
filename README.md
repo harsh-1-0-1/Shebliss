@@ -15,14 +15,14 @@ Built with **FastAPI** (backend) and **React + Vite** (frontend).
 - Orders, order tracking, damage claims, and review system
 - Admin dashboard (products, variants, banners, blogs, coupons, orders)
 - Blog with categories, WhatsApp/email order notifications, Google OAuth
-- Image uploads via Cloudinary or S3/CloudFront
+- Image uploads via Cloudflare R2 (recommended), AWS S3, or local storage
 
 ## Prerequisites
 
 - **Python 3.12+** with [`uv`](https://docs.astral.sh/uv/) installed
 - **Node.js 18+** with npm
 - **Redis** running on `localhost:6379` (or set `REDIS_URL`)
-- (Optional) **Cloudinary** account for image uploads
+- (Optional) **Cloudflare R2** bucket for image uploads (recommended - free tier)
 - (Optional) **Google OAuth** credentials for social login
 - (Optional) **Razorpay** test credentials for payments
 
@@ -123,6 +123,28 @@ Then visit `http://localhost:5173/admin` to access the admin dashboard.
 4. **Payments / email / WhatsApp** — fill in the matching vars in `backend/.env`.
 5. **Frontend copy** — check `frontend/src/pages` and `frontend/src/components`
    for section headings, FAQ text, and the corporate gifting form.
+
+## Image Storage
+
+For production deployments, you'll need cloud storage for product images:
+
+### Cloudflare R2 (Recommended - Zero Cost)
+
+- 10 GB free storage (permanent)
+- Zero egress fees (unlimited bandwidth)
+- Built-in Cloudflare CDN
+- See **[CLOUDFLARE_R2_SETUP.md](CLOUDFLARE_R2_SETUP.md)** for detailed setup
+
+### AWS S3 (Alternative)
+
+- Traditional S3 + CloudFront
+- Free tier: 5 GB for 12 months
+- See `.env.example` for configuration
+
+### Local Development
+
+- No cloud storage needed
+- Images stored in `backend/static/` directory
 
 ## Available Make Commands
 

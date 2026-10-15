@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import ProductCard from '@/components/product/ProductCard';
+import SubcategoryCarousel from '@/components/product/SubcategoryCarousel';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
@@ -216,6 +217,7 @@ function FiltersSidebar({
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false);
   const [minPrice, setMinPrice] = useState(searchParams.get('min_price') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
   const [inStock, setInStock] = useState(false);
@@ -224,7 +226,13 @@ export default function ProductsPage() {
 
   useBodyScrollLock(mobileFiltersOpen);
 
-  const category = searchParams.get('category') || '';
+  // Support both new route param (/category/:slug) and legacy query param (?category=)
+  const routeParams = useParams<{ slug: string }>();
+
+  // Use route param if on /category/:slug, otherwise fall back to query param
+  const categoryFromRoute = routeParams.slug;
+  const categoryFromQuery = searchParams.get('category') || '';
+  const category = categoryFromRoute || categoryFromQuery;
   const search = searchParams.get('search') || '';
   const sort = searchParams.get('sort_by') || '';
   const page = Number(searchParams.get('page')) || 1;
@@ -240,7 +248,7 @@ export default function ProductsPage() {
 
   function setPage(n: number) {
     const p = new URLSearchParams(searchParams);
-    n > 1 ? p.set('page', String(n)) : p.delete('page');
+    if (n > 1) { p.set('page', String(n)); } else { p.delete('page'); }
     setSearchParams(p);
     topRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
@@ -345,18 +353,42 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Mobile control bar */}
-        <div className="lg:hidden flex items-center gap-3 mb-5 pb-4 border-b border-[#EFECE6]">
-          <button onClick={() => setMobileFiltersOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.12em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors"
+        {/* Subcategory carousel - only show for category pages */}
+        {category && <SubcategoryCarousel categorySlug={category} />}
+
+        {/* ── Full-width filter / sort bar (desktop + mobile) ── */}
+        <div className="flex items-center gap-3 mb-0 pb-4 border-b border-[#EFECE6]">
+          {/* Filter toggle button */}
+          <button
+            onClick={() => { setMobileFiltersOpen(true); }}
+            className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.12em] uppercase text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors"
           >
             <SlidersHorizontal size={14} />
             Filter
             {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-[#C6A15E]" />}
           </button>
-          <div className="relative flex-1">
-            <select value={sort} onChange={(e) => updateParams({ sort_by: e.target.value })}
-              className="w-full appearance-none border border-[#EFECE6] bg-white text-[13px] font-medium text-[#2B2421] py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#C6A15E] transition-colors"
+          <button
+            onClick={() => setDesktopFiltersOpen((v) => !v)}
+            className="hidden lg:flex items-center gap-2 px-4 py-2.5 border text-[12px] font-bold tracking-[0.12em] uppercase transition-colors
+              border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-[#F9F8F6]"
+            style={desktopFiltersOpen ? { backgroundColor: '#1A1A1A', color: '#F9F8F6' } : {}}
+          >
+            <SlidersHorizontal size={14} />
+            Filter
+            {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-[#C6A15E]" />}
+          </button>
+
+          {/* Product count — centre */}
+          <span className="flex-1 text-center text-[12px] text-[#767676] tracking-wider font-body hidden sm:block">
+            {data ? `${data.total} products` : ''}
+          </span>
+
+          {/* Sort — right */}
+          <div className="relative flex-1 sm:flex-none">
+            <select
+              value={sort}
+              onChange={(e) => updateParams({ sort_by: e.target.value })}
+              className="w-full sm:w-auto appearance-none border border-[#EFECE6] bg-white text-[13px] font-medium text-[#2B2421] py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#C6A15E] transition-colors"
             >
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -364,84 +396,149 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <div className="flex gap-8 lg:gap-10">
-          {/* Desktop sidebar — sticky with scroll containment */}
-          <aside className="hidden lg:block w-[220px] xl:w-[250px] shrink-0">
-            <div
-              className="sticky overflow-y-auto scrollbar-none"
-              style={{ top: '100px', maxHeight: 'calc(100vh - 120px)' }}
-            >
-              <FiltersSidebar {...filterProps} />
-            </div>
-          </aside>
-
-          {/* Product grid area */}
-          <div className="flex-1 min-w-0">
-            {/* Desktop sort row */}
-            <div className="hidden lg:flex items-center justify-end mb-5 pb-4 border-b border-[#EFECE6]">
-              <div className="flex items-center gap-2">
-                <span className="text-[12px] text-[#767676] uppercase tracking-wider font-body">Sort by</span>
-                <div className="relative">
-                  <select value={sort} onChange={(e) => updateParams({ sort_by: e.target.value })}
-                    className="appearance-none border border-[#EFECE6] bg-white text-[13px] font-medium text-[#2B2421] py-2 pl-3 pr-7 focus:outline-none focus:border-[#C6A15E] transition-colors"
-                  >
-                    {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#767676] pointer-events-none" />
+        {/* ── Collapsible desktop filter panel ── */}
+        {desktopFiltersOpen && (
+          <div className="hidden lg:block border-b border-[#EFECE6] mb-6 py-5">
+            <div className="grid grid-cols-5 gap-6">
+              {/* Price Range */}
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] mb-3">Price Range</p>
+                <div className="space-y-1.5">
+                  {PRICE_RANGES.map((r) => {
+                    const active = filterProps.minPrice === r.min && filterProps.maxPrice === r.max && (r.min !== '' || r.max !== '');
+                    return (
+                      <button key={r.label}
+                        onClick={() => {
+                          if (active) { filterProps.onMinPrice(''); filterProps.onMaxPrice(''); }
+                          else { filterProps.onMinPrice(r.min); filterProps.onMaxPrice(r.max); }
+                        }}
+                        className={`block w-full text-left text-[12px] px-2.5 py-1.5 transition-colors ${active ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#2B2421] hover:bg-[#EFECE6]'}`}
+                      >
+                        {r.label}
+                      </button>
+                    );
+                  })}
+                  <div className="flex gap-2 mt-2">
+                    <input type="number" placeholder="Min" value={filterProps.minPrice} onChange={(e) => filterProps.onMinPrice(e.target.value)}
+                      className="w-full px-2 py-1.5 text-[12px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white" />
+                    <input type="number" placeholder="Max" value={filterProps.maxPrice} onChange={(e) => filterProps.onMaxPrice(e.target.value)}
+                      className="w-full px-2 py-1.5 text-[12px] border border-[#EFECE6] focus:outline-none focus:border-[#C6A15E] bg-white" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <ErrorBoundary>
-              {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
-                  {Array.from({ length: 15 }).map((_, i) => <SkeletonCard key={i} />)}
+              {/* Material / Finish */}
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] mb-3">Material</p>
+                <div className="space-y-1.5">
+                  {MATERIAL_TAGS.map((m) => (
+                    <TagCheckbox key={m.tag} label={m.label} tag={m.tag} selectedTags={filterProps.selectedTags} onTagToggle={filterProps.onTagToggle} />
+                  ))}
                 </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-                  <p className="font-display text-2xl text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>No results found</p>
-                  <p className="text-[14px] text-[#767676]">Try adjusting your filters or explore a different category.</p>
-                  <button onClick={resetFilters} className="mt-2 px-6 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors">
-                    Clear filters
+              </div>
+
+              {/* Occasion / Style */}
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] mb-3">Occasion</p>
+                <div className="space-y-1.5">
+                  {OCCASION_TAGS.map((o) => (
+                    <TagCheckbox key={o.tag} label={o.label} tag={o.tag} selectedTags={filterProps.selectedTags} onTagToggle={filterProps.onTagToggle} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Colour */}
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] mb-3">Colour</p>
+                {filterProps.availableColours.length === 0 ? (
+                  <p className="text-[12px] text-[#767676]">No colours on this page</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {filterProps.availableColours.map((c) => {
+                      const active = filterProps.selectedColours.includes(c.hex);
+                      return (
+                        <button key={c.hex} onClick={() => filterProps.onColourToggle(c.hex)} title={c.name} aria-label={c.name}
+                          className={`w-6 h-6 rounded-full border transition ${active ? 'border-[#1A1A1A] ring-2 ring-[#C6A15E]/40' : 'border-[#EFECE6] hover:border-[#C6A15E]'}`}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Availability + Clear */}
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1A1A1A] mb-3">Availability</p>
+                <label className="flex items-center gap-2.5 cursor-pointer group mb-4">
+                  <span onClick={() => filterProps.onInStock(!filterProps.inStock)}
+                    className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-colors cursor-pointer ${filterProps.inStock ? 'bg-[#1A1A1A] border-[#1A1A1A]' : 'border-[#EFECE6] group-hover:border-[#C6A15E]'}`}
+                  >
+                    {filterProps.inStock && <span className="text-[#F9F8F6] text-[11px]">✓</span>}
+                  </span>
+                  <span className="text-[13px] text-[#2B2421]">In Stock Only</span>
+                </label>
+                {hasFilters && (
+                  <button onClick={resetFilters} className="text-[11px] font-semibold text-[#767676] hover:text-[#C6A15E] transition-colors uppercase tracking-wider">
+                    Clear all filters
                   </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
-                  {filteredItems.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              )}
-            </ErrorBoundary>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-            {/* Pagination */}
-            {data && data.pages > 1 && (
-              <div className="flex items-center justify-center gap-1.5 mt-12">
-                <button disabled={page <= 1} onClick={() => setPage(page - 1)}
-                  className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
-                >
-                  <ChevronLeft size={15} />
+        {/* ── Product grid — full width ── */}
+        <div className="mt-6">
+          <ErrorBoundary>
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+                {Array.from({ length: 15 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+                <p className="font-display text-2xl text-[#1A1A1A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>No results found</p>
+                <p className="text-[14px] text-[#767676]">Try adjusting your filters or explore a different category.</p>
+                <button onClick={resetFilters} className="mt-2 px-6 py-2.5 border border-[#1A1A1A] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#1A1A1A] hover:text-[#F9F8F6] transition-colors">
+                  Clear filters
                 </button>
-                {Array.from({ length: data.pages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === data.pages || Math.abs(p - page) <= 1)
-                  .map((p, idx, arr) => (
-                    <span key={p} className="flex items-center gap-1.5">
-                      {idx > 0 && arr[idx - 1] !== p - 1 && <span className="text-[#EFECE6] text-sm">…</span>}
-                      <button onClick={() => setPage(p)}
-                        className={`w-9 h-9 text-[13px] font-semibold border transition-colors ${p === page ? 'bg-[#1A1A1A] text-[#F9F8F6] border-[#1A1A1A]' : 'border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'}`}
-                      >
-                        {p}
-                      </button>
-                    </span>
-                  ))}
-                <button disabled={page >= data.pages} onClick={() => setPage(page + 1)}
-                  className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
-                >
-                  <ChevronRight size={15} />
-                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+                {filteredItems.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
             )}
-          </div>
+          </ErrorBoundary>
+
+          {/* Pagination */}
+          {data && data.pages > 1 && (
+            <div className="flex items-center justify-center gap-1.5 mt-12">
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)}
+                className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
+              >
+                <ChevronLeft size={15} />
+              </button>
+              {Array.from({ length: data.pages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === data.pages || Math.abs(p - page) <= 1)
+                .map((p, idx, arr) => (
+                  <span key={p} className="flex items-center gap-1.5">
+                    {idx > 0 && arr[idx - 1] !== p - 1 && <span className="text-[#EFECE6] text-sm">…</span>}
+                    <button onClick={() => setPage(p)}
+                      className={`w-9 h-9 text-[13px] font-semibold border transition-colors ${p === page ? 'bg-[#1A1A1A] text-[#F9F8F6] border-[#1A1A1A]' : 'border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'}`}
+                    >
+                      {p}
+                    </button>
+                  </span>
+                ))}
+              <button disabled={page >= data.pages} onClick={() => setPage(page + 1)}
+                className="w-9 h-9 flex items-center justify-center border border-[#EFECE6] text-[#767676] hover:border-[#1A1A1A] hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

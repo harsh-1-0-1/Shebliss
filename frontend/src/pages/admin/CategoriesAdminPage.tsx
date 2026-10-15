@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowDown,
   ArrowUp,
@@ -8,11 +8,13 @@ import {
   Eye,
   EyeOff,
   FolderTree,
+  Image as ImageIcon,
   Info,
   Pencil,
   Plus,
   Trash2,
   Upload,
+  X,
   CheckCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -29,9 +31,10 @@ interface CategoryNodeProps {
   onRename: (id: number, name: string) => Promise<void>;
   onToggleActive: (id: number, isActive: boolean) => Promise<void>;
   onMove: (id: number, direction: -1 | 1) => Promise<void>;
+  onEditImage: (cat: Category) => void;
 }
 
-function CategoryNode({ cat, onDelete, onRename, onToggleActive, onMove }: CategoryNodeProps) {
+function CategoryNode({ cat, onDelete, onRename, onToggleActive, onMove, onEditImage }: CategoryNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(cat.name);
@@ -125,6 +128,13 @@ function CategoryNode({ cat, onDelete, onRename, onToggleActive, onMove }: Categ
             <Pencil size={13} />
           </button>
           <button
+            onClick={() => onEditImage(cat)}
+            className={`p-1.5 transition ${cat.image_url ? 'text-gray-400 hover:text-primary' : 'text-amber-500 hover:text-amber-600'}`}
+            title={cat.image_url ? 'Change image' : 'Add image'}
+          >
+            <ImageIcon size={13} />
+          </button>
+          <button
             onClick={() => handleMove(-1)}
             disabled={busy}
             className="p-1.5 text-gray-400 hover:text-primary transition"
@@ -167,6 +177,7 @@ function CategoryNode({ cat, onDelete, onRename, onToggleActive, onMove }: Categ
               onRename={onRename}
               onToggleActive={onToggleActive}
               onMove={onMove}
+              onEditImage={onEditImage}
             />
           ))}
         </div>
@@ -189,6 +200,282 @@ function findSiblings(nodes: Category[], id: number): SiblingEntry[] {
   return [];
 }
 
+interface CategoryImageModalProps {
+  cat: Category;
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function CategoryImageModal({ cat, onClose, onSaved }: CategoryImageModalProps) {
+  const [mode, setMode] = useState<'upload' | 'url'>('upload');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [manualUrl, setManualUrl] = useState('');
+  const [urlValid, setUrlValid] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (filePreview) URL.revokeObjectURL(filePreview);
+    };
+  }, [filePreview]);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setFilePreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+  }
+
+  function handleUrlBlur() {
+    if (!manualUrl) {
+      setUrlValid(null);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => setUrlValid(true);
+    img.onerror = () => setUrlValid(false);
+    img.src = manualUrl;
+  }
+
+  async function handleSave() {
+    if (saving) return;
+
+    if (mode === 'upload') {
+      if (!selectedFile) {
+        toast.error('Choose an image file first');
+        return;
+      }
+      setSaving(true);
+      try {
+        const fd = new FormData();
+        fd.append('image', selectedFile);
+        await api.post(`/categories/${cat.id}/image`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.success('Category image updated');
+        onSaved();
+        onClose();
+      } catch (err) {
+        toast.error(getApiErrorDetail(err, 'Failed to upload image'));
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
+    const url = manualUrl.trim();
+    if (!url) {
+      toast.error('Paste an image URL first');
+      return;
+    }
+    if (urlValid === false) {
+      toast.error('That image URL could not be loaded');
+      return;
+    }
+    setSaving(true);
+    try {
+      await api.put(`/categories/${cat.id}`, { image_url: url });
+      toast.success('Category image updated');
+      onSaved();
+      onClose();
+    } catch (err) {
+      toast.error(getApiErrorDetail(err, 'Failed to update image'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRemove() {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await api.put(`/categories/${cat.id}`, { image_url: null });
+      toast.success('Image removed');
+      onSaved();
+      onClose();
+    } catch (err) {
+      toast.error(getApiErrorDetail(err, 'Failed to remove image'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const previewSrc = filePreview ?? cat.image_url;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/55 transition-opacity" onClick={onClose} />
+
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b">
+          <div>
+            <h2 className="text-base font-bold text-gray-900">Edit Category Image</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{cat.name}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+            title="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {/* Preview as it appears on the site */}
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 rounded-full border-2 border-[#E5E1DA] overflow-hidden bg-[#EFECE6] shrink-0">
+              {previewSrc ? (
+                <img src={previewSrc} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[#767676] text-xs">
+                  {cat.name.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div className="text-[11px] text-gray-500 leading-relaxed">
+              <p className="font-bold text-gray-700 text-xs mb-0.5">
+                {cat.image_url ? 'Current circle image' : 'No image yet'}
+              </p>
+              <p>
+                This is how the category appears in the subcategory circles and desktop tiles on
+                your site. Recommended: 600x600px square, subject centered.
+              </p>
+            </div>
+          </div>
+
+          {/* Mode */}
+          <div className="flex gap-3 text-[11px] font-bold text-gray-500">
+            <label className="flex items-center gap-1 cursor-pointer">
+              <input
+                type="radio"
+                checked={mode === 'upload'}
+                onChange={() => setMode('upload')}
+              />
+              Upload Image
+            </label>
+            <label className="flex items-center gap-1 cursor-pointer">
+              <input type="radio" checked={mode === 'url'} onChange={() => setMode('url')} />
+              Paste URL
+            </label>
+          </div>
+
+          {mode === 'upload' && (
+            <div className="border-2 border-dashed border-gray-100 hover:border-primary/40 rounded-lg p-4 text-center cursor-pointer relative transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+              {filePreview ? (
+                <div className="space-y-1.5">
+                  <img
+                    src={filePreview}
+                    alt="Preview"
+                    className="max-h-24 mx-auto object-cover rounded-lg"
+                  />
+                  <span className="text-[11px] font-semibold text-gray-500 block">
+                    {selectedFile?.name}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-gray-400">
+                  <Upload size={20} className="mx-auto mb-1" />
+                  <span className="text-[11px] font-semibold block text-gray-700">
+                    Choose image file
+                  </span>
+                  {cat.image_url && (
+                    <span className="text-[11px] block mt-0.5">Replaces the current image</span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {mode === 'url' && (
+            <div className="space-y-1.5">
+              <input
+                type="url"
+                value={manualUrl}
+                onChange={(e) => {
+                  setManualUrl(e.target.value);
+                  setUrlValid(null);
+                }}
+                onBlur={handleUrlBlur}
+                placeholder="https://..."
+                className="w-full px-2.5 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              {urlValid === true && (
+                <p className="text-[11px] text-green-600 flex items-center gap-1 font-semibold">
+                  <CheckCircle size={11} /> Image loaded
+                </p>
+              )}
+              {urlValid === false && (
+                <p className="text-[11px] text-red-600 font-semibold">
+                  This URL could not be loaded as an image.
+                </p>
+              )}
+              {manualUrl && (
+                <div className="h-14 w-14 border rounded-lg overflow-hidden bg-gray-50">
+                  <img
+                    src={manualUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2 px-5 py-4 border-t bg-gray-50/60">
+          <div>
+            {cat.image_url && (
+              <button
+                onClick={handleRemove}
+                disabled={saving}
+                className="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-1 disabled:opacity-50 transition"
+              >
+                <Trash2 size={13} /> Remove image
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              disabled={saving}
+              className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-lg transition disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4 py-2 text-xs font-semibold bg-primary text-white rounded-lg hover:bg-primary/95 disabled:opacity-60 flex items-center gap-1.5 transition"
+            >
+              {saving ? (
+                'Saving...'
+              ) : (
+                <>
+                  <Check size={13} /> Save
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CategoriesAdminPage() {
   const qc = useQueryClient();
   const { data: categories, isLoading, refetch } = useCategoriesAdmin();
@@ -205,6 +492,9 @@ export default function CategoriesAdminPage() {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [manualUrl, setManualUrl] = useState('');
   const [urlValid, setUrlValid] = useState<boolean | null>(null);
+
+  // Edit image modal state
+  const [imageTarget, setImageTarget] = useState<Category | null>(null);
 
   const allCats = categories?.flatMap((c) => [c, ...(c.children ?? [])]) ?? [];
   const roots = categories?.filter((c) => !c.parent_id) ?? [];
@@ -326,7 +616,7 @@ export default function CategoriesAdminPage() {
           <p className="font-bold text-primary">Where do categories show up on the website?</p>
           <ul className="list-disc pl-4 mt-1 space-y-0.5">
             <li><strong>Root Categories</strong> (no parent) appear in the main navigation menu, the mobile menu, the footer, and the homepage category slider. Use the arrows to control their order in the menu.</li>
-            <li><strong>Subcategories</strong> (attached to a parent) show up as dropdown items under their root and in the catalog filters.</li>
+            <li><strong>Subcategories</strong> (attached to a parent) show up as dropdown items under their root, in the catalog filters, and as the image circles above the product grid — give them a thumbnail so they don&apos;t fall back to a letter.</li>
             <li>Use the <strong>eye</strong> button to hide a category from the site; hidden categories still appear here so you can bring them back.</li>
           </ul>
         </div>
@@ -458,16 +748,27 @@ export default function CategoriesAdminPage() {
                   onRename={handleRename}
                   onToggleActive={handleToggleActive}
                   onMove={handleMove}
+                  onEditImage={setImageTarget}
                 />
               ))}
             </div>
           )}
           <p className="text-[11px] text-gray-400 mt-3 border-t pt-2">
-            Tip: hover a category to see rename (pencil), reorder (arrows), hide/show (eye), and delete actions.
+            Tip: hover a category to see rename (pencil), image (photo), reorder (arrows),
+            hide/show (eye), and delete actions. Categories without an image show a letter in
+            their circle on the site.
           </p>
         </div>
 
       </div>
+
+      {imageTarget && (
+        <CategoryImageModal
+          cat={imageTarget}
+          onClose={() => setImageTarget(null)}
+          onSaved={invalidate}
+        />
+      )}
     </div>
   );
 }

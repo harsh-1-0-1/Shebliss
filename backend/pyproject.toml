@@ -23,6 +23,7 @@ dependencies = [
     "slowapi>=0.1.9",
     "boto3>=1.43.40",
     "python-dotenv>=1.2.2",
+    "Pillow>=10.4.0",
 ]
 
 [project.optional-dependencies]

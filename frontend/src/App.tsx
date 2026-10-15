@@ -12,6 +12,8 @@ import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import HomePage from '@/pages/HomePage';
 import ProductsPage from '@/pages/ProductsPage';
 import ProductDetailPage from '@/pages/ProductDetailPage';
+import ShopByColorPage from '@/pages/ShopByColorPage';
+import ColourProductsPage from '@/pages/ColourProductsPage';
 import CartPage from '@/pages/CartPage';
 import CheckoutPage from '@/pages/CheckoutPage';
 import OrdersPage from '@/pages/OrdersPage';
@@ -105,6 +107,9 @@ export default function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:slug" element={<ProductDetailPage />} />
+              <Route path="/category/:slug" element={<ProductsPage />} />
+              <Route path="/shop-by-color" element={<ShopByColorPage />} />
+              <Route path="/colour/:slug" element={<ColourProductsPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/orders" element={<OrdersPage />} />

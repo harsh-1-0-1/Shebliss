@@ -19,8 +19,8 @@ function TestimonialForm({
   const { data: testimonial, isLoading: isLoadingTestimonial } = useQuery<Testimonial>({
     queryKey: ['admin-testimonial', testimonialId],
     queryFn: async () => {
-      const { data } = await api.get('/testimonials/admin');
-      return data.find((t: Testimonial) => t.id === testimonialId);
+      const { data } = await api.get(`/testimonials/admin/${testimonialId}`);
+      return data;
     },
     enabled: !!testimonialId,
   });

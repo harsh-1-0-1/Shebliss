@@ -20,11 +20,13 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
 
+    # S3-compatible storage (AWS S3 or Cloudflare R2)
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"
     AWS_S3_BUCKET: str = ""
-    CDN_BASE_URL: str = ""
+    AWS_S3_ENDPOINT_URL: str = ""  # For R2: https://<account_id>.r2.cloudflarestorage.com
+    CDN_BASE_URL: str = ""  # Public R2 domain or CloudFront URL
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./ecommerce.db"
     REDIS_URL: str = "redis://localhost:6379"

@@ -4,8 +4,9 @@ import { X } from 'lucide-react';
 import { useBanners } from '@/hooks/useBanners';
 import CurrencySwitcher from '@/components/ui/CurrencySwitcher';
 
-const COOKIE_NAME = 'ann_dismissed';
-const COOKIE_MAX_AGE = 86400;
+// Dismissed state lives only in sessionStorage so a page refresh always
+// shows the bar again. We do NOT use a long-lived cookie anymore.
+const SESSION_KEY = 'ann_dismissed';
 
 const FALLBACK_MESSAGES = [
   { title: 'Free Express Shipping on Orders Over ₹999', cta_link: '/products' },
@@ -13,33 +14,33 @@ const FALLBACK_MESSAGES = [
   { title: 'New Arrivals Every Week — Explore the Collection', cta_link: '/products?sort_by=newest' },
 ];
 
-function getCookie(name: string): string | undefined {
-  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return match?.[1];
-}
-
-function setCookie(name: string, value: string, maxAge: number) {
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
-}
-
 const Dot = () => (
   <span className="mx-5 text-[#C6A15E]/50 text-[9px] select-none" aria-hidden>✦</span>
 );
 
 export default function AnnouncementBar() {
   const { data: banners = [] } = useBanners('announcement');
-  const [visible, setVisible] = useState(() => getCookie(COOKIE_NAME) !== '1');
+  // Only dismissed for the current browser session — refresh always resets it.
+  const [visible, setVisible] = useState(
+    () => sessionStorage.getItem(SESSION_KEY) !== '1',
+  );
 
   if (!visible) return null;
 
   const messages = banners.length > 0 ? banners : FALLBACK_MESSAGES;
 
   function dismiss() {
-    setCookie(COOKIE_NAME, '1', COOKIE_MAX_AGE);
+    sessionStorage.setItem(SESSION_KEY, '1');
     setVisible(false);
   }
 
-  const strip = messages.map((msg, i) => (
+  // Pad to at least 4 copies so the marquee is always a seamless closed loop
+  // regardless of how many entries the admin has configured (even just 1).
+  const MIN_COPIES = 4;
+  const copies = Math.ceil(MIN_COPIES / messages.length);
+  const loopMessages = Array.from({ length: copies }, () => messages).flat();
+
+  const strip = loopMessages.map((msg, i) => (
     <span key={i} className="inline-flex items-center whitespace-nowrap">
       {i > 0 && <Dot />}
       <Link
@@ -56,7 +57,7 @@ export default function AnnouncementBar() {
       className="relative w-full flex items-center overflow-hidden"
       style={{ backgroundColor: '#14342B', height: '36px' }}
     >
-      {/* Scrolling text strip */}
+      {/* Scrolling text strip — two copies for seamless loop */}
       <div className="flex-1 overflow-hidden">
         <div className="animate-marquee flex items-center whitespace-nowrap text-[#F9F8F6]/80">
           {strip}

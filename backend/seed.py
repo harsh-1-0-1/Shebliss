@@ -1,741 +1,474 @@
-"""Seed script: Shebliss artificial jewellery catalog.
+"""Minimal dev seed for Shebliss.
 
-Usage:
-    uv run python seed.py
+Creates:
+  4 parent categories, each with 3 subcategories  (Unsplash images)
+  3 products per subcategory  (48 products total)
+  1 admin user + 1 regular user
+  2 testimonials
+
+Run from the backend/ directory:
+    source .venv/bin/activate
+    python seed.py
+
+Safe to re-run — existing rows are skipped (slug/email uniqueness).
+Pass --reset to wipe products, categories and users first.
 """
 
 import asyncio
 import os
-import random
-import re
 import sys
-import uuid
 from datetime import datetime, timezone
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.security import hash_password
-from app.db.models import (
-    Address, Banner, BlogCategory, BlogPost, Cart, CartItem,
-    Category, Order, OrderItem, Product, ProductReview, Story, Testimonial, User,
-)
+from app.db.models import Category, Product, Testimonial, User
 
+# ---------------------------------------------------------------------------
+# DB connection
+# ---------------------------------------------------------------------------
 
-def _resolve_database_url() -> str | None:
-    url = os.environ.get("DATABASE_URL")
+def _db_url() -> str:
+    url = os.environ.get("DATABASE_URL", "")
     if not url:
         from app.core.config import settings
-        url = settings.DATABASE_URL
-    if not url:
-        return None
+        url = settings.DATABASE_URL or ""
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql+asyncpg://", 1)
     elif url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if not url:
+        sys.exit("ERROR: DATABASE_URL is not set.")
     return url
 
 
-_db_url = _resolve_database_url()
-if _db_url:
-    engine = create_async_engine(_db_url, future=True)
-    async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-else:
-    engine = None
-    async_session_factory = None
+engine = create_async_engine(_db_url(), future=True)
+Session = async_sessionmaker(engine, expire_on_commit=False)
 
-UNSPLASH = "https://images.unsplash.com/photo-{id}?w=600&q=80"
 
-# Only using photo IDs that appear verbatim as category fallback images, blog post
-# covers, or hero banners elsewhere in this codebase — proven jewelry shots, zero guessing.
-PRODUCT_IMAGES = [
-    UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),   # kundan necklace   [category + blog]
-    UNSPLASH.format(id="1573408301185-9146fe634ad0"),   # gold bangles      [category + blog]
-    UNSPLASH.format(id="1611652022419-a9419f74343d"),   # bridal jewellery  [category + blog + banner]
-    UNSPLASH.format(id="1605100804763-247f67b3557e"),   # gold ring         [category]
-    UNSPLASH.format(id="1610701596007-11502861dcfa"),   # gold chain        [original PRODUCT_IMAGES]
-    UNSPLASH.format(id="1589128777073-263566ae5e4d"),   # earrings close-up [original PRODUCT_IMAGES]
-    UNSPLASH.format(id="1515562141207-7a88fb7ce338"),   # gemstone ring     [original PRODUCT_IMAGES]
+# ---------------------------------------------------------------------------
+# Data definitions  — NOTHING is hardcoded with raw IDs.
+# Subcategories reference their parent by slug.
+# ---------------------------------------------------------------------------
+
+#  structure:
+#  [
+#    { parent_slug, parent_name, image_url, subcategories: [
+#        { slug, name, image_url }
+#    ]}
+#  ]
+CATEGORY_TREE = [
+    {
+        "slug": "necklace-sets",
+        "name": "Necklace Sets",
+        "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop&q=80",
+        "sort_order": 1,
+        "subcategories": [
+            {
+                "slug": "kundan-necklace-sets",
+                "name": "Kundan Necklace Sets",
+                "image_url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop&q=80",
+                "sort_order": 1,
+            },
+            {
+                "slug": "choker-sets",
+                "name": "Choker Sets",
+                "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop&q=80",
+                "sort_order": 2,
+            },
+            {
+                "slug": "long-sets",
+                "name": "Long Sets",
+                "image_url": "https://images.unsplash.com/photo-1601121141461-9d6647bef0a1?w=400&h=400&fit=crop&q=80",
+                "sort_order": 3,
+            },
+        ],
+    },
+    {
+        "slug": "earrings",
+        "name": "Earrings",
+        "image_url": "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=400&h=400&fit=crop&q=80",
+        "sort_order": 2,
+        "subcategories": [
+            {
+                "slug": "jhumkas",
+                "name": "Jhumkas",
+                "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop&q=80",
+                "sort_order": 1,
+            },
+            {
+                "slug": "chandbalis",
+                "name": "Chandbalis",
+                "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop&q=80",
+                "sort_order": 2,
+            },
+            {
+                "slug": "studs",
+                "name": "Studs",
+                "image_url": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=400&fit=crop&q=80",
+                "sort_order": 3,
+            },
+        ],
+    },
+    {
+        "slug": "bangles",
+        "name": "Bangles",
+        "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop&q=80",
+        "sort_order": 3,
+        "subcategories": [
+            {
+                "slug": "kada",
+                "name": "Kada",
+                "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop&q=80",
+                "sort_order": 1,
+            },
+            {
+                "slug": "bangle-set-4",
+                "name": "Set of 4 Bangles",
+                "image_url": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=400&fit=crop&q=80",
+                "sort_order": 2,
+            },
+            {
+                "slug": "bracelet",
+                "name": "Bracelet",
+                "image_url": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=400&fit=crop&q=80",
+                "sort_order": 3,
+            },
+        ],
+    },
+    {
+        "slug": "wedding-jewellery",
+        "name": "Wedding Jewellery",
+        "image_url": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=400&fit=crop&q=80",
+        "sort_order": 4,
+        "subcategories": [
+            {
+                "slug": "bridal-sets",
+                "name": "Bridal Sets",
+                "image_url": "https://images.unsplash.com/photo-1601121141461-9d6647bef0a1?w=400&h=400&fit=crop&q=80",
+                "sort_order": 1,
+            },
+            {
+                "slug": "mang-tikka",
+                "name": "Mang Tikka",
+                "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop&q=80",
+                "sort_order": 2,
+            },
+            {
+                "slug": "waist-belt",
+                "name": "Waist Belt",
+                "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop&q=80",
+                "sort_order": 3,
+            },
+        ],
+    },
 ]
 
-# Exact category tree from 'WEB SITE.xlsx' (row 4 = top-level, rows below = subcategories).
-CATEGORIES = [
-    # Top-level
-    {"name": "NEW ARRIVAL", "slug": "new-arrival", "parent_id": None},
-    {"name": "FESTIVAL PICK", "slug": "festival-pick", "parent_id": None},
-    {"name": "SIGNATURE COLLECTION", "slug": "signature-collection", "parent_id": None},
-    {"name": "PANCHA LOHA JEWELLS", "slug": "pancha-loha-jewells", "parent_id": None},
-    {"name": "NECKLACES SETS", "slug": "necklaces-sets", "parent_id": None},
-    {"name": "EAR RING", "slug": "ear-ring", "parent_id": None},
-    {"name": "BANGLES", "slug": "bangles", "parent_id": None},
-    {"name": "CHAINS", "slug": "chains", "parent_id": None},
-    {"name": "BEST SELLERS", "slug": "best-sellers", "parent_id": None},
-    {"name": "WEDDING JEWELLS", "slug": "wedding-jewells", "parent_id": None},
-    {"name": "OTHER JEWELLERY", "slug": "other-jewellery", "parent_id": None},
-    # PANCHA LOHA JEWELLS subcategories
-    {"name": "ATTIGA", "slug": "attiga", "parent_slug": "pancha-loha-jewells"},
-    {"name": "NECKLACE", "slug": "necklace", "parent_slug": "pancha-loha-jewells"},
-    {"name": "CHAIN", "slug": "chain", "parent_slug": "pancha-loha-jewells"},
-    {"name": "FINGER RINGS", "slug": "finger-rings", "parent_slug": "pancha-loha-jewells"},
-    # NECKLACES SETS subcategories
-    {"name": "KUNDAN NECKLACE SETS", "slug": "kundan-necklace-sets", "parent_slug": "necklaces-sets"},
-    {"name": "SOUTH INDIAN SETS", "slug": "south-indian-sets", "parent_slug": "necklaces-sets"},
-    {"name": "HERITAGE NECKLACE SETS", "slug": "heritage-necklace-sets", "parent_slug": "necklaces-sets"},
-    {"name": "ANTIQUE JEWELLERY SET", "slug": "antique-jewellery-set", "parent_slug": "necklaces-sets"},
-    {"name": "PENDENT NECKLACE", "slug": "pendent-necklace", "parent_slug": "necklaces-sets"},
-    {"name": "TEMPLE JEWELLERY", "slug": "temple-jewellery", "parent_slug": "necklaces-sets"},
-    {"name": "AMERICAN DIAMOND SETS", "slug": "american-diamond-sets", "parent_slug": "necklaces-sets"},
-    {"name": "CHOKER SETS", "slug": "choker-sets", "parent_slug": "necklaces-sets"},
-    {"name": "LONG SETS", "slug": "long-sets", "parent_slug": "necklaces-sets"},
-    {"name": "PANCHALOHA SETS", "slug": "panchaloha-sets", "parent_slug": "necklaces-sets"},
-    {"name": "SIMPLE AD SETS", "slug": "simple-ad-sets", "parent_slug": "necklaces-sets"},
-    {"name": "COMBO SETS", "slug": "combo-sets", "parent_slug": "necklaces-sets"},
-    # EAR RING subcategories
-    {"name": "JUMKAS", "slug": "jumkas", "parent_slug": "ear-ring"},
-    {"name": "CHANDBALIS", "slug": "chandbalis", "parent_slug": "ear-ring"},
-    {"name": "STUDS", "slug": "studs", "parent_slug": "ear-ring"},
-    {"name": "DANGLERS", "slug": "danglers", "parent_slug": "ear-ring"},
-    {"name": "BALIS", "slug": "balis", "parent_slug": "ear-ring"},
-    {"name": "DAILY WEAR", "slug": "daily-wear", "parent_slug": "ear-ring"},
-    # BANGLES subcategories
-    {"name": "SET OF 2TWO BANGLES", "slug": "set-of-2two-bangles", "parent_slug": "bangles"},
-    {"name": "SET OF 4 BANGLES", "slug": "set-of-4-bangles", "parent_slug": "bangles"},
-    {"name": "SET OF 6/12 BANGLES", "slug": "set-of-6-12-bangles", "parent_slug": "bangles"},
-    {"name": "KADA", "slug": "kada", "parent_slug": "bangles"},
-    {"name": "BRACELET", "slug": "bracelet", "parent_slug": "bangles"},
-    # CHAINS subcategories
-    {"name": "MOPPU CHAIN", "slug": "moppu-chain", "parent_slug": "chains"},
-    {"name": "PLAIN", "slug": "plain", "parent_slug": "chains"},
-    {"name": "PENDENT", "slug": "pendent", "parent_slug": "chains"},
-    {"name": "BEADS CHAIN", "slug": "beads-chain", "parent_slug": "chains"},
-    {"name": "MANGAL SUTRA", "slug": "mangal-sutra", "parent_slug": "chains"},
-    {"name": "KARIMANI MALA", "slug": "karimani-mala", "parent_slug": "chains"},
-    # WEDDING JEWELLS subcategories
-    {"name": "BRIDAL SETS", "slug": "bridal-sets", "parent_slug": "wedding-jewells"},
-    {"name": "MANG TIKKA", "slug": "mang-tikka", "parent_slug": "wedding-jewells"},
-    {"name": "WAIST BELT", "slug": "waist-belt", "parent_slug": "wedding-jewells"},
-    {"name": "VANKI ARM BAND", "slug": "vanki-arm-band", "parent_slug": "wedding-jewells"},
-    {"name": "FINGER RINGS", "slug": "wedding-finger-rings", "parent_slug": "wedding-jewells"},
-    {"name": "MANGAL SUTRA", "slug": "wedding-mangal-sutra", "parent_slug": "wedding-jewells"},
-    {"name": "GIFTING.", "slug": "gifting", "parent_slug": "wedding-jewells"},
-    # OTHER JEWELLERY subcategories
-    {"name": "ETHNIC TEMPLEJEWELLERY", "slug": "ethnic-templejewellery", "parent_slug": "other-jewellery"},
-    {"name": "MINIMAL ETHNIC JEWELLERY", "slug": "minimal-ethnic-jewellery", "parent_slug": "other-jewellery"},
-    {"name": "BRIDAL BLISS", "slug": "bridal-bliss", "parent_slug": "other-jewellery"},
+# 3 products per subcategory — keyed by subcategory slug
+# each entry is a list of (name, price, original_price, tags, color_hex)
+PRODUCTS: dict[str, list[dict]] = {
+    "kundan-necklace-sets": [
+        {"name": "Kundan Royal Choker Set", "price": 1499, "original_price": 1999, "tags": ["kundan", "bestseller", "bridal"], "color_hex": "#046c48"},
+        {"name": "Heritage Kundan Layered Set", "price": 1899, "original_price": 2499, "tags": ["kundan", "festive"], "color_hex": "#c2185b"},
+        {"name": "Kundan Emerald Necklace", "price": 2199, "original_price": 2999, "tags": ["kundan", "bridal", "new-arrival"], "color_hex": "#046c48"},
+    ],
+    "choker-sets": [
+        {"name": "Gold Plated Choker Set", "price": 999, "original_price": 1499, "tags": ["18k-gold", "bestseller"], "color_hex": "#ffd700"},
+        {"name": "Antique Choker with Earrings", "price": 1299, "original_price": 1799, "tags": ["antique", "festive"], "color_hex": "#722f37"},
+        {"name": "Minimalist AD Choker", "price": 799, "original_price": 1099, "tags": ["everyday", "new-arrival"], "color_hex": "#c0c0c0"},
+    ],
+    "long-sets": [
+        {"name": "Temple Long Haaram Set", "price": 2499, "original_price": 3299, "tags": ["temple", "bridal"], "color_hex": "#ffd700"},
+        {"name": "Polki Long Necklace Set", "price": 1999, "original_price": 2699, "tags": ["polki", "festive"], "color_hex": "#046c48"},
+        {"name": "South Indian Long Chain Set", "price": 1749, "original_price": 2299, "tags": ["temple", "traditional"], "color_hex": "#ffd700"},
+    ],
+    "jhumkas": [
+        {"name": "Classic Kundan Jhumkas", "price": 599, "original_price": 899, "tags": ["kundan", "bestseller"], "color_hex": "#ffd700"},
+        {"name": "Rani Pink Chandbali Jhumkas", "price": 699, "original_price": 999, "tags": ["festive", "new-arrival"], "color_hex": "#c2185b"},
+        {"name": "Emerald Drop Jhumkas", "price": 799, "original_price": 1099, "tags": ["everyday", "bridal"], "color_hex": "#046c48"},
+    ],
+    "chandbalis": [
+        {"name": "Antique Gold Chandbali", "price": 899, "original_price": 1199, "tags": ["antique", "bridal"], "color_hex": "#ffd700"},
+        {"name": "Ruby Red Chandbali Earrings", "price": 749, "original_price": 999, "tags": ["festive", "bestseller"], "color_hex": "#9b111e"},
+        {"name": "Peacock Enamel Chandbali", "price": 949, "original_price": 1299, "tags": ["festive", "new-arrival"], "color_hex": "#009B77"},
+    ],
+    "studs": [
+        {"name": "Pearl Drop Studs", "price": 349, "original_price": 499, "tags": ["everyday", "minimal"], "color_hex": "#f0ead6"},
+        {"name": "AD Flower Studs", "price": 299, "original_price": 449, "tags": ["everyday", "bestseller"], "color_hex": "#c0c0c0"},
+        {"name": "Gold Plated Ball Studs", "price": 249, "original_price": 399, "tags": ["everyday", "minimal"], "color_hex": "#ffd700"},
+    ],
+    "kada": [
+        {"name": "Antique Copper Finish Kada", "price": 799, "original_price": 1099, "tags": ["antique", "traditional"], "color_hex": "#722f37"},
+        {"name": "Kundan Studded Kada", "price": 999, "original_price": 1399, "tags": ["kundan", "bridal"], "color_hex": "#ffd700"},
+        {"name": "Simple Gold Plated Kada", "price": 599, "original_price": 849, "tags": ["everyday", "18k-gold"], "color_hex": "#ffd700"},
+    ],
+    "bangle-set-4": [
+        {"name": "Kundan Stone Set of 4", "price": 849, "original_price": 1199, "tags": ["kundan", "festive", "bestseller"], "color_hex": "#046c48"},
+        {"name": "Multicolor Enamel Bangles x4", "price": 699, "original_price": 999, "tags": ["festive", "new-arrival"], "color_hex": None},
+        {"name": "Gold Polish Bangles Set of 4", "price": 749, "original_price": 999, "tags": ["18k-gold", "everyday"], "color_hex": "#ffd700"},
+    ],
+    "bracelet": [
+        {"name": "Oxidised Silver Charm Bracelet", "price": 499, "original_price": 699, "tags": ["everyday", "minimal"], "color_hex": "#c0c0c0"},
+        {"name": "Kundan Bracelet with Beads", "price": 649, "original_price": 899, "tags": ["kundan", "festive"], "color_hex": "#ffd700"},
+        {"name": "AD Tennis Bracelet", "price": 549, "original_price": 799, "tags": ["everyday", "bestseller"], "color_hex": "#c0c0c0"},
+    ],
+    "bridal-sets": [
+        {"name": "Full Bridal Kundan Set", "price": 4999, "original_price": 6999, "tags": ["kundan", "bridal", "bestseller"], "color_hex": "#ffd700"},
+        {"name": "South Indian Bridal 7-Piece Set", "price": 5499, "original_price": 7499, "tags": ["temple", "bridal"], "color_hex": "#ffd700"},
+        {"name": "Polki Bridal Set with Tikka", "price": 4499, "original_price": 5999, "tags": ["polki", "bridal", "new-arrival"], "color_hex": "#046c48"},
+    ],
+    "mang-tikka": [
+        {"name": "Kundan Maang Tikka", "price": 799, "original_price": 1099, "tags": ["kundan", "bridal"], "color_hex": "#ffd700"},
+        {"name": "Pearl Maang Tikka", "price": 599, "original_price": 849, "tags": ["bridal", "everyday"], "color_hex": "#f0ead6"},
+        {"name": "Emerald Maang Tikka", "price": 999, "original_price": 1399, "tags": ["bridal", "festive"], "color_hex": "#046c48"},
+    ],
+    "waist-belt": [
+        {"name": "Bridal Kamarband Gold", "price": 1499, "original_price": 2099, "tags": ["bridal", "temple"], "color_hex": "#ffd700"},
+        {"name": "Kundan Waist Belt", "price": 1299, "original_price": 1799, "tags": ["kundan", "bridal"], "color_hex": "#046c48"},
+        {"name": "Antique Saree Waist Belt", "price": 1099, "original_price": 1499, "tags": ["antique", "traditional"], "color_hex": "#ffd700"},
+    ],
+}
+
+# A few Unsplash product image URLs reused across products
+_PRODUCT_IMAGES = [
+    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=800&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=600&h=800&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=800&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=800&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=800&fit=crop&q=80",
+]
+
+USERS = [
+    {"email": "admin@shebliss.com", "full_name": "Shebliss Admin", "is_admin": True, "password": "admin123"},
+    {"email": "demo@shebliss.com", "full_name": "Demo User", "is_admin": False, "password": "demo123"},
+]
+
+TESTIMONIALS = [
+    {
+        "name": "Priya Sharma",
+        "rating": 5,
+        "quote": "The quality of the kundan set exceeded my expectations. Wore it at my sister's wedding and got so many compliments!",
+        "item_purchased": "Kundan Royal Choker Set",
+        "location": "Mumbai",
+        "is_verified": True,
+        "is_featured": True,
+    },
+    {
+        "name": "Ananya Reddy",
+        "rating": 5,
+        "quote": "Fast delivery and beautiful packaging. The jhumkas are exactly as shown — love Shebliss!",
+        "item_purchased": "Classic Kundan Jhumkas",
+        "location": "Hyderabad",
+        "is_verified": True,
+        "is_featured": True,
+    },
 ]
 
 
-def _make_variants(base_price: int, stock_per_option: int = 12) -> dict:
-    """Shebliss variant: Select Colour (carries price) + Select Finish (add-on)."""
-    def oid(): return f"opt_{uuid.uuid4().hex[:8]}"
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
-    colours = [
-        {"id": oid(), "name": "Gold",       "price": base_price, "stock": stock_per_option},
-        {"id": oid(), "name": "Rose Gold",  "price": base_price + 200, "stock": stock_per_option},
-        {"id": oid(), "name": "Silver",     "price": base_price, "stock": stock_per_option},
-    ]
-    finishes = [
-        {"id": oid(), "name": "Standard",       "price": 0,   "stock": stock_per_option},
-        {"id": oid(), "name": "Antique Finish", "price": 150, "stock": stock_per_option},
-        {"id": oid(), "name": "High Polish",    "price": 200, "stock": stock_per_option},
-    ]
+def _slugify(text: str) -> str:
+    import re
+    s = text.lower().strip()
+    s = re.sub(r"[^\w\s-]", "", s)
+    s = re.sub(r"[\s_]+", "-", s)
+    return re.sub(r"-+", "-", s).strip("-")
+
+
+def _pick_image(index: int) -> str:
+    return _PRODUCT_IMAGES[index % len(_PRODUCT_IMAGES)]
+
+
+def _build_variants(color_hex: str | None) -> dict | None:
+    """Build a simple colour variant group when a hex is provided."""
+    if not color_hex:
+        return None
     return {
         "variant_groups": [
-            {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Colour", "options": colours},
-            {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Finish", "options": finishes},
+            {
+                "id": "colour",
+                "label": "Colour",
+                "required": False,
+                "options": [
+                    {
+                        "id": "colour-1",
+                        "name": "Default",
+                        "price": 0,
+                        "color_hex": color_hex,
+                        "color_family": None,  # admin fills this in after seeding
+                    }
+                ],
+            }
         ],
-        "default_image": UNSPLASH.format(id="1599643478518-a784e5dc4c8f"),
+        "stock_map": {"colour-1": 20},
     }
 
 
-def _make_size_variants(base_price: int, stock_per_option: int = 15) -> dict:
-    """Shebliss variant for rings/bangles: Select Size (absolute prices)."""
-    def oid(): return f"opt_{uuid.uuid4().hex[:8]}"
+# ---------------------------------------------------------------------------
+# Seed logic
+# ---------------------------------------------------------------------------
 
-    sizes = [
-        {"id": oid(), "name": "Small",  "price": base_price,      "stock": stock_per_option},
-        {"id": oid(), "name": "Medium", "price": base_price + 100, "stock": stock_per_option},
-        {"id": oid(), "name": "Large",  "price": base_price + 200, "stock": stock_per_option},
-    ]
-    return {
-        "variant_groups": [
-            {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Size", "options": sizes},
-        ],
-        "default_image": "",
-    }
+async def seed(reset: bool = False) -> None:
+    async with Session() as db:
+        if reset:
+            print("⚠  Resetting products, categories, users, testimonials …")
+            await db.execute(text("DELETE FROM testimonials"))
+            await db.execute(text("DELETE FROM product_reviews"))
+            await db.execute(text("DELETE FROM cart_items"))
+            await db.execute(text("DELETE FROM order_items"))
+            await db.execute(text("DELETE FROM products"))
+            await db.execute(text("DELETE FROM categories"))
+            await db.execute(text("DELETE FROM users"))
+            await db.commit()
 
-
-def _make_length_variants(base_price: int) -> dict:
-    """Shebliss variant for chains/necklaces: Select Length (absolute prices)."""
-    def oid(): return f"opt_{uuid.uuid4().hex[:8]}"
-
-    lengths = [
-        {"id": oid(), "name": '16" Choker',       "price": base_price, "stock": 12},
-        {"id": oid(), "name": '18" Princess',     "price": base_price + 200, "stock": 12},
-        {"id": oid(), "name": '24" Matinee',      "price": base_price + 400, "stock": 12},
-    ]
-    return {
-        "variant_groups": [
-            {"id": f"vg_{uuid.uuid4().hex[:8]}", "label": "Select Length", "options": lengths},
-        ],
-        "default_image": "",
-    }
-
-
-PRODUCTS = [
-    # ── Earrings ──
-    {"name": "Meenakari Jhumka Earrings", "cat": "jumkas", "price": 549,
-     "desc": "Hand-enamelled meenakari jhumkas with a traditional dandiya finish — featherlight for all-day wear.",
-     "tags": ["earrings", "jhumkas", "festive", "daily-wear", "best-seller"], "badge": "Bestseller",
-     "variants": _make_variants(549)},
-    {"name": "Kundan Chandelier Jhumkas", "cat": "jumkas", "price": 799,
-     "desc": "Multi-layered chandelier jhumkas set with shimmering kundan stones and pearl dangles.",
-     "tags": ["earrings", "jhumkas", "bridal", "kundan"], "badge": "Trending",
-     "variants": _make_variants(799)},
-    {"name": "Gold-Plated Teardrop Studs", "cat": "studs", "price": 349,
-     "desc": "Minimal gold-plated teardrop studs that go from office to evening without missing a beat.",
-     "tags": ["earrings", "studs", "daily-wear"], "badge": "New",
-     "variants": _make_variants(349)},
-    {"name": "Cubic Zirconia Stud Set", "cat": "studs", "price": 399,
-     "desc": "A set of four classic cubic zirconia studs with a brilliant, diamond-like sparkle.",
-     "tags": ["earrings", "studs", "daily-wear"], "badge": "Value Pack",
-     "variants": _make_variants(399)},
-    {"name": "Baroque Pearl Drop Earrings", "cat": "danglers", "price": 649,
-     "desc": "Twin baroque pearls suspended on textured gold drops for a quiet, romantic glow.",
-     "tags": ["earrings", "drops", "pearl", "festive"], "badge": "Trending",
-     "variants": _make_variants(649)},
-    {"name": "Filigree Dangle Earrings", "cat": "danglers", "price": 599,
-     "desc": "Intricate filigree dangles crafted to echo vintage heirloom metalwork.",
-     "tags": ["earrings", "drops", "antique", "festive"],
-     "variants": _make_variants(599)},
-    {"name": "Oxidised Chandbali Earrings", "cat": "chandbalis", "price": 699,
-     "desc": "Half-moon chandbalis with a matte oxidised finish and dainty hanging beads.",
-     "tags": ["earrings", "chandbalis", "antique"], "badge": "Popular",
-     "variants": _make_variants(699)},
-    # ── Necklaces ──
-    {"name": "Layered Kundan Choker", "cat": "choker-sets", "price": 899,
-     "desc": "A regal layered choker stacked with kundan rosettes and pearl cascades.",
-     "tags": ["necklaces", "chokers", "bridal", "kundan", "best-seller"], "badge": "Bestseller",
-     "variants": _make_variants(899)},
-    {"name": "American Diamond Choker", "cat": "choker-sets", "price": 749,
-     "desc": "Brilliant-cut american diamonds in a structured collar for instant glamour.",
-     "tags": ["necklaces", "chokers", "party"], "badge": "Trending",
-     "variants": _make_variants(749)},
-    {"name": "Minimal Gold Chain", "cat": "plain", "price": 399,
-     "desc": "A slim, everyday gold chain that layers beautifully with pendants.",
-     "tags": ["necklaces", "chains", "daily-wear"], "badge": "New",
-     "variants": _make_length_variants(399)},
-    {"name": "Rose Gold Bead Chain", "cat": "beads-chain", "price": 449,
-     "desc": "Soft rose-gold beads on a delicate chain — quiet luxury for everyday.",
-     "tags": ["necklaces", "chains", "daily-wear"],
-     "variants": _make_length_variants(449)},
-    {"name": "Temple Design Rani Haar", "cat": "long-sets", "price": 1499,
-     "desc": "A statement rani haar with temple-style motifs and a matching pendant drop.",
-     "tags": ["necklaces", "rani-haar", "bridal", "temple"], "badge": "Luxury",
-     "variants": _make_variants(1499)},
-    {"name": "Antique Polki Pendant Set", "cat": "pendent-necklace", "price": 999,
-     "desc": "Uncut polki-style pendant with chain, finished in an aged antique tone.",
-     "tags": ["necklaces", "pendants", "polki", "antique"], "badge": "Popular",
-     "variants": _make_variants(999)},
-    # ── Bangles & Bracelets ──
-    {"name": "Gold Plated Bangle Set (Pack of 3)", "cat": "bangles", "price": 599,
-     "desc": "Three stackable gold-plated bangles with delicate etching — a wardrobe staple.",
-     "tags": ["bangles", "daily-wear", "festive"], "badge": "Value Pack",
-     "variants": _make_variants(599)},
-    {"name": "Meenakari Bangle Set", "cat": "bangles", "price": 649,
-     "desc": "Enamelled meenakari bangles in festive jewel tones, sold as a matching pair.",
-     "tags": ["bangles", "meenakari", "festive"], "badge": "Trending",
-     "variants": _make_variants(649)},
-    {"name": "Oxidised Kada Pair", "cat": "kada", "price": 699,
-     "desc": "Rugged yet refined oxidised kadas with hand-hammered detailing.",
-     "tags": ["kadas", "antique", "festive"],
-     "variants": _make_variants(699)},
-    {"name": "Kundan Stone Bracelet", "cat": "bracelet", "price": 449,
-     "desc": "A slim kundan-studded bracelet with a secure toggle clasp.",
-     "tags": ["bracelets", "kundan", "daily-wear"],
-     "variants": _make_variants(449)},
-    # ── Bridal ──
-    {"name": "Complete Bridal Set", "cat": "bridal-sets", "price": 2999, "op": 3999,
-     "desc": "Necklace, chandelier earrings and maang tikke in one heirloom-worthy bridal set.",
-     "tags": ["bridal", "kundan", "set"], "badge": "Bridal Pick",
-     "variants": _make_variants(2999)},
-    {"name": "Floral Maang Tikka", "cat": "mang-tikka", "price": 349,
-     "desc": "A dainty floral maang tikka with a velvet ribbon back — fits every hair style.",
-     "tags": ["bridal", "maang-tikka", "daily-wear"],
-     "variants": _make_variants(349)},
-    {"name": "Polki Nath (Nose Pin)", "cat": "other-jewellery", "price": 399,
-     "desc": "A classic polki nath with a chain, sized for the bridge of the nose.",
-     "tags": ["bridal", "nath", "polki"], "badge": "New",
-     "variants": _make_variants(399)},
-    {"name": "Pearl Hair Pins (Pack of 4)", "cat": "other-jewellery", "price": 249,
-     "desc": "Four pearl-tipped hair pins to tuck into braids, buns and updos.",
-     "tags": ["bridal", "hair", "pearl"],
-     "variants": _make_variants(249)},
-    # ── Mangalsutra & Sets ──
-    {"name": "Traditional Black Bead Mangalsutra", "cat": "mangal-sutra", "price": 899,
-     "desc": "Classic black bead mangalsutra with a gold-plated diamond-cut pendant.",
-     "tags": ["mangalsutra", "daily-wear", "traditional"], "badge": "Bestseller",
-     "variants": _make_variants(899)},
-    {"name": "Gold Plated Mangalsutra Chain", "cat": "mangal-sutra", "price": 1099,
-     "desc": "A modern gold-plated mangalsutra on a delicate chain with a lustrous pendant.",
-     "tags": ["mangalsutra", "daily-wear", "modern"], "badge": "Trending",
-     "variants": _make_variants(1099)},
-    {"name": "Kundan Necklace Set (Necklace + Earrings)", "cat": "kundan-necklace-sets", "price": 1299,
-     "desc": "Matching kundan necklace and earrings set — fuss-free elegance for any festive night.",
-     "tags": ["sets", "kundan", "festive"], "badge": "Popular",
-     "variants": _make_variants(1299)},
-    {"name": "Temple Necklace Set", "cat": "temple-jewellery", "price": 1399,
-     "desc": "An ornate temple-style necklace and jhumka set with etched lakshmi motifs.",
-     "tags": ["sets", "temple", "bridal"], "badge": "Luxury",
-     "variants": _make_variants(1399)},
-    {"name": "Adjustable Ring Set (Pack of 5)", "cat": "finger-rings", "price": 499,
-     "desc": "Five adjustable cocktail rings in mixed metallics — one for every mood.",
-     "tags": ["rings", "daily-wear", "party"], "badge": "Value Pack",
-     "variants": _make_variants(499)},
-    {"name": "Antique Cocktail Ring", "cat": "finger-rings", "price": 549,
-     "desc": "A statement antique-finish ring with a deep emerald cabochon centre.",
-     "tags": ["rings", "antique", "party"], "badge": "Trending",
-     "variants": _make_size_variants(549)},
-    # ── Gift Sets ──
-    {"name": "Signature Jewellery Gift Box", "cat": "gifting", "price": 1999, "op": 2999,
-     "desc": "Our curated gift box: earrings, bracelet and chain, packed in a velvet box.",
-     "tags": ["combo", "gifting", "bundle"], "badge": "Gift",
-     "variants": _make_variants(1999)},
-    {"name": "Bride-to-Be Gift Set", "cat": "gifting", "price": 2499, "op": 3499,
-     "desc": "A bridal starter set — tikka, jhumkas and choker — ready to gift in style.",
-     "tags": ["combo", "gifting", "bundle", "bridal"], "badge": "Gift",
-     "variants": _make_variants(2499)},
-]
-
-
-BLOG_POSTS = [
-    {
-        "title": "How to Care for Your Artificial Jewellery",
-        "excerpt": "Simple habits that keep your gold-plated and kundan pieces shining for years.",
-        "category": BlogCategory.TIPS,
-        "cover": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1200&q=80",
-        "author": "Shebliss Editorial",
-        "content": """## Keeping Your Jewellery Lustrous
-
-A few minutes of care keeps every piece looking freshly polished.
-
-### 1. Keep It Dry
-Remove jewellery before washing hands, showering, or swimming. Moisture dulls plating.
-
-### 2. Store Separately
-Keep each piece in its own pouch or box to avoid scratches and tangling.
-
-### 3. Clean Gently
-Use a soft, dry microfibre cloth after every wear. Avoid harsh chemical dips.
-
-### 4. Spray Before, Wear After
-Apply perfume and hairspray first, then put your jewellery on.
-
-### 5. Rotate Your Pieces
-Let plated pieces rest a day between wears so the finish lasts longer.""",
-    },
-    {
-        "title": "Choosing Jewellery for Your Wedding Day",
-        "excerpt": "From kundan sets to polki jhumkas — how to match jewellery to your bridal look.",
-        "category": BlogCategory.GUIDES,
-        "cover": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=1200&q=80",
-        "author": "Shebliss Editorial",
-        "content": """## The Bridal Edit
-
-Your jewellery should echo your outfit, never compete with it.
-
-### 1. Start With the Lehenga
-Pick your outfit first, then choose jewellery that pulls out its colours and metal tones.
-
-### 2. Balance the Neckline
-- Deep necklines call for statement chokers.
-- High necks pair best with earrings and maang tikka.
-
-### 3. Layer in Moderation
-Choose one hero piece — a rani haar or chandelier jhumkas — and keep the rest simple.
-
-### 4. Match Metals
-If your lehenga has gold zari, lean into gold and kundan rather than silver.
-
-### 5. Test Comfort
-You'll wear this for 12+ hours. Weight and grip matter as much as sparkle.""",
-    },
-    {
-        "title": "The Story Behind Kundan Craftsmanship",
-        "excerpt": "Why the age-old art of kundan setting still feels like the crown jewel of Indian design.",
-        "category": BlogCategory.STORIES,
-        "cover": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1200&q=80",
-        "author": "Shebliss Editorial",
-        "content": """## A Craft Passed Down Generations
-
-Kundan is the art of setting stones in pure, uncast gold foil — a technique perfected in Rajasthan's royal ateliers.
-
-### What Makes Kundan Special
-The stone isn't held by prongs. It sits in a bed of foil that is pushed over its edges, creating a rich, continuous sparkle.
-
-### Why It Endures
-Modern kundan-made jewellery captures that regal glow at a fraction of the cost — heirloom beauty, made accessible.
-
-### Our Take
-We craft every Shebliss kundan piece with the same respect for the technique, so the tradition stays alive on your wedding day.""",
-    },
-    {
-        "title": "Festive Jewellery Trends for This Season",
-        "excerpt": "Temple haars, chandbalis and meenakari — the pieces our customers can't stop wearing.",
-        "category": BlogCategory.NEWS,
-        "cover": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1200&q=80",
-        "author": "Shebliss Editorial",
-        "content": """## What's Trending
-
-This festive season, heritage is having a major moment.
-
-### Temple Jewellery
-Motifs inspired by temple architecture are showing up in necklaces, haars and earrings.
-
-### Colourful Meenakari
-Bright enamels in emerald, terracotta and ivory are pairing with traditional silhouettes.
-
-### Oxidised Antiques
-Matte oxidised finishes offer an effortless, bohemian take on festive dressing.
-
-### Pearl Everywhere
-From drop earrings to hair pins, pearls add a soft, romantic note to every look.""",
-    },
-]
-
-
-def _pick_images() -> list[str]:
-    return random.sample(PRODUCT_IMAGES, k=random.randint(1, 3))
-
-
-def _original_price(price: float) -> float:
-    markup = random.uniform(1.15, 1.50)
-    return round(price * markup)
-
-
-async def seed() -> None:
-    if not async_session_factory or not engine:
-        print("DATABASE_URL not set – skipping seed.")
-        return
-    async with async_session_factory() as db:
-        # Clear in dependency order (children first, then parents)
-        await db.execute(CartItem.__table__.delete())
-        await db.execute(Cart.__table__.delete())
-        await db.execute(OrderItem.__table__.delete())
-        await db.execute(Order.__table__.delete())
-        await db.execute(Address.__table__.delete())
-        await db.execute(ProductReview.__table__.delete())
-        await db.execute(Testimonial.__table__.delete())
-        await db.execute(Story.__table__.delete())
-        await db.execute(Banner.__table__.delete())
-        await db.execute(Product.__table__.delete())
-        await db.execute(Category.__table__.delete())
-        await db.execute(BlogPost.__table__.delete())
-        await db.execute(User.__table__.delete())
-        await db.flush()
-        print("Cleared existing data.\n")
-
-        # Admin user
-        admin = User(
-            email="admin@example.com",
-            hashed_password=hash_password("adminadmin"),
-            full_name="Admin",
-            is_active=True,
-            is_admin=True,
-        )
-        db.add(admin)
-        await db.flush()
-        print(f"  Admin user: {admin.email} (id={admin.id})")
-
-        slug_to_id: dict[str, int] = {}
-
-        for sort_idx, cat_data in enumerate(CATEGORIES):
-            parent_id = cat_data.get("parent_id")
-            parent_slug = cat_data.get("parent_slug")
-            if parent_slug:
-                parent_id = slug_to_id.get(parent_slug)
-
-            cat = Category(
-                name=cat_data["name"],
-                slug=cat_data["slug"],
-                parent_id=parent_id,
-                sort_order=sort_idx,
-                is_active=True,
+        # ------------------------------------------------------------------
+        # 1. Users
+        # ------------------------------------------------------------------
+        for u in USERS:
+            exists = await db.execute(
+                text("SELECT id FROM users WHERE email = :e"), {"e": u["email"]}
             )
-            db.add(cat)
-            await db.flush()
-            await db.refresh(cat)
-            slug_to_id[cat.slug] = cat.id
-            print(f"  Category: {cat.name} (id={cat.id})")
+            if exists.scalar_one_or_none():
+                print(f"  skip user  {u['email']}")
+                continue
+            db.add(User(
+                email=u["email"],
+                full_name=u["full_name"],
+                hashed_password=hash_password(u["password"]),
+                is_admin=u["is_admin"],
+                is_active=True,
+            ))
+            print(f"  + user     {u['email']}")
+        await db.commit()
 
-        for p in PRODUCTS:
-            cat_id = slug_to_id[p["cat"]]
-            slug = p["name"].lower().strip()
-            slug = re.sub(r"[^\w\s-]", "", slug)
-            slug = re.sub(r"[\s_]+", "-", slug)
-            slug = re.sub(r"-+", "-", slug).strip("-")
+        # ------------------------------------------------------------------
+        # 2. Categories (parents first, then children)
+        # ------------------------------------------------------------------
+        # slug → Category ORM object (populated after insert)
+        cat_map: dict[str, Category] = {}
 
-            variants = p.get("variants")
-            if variants and "variant_groups" in variants:
-                # New format: sum stock across all options in the first group
-                all_stocks = [
-                    int(opt.get("stock", 0))
-                    for grp in variants["variant_groups"]
-                    for opt in grp.get("options", [])
-                ]
-                stock_qty = sum(all_stocks) if all_stocks else random.randint(5, 200)
+        for parent_def in CATEGORY_TREE:
+            row = await db.execute(
+                text("SELECT id FROM categories WHERE slug = :s"), {"s": parent_def["slug"]}
+            )
+            existing_id = row.scalar_one_or_none()
+            if existing_id:
+                print(f"  skip cat   {parent_def['slug']}")
+                row2 = await db.execute(
+                    text("SELECT * FROM categories WHERE id = :i"), {"i": existing_id}
+                )
+                # just record the id so children can reference it
+                cat_map[parent_def["slug"]] = existing_id  # type: ignore[assignment]
             else:
-                stock_qty = random.randint(5, 200)
+                parent_cat = Category(
+                    name=parent_def["name"],
+                    slug=parent_def["slug"],
+                    image_url=parent_def["image_url"],
+                    sort_order=parent_def["sort_order"],
+                    is_active=True,
+                )
+                db.add(parent_cat)
+                await db.flush()   # get the id
+                cat_map[parent_def["slug"]] = parent_cat
+                print(f"  + cat      {parent_def['slug']}")
 
-            product = Product(
-                name=p["name"],
-                slug=slug,
-                description=p.get("desc", ""),
-                price=p["price"],
-                original_price=p["op"] if "op" in p else _original_price(p["price"]),
-                stock_qty=stock_qty,
-                category_id=cat_id,
-                images=_pick_images(),
-                tags=p.get("tags", []),
-                badge=p.get("badge"),
-                variants=variants,
-                is_active=True,
+            parent_id = (
+                cat_map[parent_def["slug"]].id  # type: ignore[union-attr]
+                if not isinstance(cat_map[parent_def["slug"]], int)
+                else cat_map[parent_def["slug"]]
             )
-            db.add(product)
 
-        for bp in BLOG_POSTS:
-            slug = bp["title"].lower().strip()
-            slug = re.sub(r"[^\w\s-]", "", slug)
-            slug = re.sub(r"[\s_]+", "-", slug)
-            slug = re.sub(r"-+", "-", slug).strip("-")
-
-            post = BlogPost(
-                title=bp["title"],
-                slug=slug,
-                excerpt=bp["excerpt"],
-                content=bp["content"],
-                cover_image_url=bp["cover"],
-                category=bp["category"],
-                author_name=bp["author"],
-                is_published=True,
-                published_at=datetime.now(timezone.utc),
-            )
-            db.add(post)
-
-        banners_seed = [
-            Banner(
-                title="Timeless Craft, Joyful Prices",
-                subtitle="Artificial jewellery designed to feel heirloom — handcrafted kundan, polki and temple pieces.",
-                cta_text="Shop the Collection",
-                cta_link="/products",
-                badge_text="Up to 40% Off",
-                placement="hero",
-                position=0,
-                bg_color="#0E4D3A",
-                text_color="#F8F4EC",
-                image_url="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1400&h=600&fit=crop&crop=center",
-            ),
-            Banner(
-                title="The Bridal Edit",
-                subtitle="Rani haars, chandelier jhumkas and complete bridal sets for your big day.",
-                cta_text="Shop Bridal",
-                cta_link="/products?category=bridal-sets",
-                placement="hero",
-                position=1,
-                bg_color="#A34A2F",
-                text_color="#F8F4EC",
-                image_url="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=1400&h=600&fit=crop&crop=center",
-            ),
-            Banner(
-                title="Free Delivery Above ₹499 | Shop Now",
-                cta_link="/products",
-                placement="announcement",
-                position=0,
-                bg_color="#0E4D3A",
-                text_color="#F8F4EC",
-            ),
-            Banner(
-                title="Gift Boxes From ₹1,999",
-                cta_link="/products?tags=bundle",
-                placement="announcement",
-                position=1,
-                bg_color="#0A3B2C",
-                text_color="#F8F4EC",
-            ),
-            Banner(
-                title="Express Delivery Available",
-                cta_link="/products",
-                placement="announcement",
-                position=2,
-                bg_color="#0E4D3A",
-                text_color="#F8F4EC",
-            ),
-            Banner(
-                title="Adorn Yourself, Adorn Your Story.",
-                cta_link="/products",
-                placement="page",
-                position=0,
-                bg_color="#F1E9DC",
-                text_color="#0E4D3A",
-                image_url="/page-banner-default.jpeg",
-            ),
-            Banner(
-                title="Style Inspiration",
-                subtitle="Shop the looks you love — curated style edits from our jewellery.",
-                cta_text="View All",
-                cta_link="/products",
-                placement="reels",
-                position=0,
-                bg_color="#14342B",
-                text_color="#F9F8F6",
-            ),
-            Banner(
-                title="Kundan Necklaces — Wedding Edit",
-                badge_text="Kundan Jewellery Set",
-                subtitle="Timeless jewels — Flat 50% Off",
-                cta_text="Shop Kundan",
-                cta_link="/products?tags=kundan",
-                products_tag="kundan",
-                placement="home_collection",
-                position=0,
-                bg_color="#14342B",
-                text_color="#F9F8F6",
-                image_url="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1600&h=640&fit=crop&crop=center",
-            ),
-            Banner(
-                title="The Bridal Edit",
-                badge_text="Trending Bridal Looks",
-                subtitle="Full bridal sets — super budget friendly — Flat 50% Off",
-                cta_text="Shop Bridal",
-                cta_link="/products?tags=bridal",
-                products_tag="bridal",
-                placement="home_collection",
-                position=1,
-                bg_color="#14342B",
-                text_color="#F9F8F6",
-                image_url="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=1600&h=640&fit=crop&crop=center",
-            ),
-        ]
-        db.add_all(banners_seed)
-
-        testimonials_seed = [
-            Testimonial(
-                name="Ananya Sharma",
-                rating=5,
-                quote="The Kundan set looks even better in person! Wore it to a wedding for 8 hours and it didn't feel heavy at all. Truly anti-tarnish.",
-                item_purchased="Layered Kundan Choker",
-                location="Mumbai",
-                is_verified=True,
-                is_featured=True,
-                is_active=True,
-                sort_order=0,
-            ),
-            Testimonial(
-                name="Priya Deshmukh",
-                rating=5,
-                quote="Looks just like real gold. I've had compliments every single time I wear it — nobody believes it's artificial.",
-                item_purchased="Signature Jewellery Gift Box",
-                location="Pune",
-                is_verified=True,
-                is_featured=True,
-                is_active=True,
-                sort_order=1,
-            ),
-            Testimonial(
-                name="Ritika Mehta",
-                rating=5,
-                quote="The gift box presentation was stunning — it arrived like a luxury parcel. Made the perfect anniversary gift for my mother.",
-                item_purchased="Bridal Temple Necklace Set",
-                location="Delhi",
-                is_verified=True,
-                is_featured=True,
-                is_active=True,
-                sort_order=2,
-            ),
-            Testimonial(
-                name="Sneha Kulkarni",
-                rating=5,
-                quote="Super lightweight for long events. I danced the whole reception and the jhumkas stayed comfortable all night.",
-                item_purchased="Chandelier Jhumka Earrings",
-                location="Bengaluru",
-                is_verified=True,
-                is_featured=False,
-                is_active=True,
-                sort_order=3,
-            ),
-            Testimonial(
-                name="Kavya Iyer",
-                rating=4,
-                quote="Fast delivery and beautiful finish. The anti-tarnish coating is the real deal — still shiny after months of use.",
-                item_purchased="Meenakari Bangles",
-                location="Chennai",
-                is_verified=True,
-                is_featured=False,
-                is_active=True,
-                sort_order=4,
-            ),
-            Testimonial(
-                name="Neha Gupta",
-                rating=5,
-                quote="Ordered three sets for my sister's sangeet. The whole family asked where I got them. Absolutely worth it.",
-                item_purchased="Rani Haar & Maang Tikka Set",
-                location="Jaipur",
-                is_verified=True,
-                is_featured=False,
-                is_active=True,
-                sort_order=5,
-            ),
-        ]
-        db.add_all(testimonials_seed)
-
-        # Placeholder lifestyle reels for the homepage "Style Inspiration" section.
-        # is_placeholder=True marks them as stock/mood content (no linked product) so
-        # they can be bulk-queried and swapped for real product footage later, and so
-        # the PDP "real videos of this product" section can hide them.
-        UNSPLASH_THUMB = UNSPLASH.format(id="1599643478518-a784e5dc4c8f")
-        stories_seed = [
-            Story(
-                video="https://cdn.pixabay.com/video/2017/04/15/8703-213442868_large.mp4",
-                thumbnail=UNSPLASH_THUMB,
-                caption="Dainty earrings, daily shine",
-                display_order=0,
-                is_active=True,
-                is_placeholder=True,
-            ),
-            Story(
-                video="https://cdn.pixabay.com/video/2021/11/13/96186-651410630_large.mp4",
-                thumbnail=UNSPLASH.format(id="1573408301185-9146fe634ad0"),
-                caption="Layered necklaces, layered looks",
-                display_order=1,
-                is_active=True,
-                is_placeholder=True,
-            ),
-            Story(
-                video="https://cdn.pixabay.com/video/2016/05/12/3125-166335844_large.mp4",
-                thumbnail=UNSPLASH.format(id="1611652022419-a9419f74343d"),
-                caption="Bridal rings, forever moments",
-                display_order=2,
-                is_active=True,
-                is_placeholder=True,
-            ),
-            Story(
-                video="https://cdn.pixabay.com/video/2024/07/03/219228_large.mp4",
-                thumbnail=UNSPLASH.format(id="1605100804763-247f67b3557e"),
-                caption="Stacked bangles, festive energy",
-                display_order=3,
-                is_active=True,
-                is_placeholder=True,
-            ),
-        ]
-        db.add_all(stories_seed)
+            for sub_def in parent_def["subcategories"]:
+                row = await db.execute(
+                    text("SELECT id FROM categories WHERE slug = :s"), {"s": sub_def["slug"]}
+                )
+                if row.scalar_one_or_none():
+                    print(f"  skip cat   {sub_def['slug']}")
+                    continue
+                sub_cat = Category(
+                    name=sub_def["name"],
+                    slug=sub_def["slug"],
+                    image_url=sub_def["image_url"],
+                    sort_order=sub_def["sort_order"],
+                    parent_id=parent_id,
+                    is_active=True,
+                )
+                db.add(sub_cat)
+                await db.flush()
+                cat_map[sub_def["slug"]] = sub_cat
+                print(f"  + cat      {sub_def['slug']}  (child of {parent_def['slug']})")
 
         await db.commit()
-        print(
-            f"\nSeeded 1 admin, {len(CATEGORIES)} categories, "
-            f"{len(PRODUCTS)} products, {len(BLOG_POSTS)} blog posts, "
-            f"{len(banners_seed)} banners, {len(testimonials_seed)} testimonials, "
-            f"and {len(stories_seed)} stories."
-        )
 
+        # ------------------------------------------------------------------
+        # 3. Products
+        # ------------------------------------------------------------------
+        img_counter = 0
+        for sub_slug, product_list in PRODUCTS.items():
+            # look up the subcategory id
+            row = await db.execute(
+                text("SELECT id FROM categories WHERE slug = :s"), {"s": sub_slug}
+            )
+            cat_id = row.scalar_one_or_none()
+            if not cat_id:
+                print(f"  WARN: subcategory '{sub_slug}' not found, skipping its products")
+                continue
+
+            for p in product_list:
+                slug = _slugify(p["name"])
+                row = await db.execute(
+                    text("SELECT id FROM products WHERE slug = :s"), {"s": slug}
+                )
+                if row.scalar_one_or_none():
+                    print(f"  skip prod  {slug}")
+                    img_counter += 1
+                    continue
+
+                db.add(Product(
+                    name=p["name"],
+                    slug=slug,
+                    description=f"Beautiful {p['name'].lower()} — handcrafted with premium artificial jewellery.",
+                    price=float(p["price"]),
+                    original_price=float(p["original_price"]),
+                    stock_qty=20,
+                    category_id=cat_id,
+                    images=[_pick_image(img_counter), _pick_image(img_counter + 1)],
+                    tags=p["tags"],
+                    is_active=True,
+                    variants=_build_variants(p.get("color_hex")),
+                ))
+                print(f"  + product  {slug}")
+                img_counter += 1
+
+        await db.commit()
+
+        # ------------------------------------------------------------------
+        # 4. Testimonials
+        # ------------------------------------------------------------------
+        for t in TESTIMONIALS:
+            row = await db.execute(
+                text("SELECT id FROM testimonials WHERE name = :n AND quote = :q"),
+                {"n": t["name"], "q": t["quote"]},
+            )
+            if row.scalar_one_or_none():
+                print(f"  skip test  {t['name']}")
+                continue
+            db.add(Testimonial(**t))
+            print(f"  + test     {t['name']}")
+
+        await db.commit()
+
+    print("\n✅  Seed complete.")
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    asyncio.run(seed())
+    reset_flag = "--reset" in sys.argv
+    asyncio.run(seed(reset=reset_flag))

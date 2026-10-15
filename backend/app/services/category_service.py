@@ -113,3 +113,6 @@ async def delete_category(db: AsyncSession, category: Category) -> None:
         raise ValueError("Cannot delete category with products attached")
     await db.delete(category)
     await db.flush()
+
+
+    
