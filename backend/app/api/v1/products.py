@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import Annotated, Optional
 
@@ -164,40 +165,58 @@ async def get_product_raw(
     }
 
 
+def _is_xlsx(filename: str | None, data: bytes) -> bool:
+    if (filename or "").lower().endswith((".xlsx", ".xlsm")):
+        return True
+    return data[:2] == b"PK" and b"[Content_Types].xml" in data[:2000]
+
+
 async def _read_bulk_inputs(
-    csv_file: UploadFile, images_zip: UploadFile | None,
-) -> tuple[bytes, bytes | None]:
-    csv_bytes = await csv_file.read()
-    if not csv_bytes:
-        raise HTTPException(status_code=400, detail="CSV file is empty")
-    if len(csv_bytes) > bulk_import_service.MAX_CSV_BYTES:
+    source_file: UploadFile, images_zip: UploadFile | None,
+) -> tuple[bytes, bytes | None, bool]:
+    data = await source_file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+    if not _is_xlsx(source_file.filename, data) and len(data) > bulk_import_service.MAX_CSV_BYTES:
         raise HTTPException(status_code=400, detail="CSV file is larger than 2MB")
 
     zip_bytes: bytes | None = None
     if images_zip is not None and images_zip.filename:
         zip_bytes = await images_zip.read() or None
-    return csv_bytes, zip_bytes
+    return data, zip_bytes, _is_xlsx(source_file.filename, data)
 
 
-async def _bulk_context(db: AsyncSession, csv_bytes: bytes, zip_bytes: bytes | None):
-    """Parse the CSV, open the ZIP and resolve the category map (no writes)."""
+async def _bulk_context(db: AsyncSession, data: bytes, zip_bytes: bytes | None, is_xlsx: bool):
+    """Parse the uploaded file and resolve the category map (no writes)."""
+    embedded_by_row: dict[int, list[bytes]] | None = None
     try:
-        rows = bulk_import_service.parse_csv(csv_bytes)
-        zf, name_map = bulk_import_service.open_zip(zip_bytes)
+        if is_xlsx:
+            rows, embedded_by_row = bulk_import_service.parse_xlsx(data)
+            zf = name_map = None
+        else:
+            rows = bulk_import_service.parse_csv(data)
+            zf, name_map = bulk_import_service.open_zip(zip_bytes)
         categories = await category_service.get_all_categories_include_inactive(db)
         cat_map, ambiguous = bulk_import_service.build_category_map(categories)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
-    return rows, zf, name_map, cat_map, ambiguous
+    return rows, zf, name_map, cat_map, ambiguous, embedded_by_row
 
 
 @router.get("/bulk-import/template")
-async def bulk_import_template():
-    """Download a CSV template showing the expected columns and separators."""
+async def bulk_import_template(format: str = Query("xlsx")):
+    """Download the import template (XLSX with PICTURE columns, or CSV)."""
+    if format.lower() == "csv":
+        return Response(
+            content=bulk_import_service.TEMPLATE_CSV,
+            media_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="products-import-template.csv"'},
+        )
+    content = await asyncio.to_thread(bulk_import_service.build_template_xlsx)
     return Response(
-        content=bulk_import_service.TEMPLATE_CSV,
-        media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="products-import-template.csv"'},
+        content=content,
+        media_type=bulk_import_service.TEMPLATE_XLSX_MEDIA_TYPE,
+        headers={"Content-Disposition": 'attachment; filename="products-import-template.xlsx"'},
     )
 
 
@@ -205,20 +224,20 @@ async def bulk_import_template():
 @limiter.limit("10/hour")
 async def bulk_import_validate(
     request: Request,
-    csv_file: UploadFile = File(...),
+    source_file: UploadFile = File(..., alias="csv_file"),
     images_zip: UploadFile | None = File(None),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
     """Dry-run a bulk import: row-level errors only, no writes and no downloads.
 
-    Image URLs are checked for format here; availability (404s) is only
+    Embedded pictures are Pillow-checked here; URL availability is only
     discovered during the actual import.
     """
-    csv_bytes, zip_bytes = await _read_bulk_inputs(csv_file, images_zip)
-    rows, zf, name_map, cat_map, ambiguous = await _bulk_context(db, csv_bytes, zip_bytes)
-    results, warnings = bulk_import_service.validate_rows(
-        rows, cat_map=cat_map, ambiguous=ambiguous, zip_names=name_map,
+    data, zip_bytes, is_xlsx = await _read_bulk_inputs(source_file, images_zip)
+    rows, zf, name_map, cat_map, ambiguous, embedded = await _bulk_context(db, data, zip_bytes, is_xlsx)
+    results, warnings = await bulk_import_service.validate_rows(
+        rows, cat_map=cat_map, ambiguous=ambiguous, zip_names=name_map, embedded_by_row=embedded,
     )
     return {"rows": results, "warnings": warnings, "total": len(results)}
 
@@ -227,19 +246,21 @@ async def bulk_import_validate(
 @limiter.limit("10/hour")
 async def bulk_import(
     request: Request,
-    csv_file: UploadFile = File(...),
+    source_file: UploadFile = File(..., alias="csv_file"),
     images_zip: UploadFile | None = File(None),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
-    """Create/update products from a CSV, one transaction per row.
+    """Create/update products from a CSV or XLSX, one transaction per row.
 
     Failing rows are reported and rolled back individually; rows committed
     before a failure survive.
     """
-    csv_bytes, zip_bytes = await _read_bulk_inputs(csv_file, images_zip)
-    rows, zf, name_map, cat_map, ambiguous = await _bulk_context(db, csv_bytes, zip_bytes)
-    return await bulk_import_service.run_import(db, rows, zf, name_map, cat_map, ambiguous)
+    data, zip_bytes, is_xlsx = await _read_bulk_inputs(source_file, images_zip)
+    rows, zf, name_map, cat_map, ambiguous, embedded = await _bulk_context(db, data, zip_bytes, is_xlsx)
+    return await bulk_import_service.run_import(
+        db, rows, zf, name_map, cat_map, ambiguous, embedded_by_row=embedded,
+    )
 
 
 @router.get("/{slug}", response_model=ProductResponse)
