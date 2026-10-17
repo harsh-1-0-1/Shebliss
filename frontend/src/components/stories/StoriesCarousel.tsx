@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { StoryViewer } from './StoryViewer';
+import { useCurrencyStore } from '@/store/currencyStore';
 import type { Story } from '@/types';
 
 interface StoriesCarouselProps {
@@ -8,6 +9,7 @@ interface StoriesCarouselProps {
 
 function StoryCard({ story, onClick }: { story: Story; onClick: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { format } = useCurrencyStore();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -72,7 +74,7 @@ function StoryCard({ story, onClick }: { story: Story; onClick: () => void }) {
               {story.linked_product.name}
             </div>
             <div className="font-bold text-green-800 text-[12px]">
-              ₹{story.linked_product.price}
+              {format(story.linked_product.price)}
             </div>
           </div>
         </div>

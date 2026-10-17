@@ -1,10 +1,11 @@
 import json
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, Response, UploadFile, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.rate_limit import limiter
 from app.core.security import require_admin
 from app.db.session import get_db
 from app.schemas.product import (
@@ -14,7 +15,7 @@ from app.schemas.product import (
     ProductResponse,
     ProductUpdate,
 )
-from app.services import product_service
+from app.services import bulk_import_service, category_service, product_service
 from app.utils.image_upload import (
     delete_image_file,
     extract_relative_key,
@@ -161,6 +162,84 @@ async def get_product_raw(
         "faqs": product.faqs,
         "created_at": product.created_at.isoformat() if product.created_at else None,
     }
+
+
+async def _read_bulk_inputs(
+    csv_file: UploadFile, images_zip: UploadFile | None,
+) -> tuple[bytes, bytes | None]:
+    csv_bytes = await csv_file.read()
+    if not csv_bytes:
+        raise HTTPException(status_code=400, detail="CSV file is empty")
+    if len(csv_bytes) > bulk_import_service.MAX_CSV_BYTES:
+        raise HTTPException(status_code=400, detail="CSV file is larger than 2MB")
+
+    zip_bytes: bytes | None = None
+    if images_zip is not None and images_zip.filename:
+        zip_bytes = await images_zip.read() or None
+    return csv_bytes, zip_bytes
+
+
+async def _bulk_context(db: AsyncSession, csv_bytes: bytes, zip_bytes: bytes | None):
+    """Parse the CSV, open the ZIP and resolve the category map (no writes)."""
+    try:
+        rows = bulk_import_service.parse_csv(csv_bytes)
+        zf, name_map = bulk_import_service.open_zip(zip_bytes)
+        categories = await category_service.get_all_categories_include_inactive(db)
+        cat_map, ambiguous = bulk_import_service.build_category_map(categories)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return rows, zf, name_map, cat_map, ambiguous
+
+
+@router.get("/bulk-import/template")
+async def bulk_import_template():
+    """Download a CSV template showing the expected columns and separators."""
+    return Response(
+        content=bulk_import_service.TEMPLATE_CSV,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="products-import-template.csv"'},
+    )
+
+
+@router.post("/bulk-import/validate")
+@limiter.limit("10/hour")
+async def bulk_import_validate(
+    request: Request,
+    csv_file: UploadFile = File(...),
+    images_zip: UploadFile | None = File(None),
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    """Dry-run a bulk import: row-level errors only, no writes and no downloads.
+
+    Image URLs are checked for format here; availability (404s) is only
+    discovered during the actual import.
+    """
+    csv_bytes, zip_bytes = await _read_bulk_inputs(csv_file, images_zip)
+    rows, zf, name_map, cat_map, ambiguous = await _bulk_context(db, csv_bytes, zip_bytes)
+    results, warnings = bulk_import_service.validate_rows(
+        rows, cat_map=cat_map, ambiguous=ambiguous, zip_names=name_map,
+    )
+    return {"rows": results, "warnings": warnings, "total": len(results)}
+
+
+@router.post("/bulk-import")
+@limiter.limit("10/hour")
+async def bulk_import(
+    request: Request,
+    csv_file: UploadFile = File(...),
+    images_zip: UploadFile | None = File(None),
+    db: AsyncSession = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    """Create/update products from a CSV, one transaction per row.
+
+    Failing rows are reported and rolled back individually; rows committed
+    before a failure survive.
+    """
+    csv_bytes, zip_bytes = await _read_bulk_inputs(csv_file, images_zip)
+    rows, zf, name_map, cat_map, ambiguous = await _bulk_context(db, csv_bytes, zip_bytes)
+    return await bulk_import_service.run_import(db, rows, zf, name_map, cat_map, ambiguous)
 
 
 @router.get("/{slug}", response_model=ProductResponse)

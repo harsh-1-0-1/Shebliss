@@ -4,6 +4,7 @@ import { Plus, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useProducts } from '@/hooks/useProducts';
 import { useCartStore } from '@/store/cartStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import { getRecommendedProducts } from '@/lib/recommendations';
 import type { Product, CartItem } from '@/types';
 
@@ -15,6 +16,7 @@ interface RecommendationBarProps {
 export default function RecommendationBar({ lastAddedProduct, cartItems }: RecommendationBarProps) {
   const addItem = useCartStore((s) => s.addItem);
   const navigate = useNavigate();
+  const { format } = useCurrencyStore();
   const [addingId, setAddingId] = useState<number | null>(null);
 
   // Fetch a broad pool — same category, limit 20
@@ -88,7 +90,7 @@ export default function RecommendationBar({ lastAddedProduct, cartItems }: Recom
               <p className="text-[12px] font-medium text-gray-800 line-clamp-2 leading-tight mb-1">
                 {product.name}
               </p>
-              <p className="text-[12px] font-bold text-[#a34a2f] mb-2">₹{product.price}</p>
+              <p className="text-[12px] font-bold text-[#a34a2f] mb-2">{format(product.price)}</p>
 
               {/* Quick Add button */}
               <button

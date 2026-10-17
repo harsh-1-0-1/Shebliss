@@ -248,6 +248,21 @@ async def get_product_by_id(db: AsyncSession, product_id: int) -> Product | None
     return result.scalar_one_or_none()
 
 
+async def find_by_name_or_slug(db: AsyncSession, name: str) -> Product | None:
+    """Look up a product for bulk-import upserts.
+
+    Matches the normalized (lowercased, trimmed) name first, then falls back to
+    the slugified name — `_unique_slug` appends -2/-3 on collisions, so a name
+    that already exists as "foo-2" would otherwise look like a new product.
+    """
+    normalized = name.strip().lower()
+    result = await db.execute(select(Product).where(func.lower(Product.name) == normalized))
+    product = result.scalars().first()
+    if product is not None:
+        return product
+    return await get_product_by_slug(db, _slugify(name))
+
+
 async def _unique_slug(db: AsyncSession, base_slug: str, exclude_id: int | None = None) -> str:
     """Return a slug that doesn't collide with any existing product.
     
@@ -278,6 +293,7 @@ def _is_slug_violation(exc: IntegrityError) -> bool:
 
 async def create_product(
     db: AsyncSession, payload: ProductCreate, image_urls: list[str] | None = None,
+    *, skip_cache_invalidation: bool = False,
 ) -> Product:
     base_slug = _slugify(payload.name)
     data = payload.model_dump()
@@ -303,12 +319,14 @@ async def create_product(
         break
 
     await db.refresh(product)
-    await _invalidate_product_cache(product.slug)
+    if not skip_cache_invalidation:
+        await _invalidate_product_cache(product.slug)
     return product
 
 
 async def update_product(
     db: AsyncSession, product: Product, payload: ProductUpdate,
+    *, skip_cache_invalidation: bool = False,
 ) -> Product:
     old_slug = product.slug
     data = payload.model_dump(exclude_unset=True)
@@ -357,8 +375,9 @@ async def update_product(
         break
 
     await db.refresh(product)
-    await cache_delete(f"product:{old_slug}")
-    await _invalidate_product_cache(product.slug)
+    if not skip_cache_invalidation:
+        await cache_delete(f"product:{old_slug}")
+        await _invalidate_product_cache(product.slug)
     return product
 
 

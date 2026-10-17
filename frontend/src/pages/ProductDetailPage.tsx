@@ -726,7 +726,7 @@ export default function ProductDetailPage() {
     { label: 'Category', value: findCategoryName(categories, product.category_id) },
     { label: 'Country of Origin', value: STORE_LEGAL.countryOfOrigin },
     { label: 'Marketed by', value: STORE_LEGAL.marketedBy },
-    { label: 'MRP', value: `₹${mrp.toFixed(2)} (Incl. of all taxes)` },
+    { label: 'MRP', value: `${format(mrp)} (Incl. of all taxes)` },
     { label: 'Net Quantity', value: '1' },
     { label: 'Manufactured by', value: STORE_LEGAL.manufacturedBy },
   ];
@@ -778,10 +778,10 @@ export default function ProductDetailPage() {
             <ProductRatingInline summary={reviewPreview?.summary} />
 
             <div className="flex items-baseline gap-2 sm:gap-3">
-              <span className="text-2xl sm:text-3xl font-bold text-primary">₹{displayPrice}</span>
+              <span className="text-2xl sm:text-3xl font-bold text-primary">{format(displayPrice)}</span>
               {displayOriginalPrice && displayOriginalPrice > displayPrice && (
                 <>
-                  <span className="text-base sm:text-lg text-red-500 line-through">₹{displayOriginalPrice}</span>
+                  <span className="text-base sm:text-lg text-red-500 line-through">{format(displayOriginalPrice)}</span>
                   <span className="text-xs sm:text-sm font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded">
                     {discount}% OFF
                   </span>

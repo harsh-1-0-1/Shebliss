@@ -24,6 +24,7 @@ import api from '@/lib/api';
 import { getApiErrorDetail } from '@/lib/apiError';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import BulkImportModal from '@/components/admin/BulkImportModal';
 import type { FAQItem, Product, ProductListResponse, ProductVariants, VariantGroup, VariantOption } from '@/types';
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -1466,6 +1467,7 @@ export default function ProductsAdminPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
   // Stock alert filter tab
@@ -1526,12 +1528,20 @@ export default function ProductsAdminPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Products Catalog</h1>
           <p className="text-xs text-gray-500 mt-0.5">Manage details, stock levels, variants, and visibility of products on the website.</p>
         </div>
-        <button
-          onClick={() => { setEditingProduct(null); setShowModal(true); }}
-          className="px-4 py-2.5 bg-primary hover:bg-primary/95 text-white text-sm rounded-lg font-semibold flex items-center justify-center gap-2 transition"
-        >
-          <Plus size={16} /> Add Product
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <button
+            onClick={() => setShowBulkImport(true)}
+            className="px-4 py-2.5 border border-primary text-primary hover:bg-primary/5 text-sm rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+          >
+            <Upload size={16} /> Bulk Import
+          </button>
+          <button
+            onClick={() => { setEditingProduct(null); setShowModal(true); }}
+            className="px-4 py-2.5 bg-primary hover:bg-primary/95 text-white text-sm rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+          >
+            <Plus size={16} /> Add Product
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs & Search */}
@@ -1710,6 +1720,11 @@ export default function ProductsAdminPage() {
           editProduct={editingProduct}
           onClose={() => { setShowModal(false); setEditingProduct(null); }}
         />
+      )}
+
+      {/* Bulk Import Modal */}
+      {showBulkImport && (
+        <BulkImportModal onClose={() => setShowBulkImport(false)} />
       )}
     </div>
   );

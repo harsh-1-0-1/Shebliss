@@ -1,4 +1,5 @@
 import { buildComboRows } from '@/lib/variants';
+import { useCurrencyStore } from '@/store/currencyStore';
 import type { VariantGroup, VariantOption } from '@/types';
 
 interface VariantPickerProps {
@@ -17,6 +18,7 @@ interface VariantPickerProps {
  * the selectedOptions state and applies the replacement selection via onSelect.
  */
 export default function VariantPicker({ groups, stockMap, selectedOptions, onSelect }: VariantPickerProps) {
+  const { format } = useCurrencyStore();
   // Combo rows (with per-group option maps + stock) — used for per-combo visibility.
   const comboRows = buildComboRows(groups).map((row) => ({
     ...row,
@@ -171,7 +173,7 @@ export default function VariantPicker({ groups, stockMap, selectedOptions, onSel
                         </span>
                         {priceDelta > 0 && (
                           <span className={`text-[11px] mt-0.5 font-medium ${isSelected ? 'text-primary/80' : 'text-gray-400'}`}>
-                            +₹{priceDelta}
+                            +{format(priceDelta)}
                           </span>
                         )}
                         {priceDelta === 0 && (
@@ -205,7 +207,7 @@ export default function VariantPicker({ groups, stockMap, selectedOptions, onSel
                         {opt.name}
                         {priceDelta > 0 && (
                           <span className={`ml-1.5 text-xs font-normal ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
-                            +₹{priceDelta}
+                            +{format(priceDelta)}
                           </span>
                         )}
                       </button>

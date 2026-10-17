@@ -42,7 +42,7 @@ export default function CurrencySwitcher({ variant = 'compact', className = '' }
       {open && (
         <div
           role="listbox"
-          className="absolute top-full mt-1 right-0 z-50 bg-[#1A1A1A] border border-white/10 rounded-lg shadow-2xl py-1 w-48 animate-dropdown"
+          className="absolute top-full mt-1 right-0 z-[60] bg-[#1A1A1A] border border-white/10 rounded-lg shadow-2xl py-1 w-48 animate-dropdown"
         >
           {CURRENCIES.map((c) => (
             <button
