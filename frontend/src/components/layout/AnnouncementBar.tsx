@@ -25,8 +25,6 @@ export default function AnnouncementBar() {
     () => sessionStorage.getItem(SESSION_KEY) !== '1',
   );
 
-  if (!visible) return null;
-
   const messages = banners.length > 0 ? banners : FALLBACK_MESSAGES;
 
   function dismiss() {
@@ -53,33 +51,38 @@ export default function AnnouncementBar() {
   ));
 
   return (
-    <div
-      className="relative w-full flex items-center overflow-hidden"
-      style={{ backgroundColor: '#14342B', height: '36px' }}
-    >
-      {/* Scrolling text strip — two copies for seamless loop */}
-      <div className="flex-1 overflow-hidden">
-        <div className="animate-marquee flex items-center whitespace-nowrap text-[#F9F8F6]/80">
-          {strip}
-          <Dot />
-          {strip}
-          <Dot />
-        </div>
-      </div>
+    <div className="w-full" style={{ backgroundColor: '#14342B' }}>
+      {/* Scrolling text strip — clipped so the marquee loop is seamless */}
+      {visible && (
+        <div className="relative w-full flex items-center overflow-hidden" style={{ height: '36px' }}>
+          <div className="flex-1 overflow-hidden">
+            <div className="animate-marquee flex items-center whitespace-nowrap text-[#F9F8F6]/80">
+              {strip}
+              <Dot />
+              {strip}
+              <Dot />
+            </div>
+          </div>
 
-      {/* Currency switcher — right side */}
-      <div className="shrink-0 border-l border-white/10 pl-3 pr-8 sm:pr-10">
+          {/* Dismiss button */}
+          <button
+            onClick={dismiss}
+            aria-label="Close announcement"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X size={11} />
+          </button>
+        </div>
+      )}
+
+      {/* Currency switcher — own row below the promotional strip so the
+          dropdown is never clipped by the marquee's overflow-hidden.
+          Stays visible even when the announcement strip is dismissed. */}
+      <div
+        className={`flex justify-end pr-4 sm:pr-8 ${visible ? 'border-t border-white/10' : ''}`}
+      >
         <CurrencySwitcher variant="compact" />
       </div>
-
-      {/* Dismiss button */}
-      <button
-        onClick={dismiss}
-        aria-label="Close announcement"
-        className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-      >
-        <X size={11} />
-      </button>
     </div>
   );
 }

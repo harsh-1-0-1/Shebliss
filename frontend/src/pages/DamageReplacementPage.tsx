@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowLeft, CheckCircle2, ChevronDown, Loader2, ShieldCheck, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useDeliveredOrders, useSubmitDamageClaim } from '@/hooks/useDamageClaims';
+import { useCurrencyStore } from '@/store/currencyStore';
 import type { Order } from '@/types';
 
 const ISSUE_TYPES = [
@@ -42,6 +43,7 @@ interface SuccessState {
 export default function DamageReplacementPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { format } = useCurrencyStore();
 
   // Server state
   const { data: deliveredOrders, isLoading: ordersLoading } = useDeliveredOrders();
@@ -311,7 +313,7 @@ export default function DamageReplacementPage() {
                 ))}
                 <div className="pt-1.5 border-t border-gray-200 flex justify-between text-gray-500">
                   <span>Total</span>
-                  <span className="font-semibold text-gray-800">₹{selectedOrder.total_amount}</span>
+                  <span className="font-semibold text-gray-800">{format(Number(selectedOrder.total_amount))}</span>
                 </div>
               </div>
 

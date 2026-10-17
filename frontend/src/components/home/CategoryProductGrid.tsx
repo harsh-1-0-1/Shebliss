@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 
 import { useProducts } from '@/hooks/useProducts';
 import { useCartStore } from '@/store/cartStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import ProductTagBadges from '@/components/product/ProductTagBadges';
 import type { Product } from '@/types';
 
@@ -11,6 +12,7 @@ const SECONDARY = '#a34a2f';
 function ProductTile({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const navigate = useNavigate();
+  const { format } = useCurrencyStore();
   const hasVariants = Boolean(
     (product.variants?.variant_groups?.length ?? 0) > 0,
   );
@@ -73,12 +75,12 @@ function ProductTile({ product }: { product: Product }) {
             style={{ color: SECONDARY }}
           >
             {hasVariants && <span className="text-xs font-normal text-gray-500 mr-0.5">from</span>}
-            ₹{product.price}
+            {format(product.price)}
           </span>
           {product.original_price &&
             product.original_price > product.price && (
               <span className="text-xs sm:text-sm text-gray-400 line-through">
-                ₹{product.original_price}
+                {format(product.original_price)}
               </span>
             )}
         </div>

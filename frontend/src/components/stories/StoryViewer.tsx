@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import { useCurrencyStore } from '@/store/currencyStore';
 import type { Story } from '@/types';
 import toast from 'react-hot-toast';
 
@@ -16,6 +17,7 @@ export function StoryViewer({ stories, startIndex, onClose }: StoryViewerProps) 
   const videoRef = useRef<HTMLVideoElement>(null);
   const addItem = useCartStore((s) => s.addItem);
   const { openDrawer } = useCartStore();
+  const { format } = useCurrencyStore();
 
   const story = stories[index];
 
@@ -118,10 +120,10 @@ export function StoryViewer({ stories, startIndex, onClose }: StoryViewerProps) 
                 {story.linked_product.name}
               </h3>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="font-bold text-green-800 text-sm">₹{story.linked_product.price}</span>
+                <span className="font-bold text-green-800 text-sm">{format(story.linked_product.price)}</span>
                 {story.linked_product.original_price && (
                   <span className="text-xs text-gray-400 line-through">
-                    ₹{story.linked_product.original_price}
+                    {format(story.linked_product.original_price)}
                   </span>
                 )}
               </div>
