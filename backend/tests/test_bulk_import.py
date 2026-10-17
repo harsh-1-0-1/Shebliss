@@ -48,6 +48,42 @@ def _zip_with(entries: dict[str, bytes]) -> bytes:
     return buf.getvalue()
 
 
+def _xlsx_bytes(
+    rows: list[list], images: list[tuple[str, bytes]] | None = None, headers: list[str] | None = None,
+) -> bytes:
+    from openpyxl import Workbook
+    from openpyxl.drawing.image import Image as XLImage
+
+    from app.services.bulk_import_service import TEMPLATE_HEADERS
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Products"
+    ws.append(list(headers if headers is not None else TEMPLATE_HEADERS))
+    for row in rows:
+        ws.append(row)
+    for cell, blob in images or []:
+        ws.add_image(XLImage(io.BytesIO(blob)), cell)
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()
+
+
+def _corrupt_first_media(xlsx_bytes: bytes) -> bytes:
+    src = zipfile.ZipFile(io.BytesIO(xlsx_bytes))
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as out:
+        for info in src.infolist():
+            data = b"definitely not an image" if info.filename.startswith("xl/media/") else src.read(info.filename)
+            out.writestr(info, data)
+    return buf.getvalue()
+
+
+async def _post_xlsx(client: AsyncClient, token: str, url: str, xlsx_bytes: bytes):
+    files = {"csv_file": ("products.xlsx", xlsx_bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+    return await client.post(url, files=files, headers={"Authorization": f"Bearer {token}"})
+
+
 # ---- Access control & template ------------------------------------------
 
 
@@ -58,8 +94,21 @@ async def test_bulk_import_requires_admin(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_template_download(client: AsyncClient, admin_token: str):
+async def test_template_download_is_xlsx_with_picture_columns(client: AsyncClient, admin_token: str):
+    from app.services import bulk_import_service
+
     resp = await client.get(TEMPLATE_URL, headers={"Authorization": f"Bearer {admin_token}"})
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith(bulk_import_service.TEMPLATE_XLSX_MEDIA_TYPE)
+    rows, images = bulk_import_service.parse_xlsx(resp.content)
+    assert images == {}
+    assert set(bulk_import_service.REQUIRED_HEADERS) <= set(rows[0])
+    assert "picture 1" in rows[0] and "picture 5" in rows[0]
+
+
+@pytest.mark.asyncio
+async def test_template_csv_variant(client: AsyncClient, admin_token: str):
+    resp = await client.get(f"{TEMPLATE_URL}?format=csv", headers={"Authorization": f"Bearer {admin_token}"})
     assert resp.status_code == 200
     assert "text/csv" in resp.headers["content-type"]
     assert resp.text.splitlines()[0] == HEADERS
@@ -297,3 +346,80 @@ async def test_import_too_many_rows_rejected(client: AsyncClient, admin_token: s
     resp = await _post(client, admin_token, IMPORT_URL, _csv(rows))
     assert resp.status_code == 400
     assert "maximum is 50" in resp.json()["detail"]
+
+
+# ---- XLSX with embedded images -------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_xlsx_validate_accepts_required_columns_and_pictures(client: AsyncClient, admin_token: str):
+    await _seed_category(client, admin_token, "Earrings")
+    xlsx = _xlsx_bytes(
+        [["Xlsx Jhumka", "Earrings", 150, None, 3, "desc", "New", "gold|festive", "", "", "", "", ""]],
+        images=[("I2", _png_bytes())],
+    )
+    resp = await _post_xlsx(client, admin_token, VALIDATE_URL, xlsx)
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["rows"][0]["status"] == "ok"
+
+
+@pytest.mark.asyncio
+async def test_xlsx_import_rehosts_embedded_images(client: AsyncClient, admin_token: str, monkeypatch):
+    await _seed_category(client, admin_token, "Earrings")
+    uploaded: list[str] = []
+
+    async def fake_upload(file, folder: str, entity_id=None):
+        uploaded.append(file.filename or "")
+        return f"store/products/{entity_id}/{file.filename}"
+
+    monkeypatch.setattr("app.services.bulk_import_service.upload_image_file", fake_upload)
+
+    xlsx = _xlsx_bytes(
+        [["Xlsx Jhumka", "Earrings", 150, None, 3, "", "", "", "", "", "", "", ""]],
+        images=[("I2", _png_bytes()), ("J2", _png_bytes())],
+    )
+    resp = await _post_xlsx(client, admin_token, IMPORT_URL, xlsx)
+    assert resp.status_code == 200, resp.text
+    assert resp.json() == {"created": 1, "updated": 0, "errors": []}
+    assert uploaded == ["xlsx-jhumka-1.png", "xlsx-jhumka-2.png"]
+
+    listing = await client.get("/api/v1/products")
+    assert len(listing.json()["items"][0]["images"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_xlsx_missing_required_column_rejected(client: AsyncClient, admin_token: str):
+    xlsx = _xlsx_bytes([["Foo", 100]], headers=["name", "price"])
+    resp = await _post_xlsx(client, admin_token, VALIDATE_URL, xlsx)
+    assert resp.status_code == 400
+    assert "category" in resp.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_xlsx_corrupt_embedded_picture_fails_row(client: AsyncClient, admin_token: str):
+    await _seed_category(client, admin_token, "Earrings")
+    xlsx = _corrupt_first_media(_xlsx_bytes(
+        [["Broken Jhumka", "Earrings", 100, None, 1, "", "", "", "", "", "", "", ""]],
+        images=[("I2", _png_bytes())],
+    ))
+    resp = await _post_xlsx(client, admin_token, VALIDATE_URL, xlsx)
+    assert resp.status_code == 200, resp.text
+    row = resp.json()["rows"][0]
+    assert row["status"] == "error"
+    assert "not a valid image file" in row["errors"][0]
+
+
+@pytest.mark.asyncio
+async def test_xlsx_too_many_embedded_pictures_rejected(client: AsyncClient, admin_token: str):
+    await _seed_category(client, admin_token, "Earrings")
+    from app.services.bulk_import_service import TEMPLATE_HEADERS
+
+    headers = [*TEMPLATE_HEADERS, "PICTURE 6"]
+    row = ["Nine Jhumka", "Earrings", 100, None, 1, "", "", "", "", "", "", "", "", ""]
+    images = [(f"{chr(ord('I') + i)}2", _png_bytes()) for i in range(6)]
+    xlsx = _xlsx_bytes([row], images=images, headers=headers)
+    resp = await _post_xlsx(client, admin_token, VALIDATE_URL, xlsx)
+    assert resp.status_code == 200, resp.text
+    row_result = resp.json()["rows"][0]
+    assert row_result["status"] == "error"
+    assert "Too many images" in row_result["errors"][0]

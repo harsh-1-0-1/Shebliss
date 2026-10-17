@@ -75,7 +75,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
       const url = URL.createObjectURL(data as Blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = 'products-import-template.csv';
+      anchor.download = 'products-import-template.xlsx';
       anchor.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -85,7 +85,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
 
   async function handleValidate() {
     if (!csvFile) {
-      setError('Choose a CSV file first.');
+      setError('Choose a product file first.');
       return;
     }
     setError(null);
@@ -130,7 +130,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
           <div>
             <h2 className="text-lg font-bold text-gray-900">Bulk Import Products</h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Upload a CSV to create or update many products at once
+              Upload an Excel (.xlsx) or CSV file to create or update many products at once
             </p>
           </div>
           <button
@@ -155,12 +155,12 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
               <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
-                    Product CSV *
+                    Product file (Excel or CSV) *
                   </label>
                   <input
                     ref={csvInputRef}
                     type="file"
-                    accept=".csv,text/csv"
+                    accept=".csv,.xlsx,.xlsm"
                     className="hidden"
                     onChange={(e) => {
                       setCsvFile(e.target.files?.[0] ?? null);
@@ -176,10 +176,10 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                       <FileText size={18} className="text-primary shrink-0" />
                       <span className="min-w-0">
                         <span className="block text-sm font-medium text-gray-800 truncate">
-                          {csvFile ? csvFile.name : 'Choose a CSV file'}
+                          {csvFile ? csvFile.name : 'Choose a .xlsx or .csv file'}
                         </span>
                         <span className="block text-[11px] text-gray-400">
-                          {csvFile ? `${(csvFile.size / 1024).toFixed(1)} KB` : 'Required · max 2MB · up to 50 rows'}
+                          {csvFile ? `${(csvFile.size / 1024).toFixed(1)} KB` : 'Required · up to 50 rows · pictures go inside the xlsx'}
                         </span>
                       </span>
                     </span>
@@ -189,7 +189,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
-                    Images ZIP <span className="font-normal text-gray-400">(optional)</span>
+                    Images ZIP <span className="font-normal text-gray-400">(CSV only, optional)</span>
                   </label>
                   <input
                     ref={zipInputRef}
@@ -215,7 +215,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                         <span className="block text-[11px] text-gray-400">
                           {zipFile
                             ? `${(zipFile.size / 1024).toFixed(1)} KB`
-                            : 'Referenced by filename in the image_files column'}
+                            : 'Not needed when pictures are embedded in the xlsx'}
                         </span>
                       </span>
                     </span>
@@ -228,15 +228,16 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                   onClick={downloadTemplate}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  <Download size={13} /> Download CSV template
+                  <Download size={13} /> Download Excel template
                 </button>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-5 text-xs text-gray-500 space-y-1.5">
                 <p className="font-semibold text-gray-700 text-xs">How it works</p>
-                <p>· Columns: name, category, price, original_price, stock_qty, description, badge, tags, image_files.</p>
-                <p>· Separate multiple tags or images with <code className="bg-gray-100 px-1 rounded">|</code>.</p>
-                <p>· Image entries can be filenames from the ZIP or public http(s) URLs.</p>
+                <p>· Required columns: <span className="font-medium text-gray-700">name, category, price</span>. Optional: original_price, stock_qty, description, badge, tags.</p>
+                <p>· <span className="font-medium text-gray-700">Excel:</span> insert each product's photos into its PICTURE 1–5 cells (max 5, 5MB each, JPG/PNG/WEBP).</p>
+                <p>· <span className="font-medium text-gray-700">CSV:</span> list image filenames (from the ZIP) or public http(s) URLs in the image_files column.</p>
+                <p>· Separate multiple tags or image entries with <code className="bg-gray-100 px-1 rounded">|</code>.</p>
                 <p>· An existing product is matched by its name (case-insensitive); blank cells keep the current value.</p>
                 <p>· Simple products only — products with variants are not supported by bulk import.</p>
               </div>
@@ -304,8 +305,8 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
               </div>
 
               <p className="text-[11px] text-gray-400">
-                Image URLs are checked for format only — availability is verified during import,
-                so a broken URL fails that row (and only that row).
+                Embedded pictures are checked here. Image URLs are checked for format only —
+                availability is verified during import, so a broken URL fails that row (and only that row).
               </p>
             </>
           )}
@@ -366,7 +367,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                 className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/95 disabled:opacity-60 transition inline-flex items-center justify-center gap-2"
               >
                 {busy === 'validate' ? <Loader2 size={15} className="animate-spin" /> : null}
-                {busy === 'validate' ? 'Validating...' : 'Validate CSV'}
+                {busy === 'validate' ? 'Validating...' : 'Validate file'}
               </button>
             </>
           )}
