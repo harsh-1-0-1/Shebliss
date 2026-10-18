@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useCategories } from '@/hooks/useCategories';
 import { categoryUrl } from '@/lib/urls';
 import type { Category } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 interface SubcategoryCarouselProps {
   /** The category slug from the URL */
@@ -118,8 +119,10 @@ export default function SubcategoryCarousel({ categorySlug }: SubcategoryCarouse
               }`}
             >
               {item.image_url ? (
-                <img
+                <OptimizedImage
                   src={item.image_url}
+                  widths={[400]}
+                  sizes="64px"
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
@@ -151,8 +154,10 @@ export default function SubcategoryCarousel({ categorySlug }: SubcategoryCarouse
               }`}
             >
               {item.image_url ? (
-                <img
+                <OptimizedImage
                   src={item.image_url}
+                  widths={[400]}
+                  sizes="96px"
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { StoryViewer } from './StoryViewer';
 import { useCurrencyStore } from '@/store/currencyStore';
 import type { Story } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 interface StoriesCarouselProps {
   stories: Story[];
@@ -63,8 +64,10 @@ function StoryCard({ story, onClick }: { story: Story; onClick: () => void }) {
       {story.linked_product && (
         <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl p-2 flex items-center gap-2 z-20 shadow-lg group-hover:-translate-y-1 transition-transform">
           {story.linked_product.thumbnail && (
-            <img
+            <OptimizedImage
               src={story.linked_product.thumbnail}
+              widths={[400]}
+              sizes="36px"
               className="w-9 h-9 rounded-lg object-cover bg-gray-100 shrink-0"
               alt={story.linked_product.name}
             />

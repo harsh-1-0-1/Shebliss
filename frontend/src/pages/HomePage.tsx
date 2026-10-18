@@ -14,6 +14,7 @@ import BlogSection from '@/components/home/BlogSection';
 export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#F9F8F6' }}>
+      <title>Artificial Jewellery Online | Shebliss</title>
       {/* Category bubbles — above the hero on all breakpoints */}
       <MobileCategoryNav />
 
@@ -30,24 +31,24 @@ export default function HomePage() {
         <FeaturedProductsGrid />
       </ErrorBoundary>
 
-      {/* Category grid */}
-      <ErrorBoundary>
-        <CategoryHighlightGrid />
-      </ErrorBoundary>
-
-      {/* Editorial featured collection */}
-      <ErrorBoundary>
-        <EditorialCollection />
-      </ErrorBoundary>
-
       {/* Repeated collection banner + slidable product bar blocks (admin-editable) */}
       <ErrorBoundary>
         <HomeCollectionBlocks />
       </ErrorBoundary>
 
+      {/* Category grid */}
+      <ErrorBoundary>
+        <CategoryHighlightGrid />
+      </ErrorBoundary>
+
       {/* Style inspiration reels — mood/lifestyle videos from the Stories system */}
       <ErrorBoundary>
         <StyleInspiration />
+      </ErrorBoundary>
+
+      {/* Editorial featured collection */}
+      <ErrorBoundary>
+        <EditorialCollection />
       </ErrorBoundary>
 
       {/* Testimonials — customer love */}

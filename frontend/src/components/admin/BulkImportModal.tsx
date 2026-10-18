@@ -34,6 +34,7 @@ interface ImportReport {
   created: number;
   updated: number;
   errors: { row: number; name?: string; error: string }[];
+  warnings?: string[];
 }
 
 export default function BulkImportModal({ onClose }: { onClose: () => void }) {
@@ -238,6 +239,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                 <p>· <span className="font-medium text-gray-700">Excel:</span> insert each product's photos into its PICTURE 1–5 cells (max 5, 5MB each, JPG/PNG/WEBP).</p>
                 <p>· <span className="font-medium text-gray-700">CSV:</span> list image filenames (from the ZIP) or public http(s) URLs in the image_files column.</p>
                 <p>· Separate multiple tags or image entries with <code className="bg-gray-100 px-1 rounded">|</code>.</p>
+                <p>· A blank or unknown category puts a new product in <span className="font-medium text-gray-700">Uncategorized</span>; change it later from Products.</p>
                 <p>· An existing product is matched by its name (case-insensitive); blank cells keep the current value.</p>
                 <p>· Simple products only — products with variants are not supported by bulk import.</p>
               </div>
@@ -331,6 +333,14 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
                   </p>
                 </div>
               </div>
+
+              {(result.warnings?.length ?? 0) > 0 && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl px-4 py-3 space-y-1 max-h-40 overflow-y-auto">
+                  {result.warnings!.map((w) => (
+                    <p key={w}>{w}</p>
+                  ))}
+                </div>
+              )}
 
               {result.errors.length > 0 && (
                 <div className="border border-red-200 bg-red-50 rounded-xl overflow-hidden">

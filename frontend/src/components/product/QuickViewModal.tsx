@@ -12,6 +12,7 @@ import { PLACEHOLDER_IMAGE } from '@/lib/branding';
 import Spinner from '@/components/ui/Spinner';
 import VariantPicker from '@/components/product/VariantPicker';
 import type { VariantGroup, VariantOption } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 export default function QuickViewModal() {
   const { slug, close } = useQuickViewStore();
@@ -109,8 +110,9 @@ export default function QuickViewModal() {
             <div className="grid md:grid-cols-2">
               {/* Image */}
               <div className="relative aspect-[3/4] bg-card overflow-hidden md:aspect-auto md:min-h-[420px]">
-                <img
+                <OptimizedImage
                   src={product.images?.[0] || PLACEHOLDER_IMAGE}
+                  sizes="(min-width: 768px) 450px, 100vw"
                   alt={product.name}
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="eager"

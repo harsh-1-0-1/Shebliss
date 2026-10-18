@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
@@ -16,7 +15,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy.exc import IntegrityError
 
 import app.core.logging as _  # noqa: F401 – initialise loguru sinks
-from app.api.middleware import CloudFrontGateMiddleware
+from app.api.middleware import CloudFrontGateMiddleware, StaticAwareGZipMiddleware
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.rate_limit import limiter
@@ -55,7 +54,7 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(StaticAwareGZipMiddleware, minimum_size=1000)
 app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(CloudFrontGateMiddleware)
 

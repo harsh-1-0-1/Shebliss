@@ -1,48 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';
-
-const FALLBACK_CATEGORIES = [
-  {
-    name: 'Ear Ring',
-    slug: 'ear-ring',
-    image: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=ear-ring',
-  },
-  {
-    name: 'Necklaces Sets',
-    slug: 'necklaces-sets',
-    image: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=necklaces-sets',
-  },
-  {
-    name: 'Bangles',
-    slug: 'bangles',
-    image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=bangles',
-  },
-  {
-    name: 'Wedding Jewells',
-    slug: 'wedding-jewells',
-    image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=wedding-jewells',
-  },
-  {
-    name: 'Chains',
-    slug: 'chains',
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=chains',
-  },
-  {
-    name: 'Best Sellers',
-    slug: 'best-sellers',
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=1067&fit=crop&crop=center&q=85',
-    href: '/products?category=best-sellers',
-  },
-];
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=1067&fit=crop&crop=center&q=85';
+import OptimizedImage from '@/components/common/OptimizedImage';
+import { categoryLink, sortByMenuOrder } from '@/components/layout/Navbar/navData';
 
 interface CatItem {
   name: string;
@@ -58,15 +18,15 @@ function CategoryCard({ cat }: { cat: CatItem }) {
       className="relative overflow-hidden group block bg-card"
       style={{ aspectRatio: '3/4' }}
     >
-      <img
-        src={cat.image}
-        alt={cat.name}
-        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-        loading="lazy"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
-        }}
-      />
+      {cat.image && (
+        <OptimizedImage
+          src={cat.image}
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          alt={cat.name}
+          className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+          loading="lazy"
+        />
+      )}
       {/* Gradient overlay — stronger for text contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
       {/* Label */}
@@ -91,19 +51,16 @@ function CategoryCard({ cat }: { cat: CatItem }) {
 }
 
 export default function CategoryHighlightGrid() {
-  const { data: apiCategories } = useCategories();
+  const { data: apiCategories = [] } = useCategories();
 
-  const displayCats: CatItem[] = apiCategories?.length
-    ? apiCategories.slice(0, 4).map((c) => ({
-        name: c.name,
-        slug: c.slug,
-        image:
-          c.image_url ||
-          FALLBACK_CATEGORIES.find((f) => f.slug === c.slug)?.image ||
-          FALLBACK_IMAGE,
-        href: `/products?category=${c.slug}`,
-      }))
-    : FALLBACK_CATEGORIES.slice(0, 4);
+  const displayCats: CatItem[] = sortByMenuOrder(apiCategories).slice(0, 4).map((c) => ({
+    name: c.name,
+    slug: c.slug,
+    image: c.image_url || '',
+    href: categoryLink(c),
+  }));
+
+  if (displayCats.length === 0) return null;
 
   return (
     <section className="w-full py-10 sm:py-16" style={{ backgroundColor: '#F9F8F6' }}>

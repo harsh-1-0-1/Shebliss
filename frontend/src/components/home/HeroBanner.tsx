@@ -2,33 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { useBanners } from '@/hooks/useBanners';
-import type { Banner } from '@/types';
-
-const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1920&h=900&fit=crop&crop=center&q=85';
-
-const FALLBACK_SLIDES: Banner[] = [
-  {
-    id: 0,
-    title: '',
-    image_url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1920&h=900&fit=crop&crop=center&q=85',
-    bg_color: '#14342B',
-    text_color: '#F9F8F6',
-    placement: 'hero',
-    position: 0,
-    is_active: true,
-  },
-  {
-    id: 1,
-    title: '',
-    image_url: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=1920&h=900&fit=crop&crop=center&q=85',
-    bg_color: '#14342B',
-    text_color: '#F9F8F6',
-    placement: 'hero',
-    position: 1,
-    is_active: true,
-  },
-];
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 function HeroSkeleton() {
   return (
@@ -38,7 +12,7 @@ function HeroSkeleton() {
 
 export default function HeroBanner() {
   const { data: banners = [], isLoading } = useBanners('hero');
-  const slides = banners.length > 0 ? banners : FALLBACK_SLIDES;
+  const slides = banners;
 
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -54,6 +28,7 @@ export default function HeroBanner() {
   }, [paused, next, current, slides.length]);
 
   if (isLoading) return <HeroSkeleton />;
+  if (slides.length === 0) return null;
 
   return (
     <section
@@ -79,19 +54,16 @@ export default function HeroBanner() {
             aria-hidden={i !== current}
           >
             {s.image_url ? (
-              <img
+              <OptimizedImage
                 src={s.image_url}
                 alt={s.title || ''}
+                sizes="100vw"
                 className="w-full h-full object-cover object-center"
                 loading={i === 0 ? 'eager' : 'lazy'}
+                fetchPriority={i === 0 ? 'high' : 'auto'}
               />
             ) : (
-              <img
-                src={DEFAULT_IMAGE}
-                alt=""
-                className="w-full h-full object-cover object-center"
-                loading={i === 0 ? 'eager' : 'lazy'}
-              />
+              <div className="w-full h-full" style={{ backgroundColor: s.bg_color || '#14342B' }} />
             )}
           </div>
         ))}

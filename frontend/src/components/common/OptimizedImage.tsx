@@ -1,8 +1,8 @@
-import { useState, type ImgHTMLAttributes, type ReactNode } from 'react';
-import { buildSrcset, IMAGE_VARIANT_WIDTHS } from '@/utils/image';
+import { useState, type ImgHTMLAttributes } from 'react';
+import { buildSrcset, hasVariants, IMAGE_VARIANT_WIDTHS } from '@/utils/image';
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'onError'> {
-  /** Base image URL as returned by the API (the full-size WebP or legacy JPEG). */
+  /** Image URL as returned by the API (the full-size WebP or legacy JPEG). */
   src: string;
   alt: string;
   /** Responsive widths to include in the srcset. Defaults to [400, 800, 1200]. */
@@ -15,20 +15,18 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   sizes?: string;
   /** "lazy" (default) or "eager" for above-the-fold images. */
   loading?: 'lazy' | 'eager';
-  /** Error handler — fires after internal fallback has already kicked in. */
+  /** Fires only when the original URL itself fails to load. */
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
-  /** Wrap the <img> in extra JSX (e.g. for ref access) — rarely needed. */
-  children?: ReactNode;
 }
 
 /**
- * Responsive image component that serves WebP variants via ``<picture>`` + ``srcset``.
+ * Responsive image that adds a ``srcset`` of the backend's WebP variants
+ * (``_400w``/``_800w``/``_1200w``) so the browser downloads the smallest file
+ * that still looks crisp.
  *
- * The browser picks the smallest variant that still looks crisp for the viewport.
- * If a variant doesn't exist (e.g. legacy image not yet migrated), ``onError``
- * fires and the component falls back to a plain ``<img>`` with the original URL.
- *
- * Always adds ``decoding="async"`` for non-blocking decode.
+ * Only uploaded images (``/store/`` keys) get a srcset; external or bundled
+ * URLs render as a plain ``<img>``. If a variant is missing (legacy upload),
+ * the srcset is dropped and the original URL is loaded instead.
  */
 export function OptimizedImage({
   src,
@@ -37,46 +35,30 @@ export function OptimizedImage({
   sizes,
   loading = 'lazy',
   onError,
-  children,
   className,
   ...imgProps
 }: OptimizedImageProps) {
-  const [failed, setFailed] = useState(false);
-
-  // Fallback: a variant URL 404'd (legacy image without variants).
-  // Render a plain <img> with the original URL which definitely exists.
-  if (failed) {
-    return (
-      <img
-        src={src}
-        alt={alt}
-        className={className}
-        loading={loading}
-        decoding="async"
-        {...imgProps}
-      />
-    );
-  }
-
-  const srcset = buildSrcset(src, widths);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const responsive = hasVariants(src) && failedSrc !== src;
 
   return (
-    <picture>
-      <source type="image/webp" srcSet={srcset} sizes={sizes} />
-      <img
-        src={src}
-        alt={alt}
-        className={className}
-        loading={loading}
-        decoding="async"
-        onError={(e) => {
-          setFailed(true);
-          onError?.(e);
-        }}
-        {...imgProps}
-      />
-      {children}
-    </picture>
+    <img
+      src={src}
+      srcSet={responsive ? buildSrcset(src, widths) : undefined}
+      sizes={responsive ? sizes : undefined}
+      alt={alt}
+      className={className}
+      loading={loading}
+      decoding="async"
+      onError={(e) => {
+        if (responsive) {
+          setFailedSrc(src);
+          return;
+        }
+        onError?.(e);
+      }}
+      {...imgProps}
+    />
   );
 }
 

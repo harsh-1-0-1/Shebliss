@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import AnnouncementBar from './AnnouncementBar';
 import Navbar from './Navbar';
@@ -9,11 +10,30 @@ import QuickViewModal from '@/components/product/QuickViewModal';
 import FloatingWhatsAppButton from '@/components/corporate/FloatingWhatsAppButton';
 import { useAuthStore } from '@/store/authStore';
 import MaintenancePage from '@/pages/MaintenancePage';
+import { APP_NAME } from '@/lib/branding';
+
+function useServerHeadHandoff(pathname: string) {
+  const firstPath = useRef(pathname);
+  const navigated = useRef(false);
+
+  useEffect(() => {
+    if (!navigated.current && pathname === firstPath.current) return;
+    navigated.current = true;
+    document.head.querySelectorAll('[data-seo]').forEach((el) => el.remove());
+    if (!document.title) {
+      const fallback = document.createElement('title');
+      fallback.setAttribute('data-seo', 'fallback');
+      fallback.textContent = APP_NAME;
+      document.head.appendChild(fallback);
+    }
+  }, [pathname]);
+}
 
 export default function Layout() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
   const { user, isMaintenance, isMaintenanceLoading } = useAuthStore();
+  useServerHeadHandoff(location.pathname);
 
   if (isMaintenanceLoading) {
     return null; // Loading state gate to prevent storefront flash

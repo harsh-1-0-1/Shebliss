@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./ecommerce.db"
     REDIS_URL: str = "redis://localhost:6379"
     BACKEND_PUBLIC_URL: str = "http://localhost:8000"
+    SITE_URL: str = ""
 
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

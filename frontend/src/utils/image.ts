@@ -42,6 +42,14 @@ export function buildSrcset(
 }
 
 /**
+ * Returns true for images uploaded through the backend (``/store/`` keys),
+ * which are the only ones with responsive variants.
+ */
+export function hasVariants(url: string | null | undefined): boolean {
+  return !!url && /\/store\/[^?#]+\.(jpe?g|png|webp)$/i.test(url);
+}
+
+/**
  * Returns true when the URL points to a WebP image (i.e. processed by the
  * new upload pipeline). Legacy .jpg/.png URLs are served as-is.
  */

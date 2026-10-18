@@ -3,19 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { APP_NAME } from '@/lib/branding';
 import { useAuthStore } from '@/store/authStore';
+import { useCategories } from '@/hooks/useCategories';
+import { categoryLink, sortByMenuOrder, WHATSAPP_NUMBER } from '@/components/layout/Navbar/navData';
 
-const COLUMNS = [
-  {
-    title: 'Collections',
-    links: [
-      { label: 'Ear Ring', to: '/products?category=ear-ring' },
-      { label: 'Necklaces Sets', to: '/products?category=necklaces-sets' },
-      { label: 'Bangles', to: '/products?category=bangles' },
-      { label: 'Wedding Jewells', to: '/products?category=wedding-jewells' },
-      { label: 'Chains', to: '/products?category=chains' },
-      { label: 'Pancha Loha Jewells', to: '/products?category=pancha-loha-jewells' },
-    ],
-  },
+const STATIC_COLUMNS = [
   {
     title: 'Shop',
     links: [
@@ -27,12 +18,19 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'Company',
+    title: 'About',
     links: [
       { label: 'About Us', to: '/#about-us' },
       { label: 'Blog', to: '/blog' },
+      { label: 'Shop by Color', to: '/shop-by-color' },
+    ],
+  },
+  {
+    title: 'Help',
+    links: [
       { label: 'FAQs', to: '/faqs' },
       { label: 'Damage Replacement', to: '/damage-replacement' },
+      { label: 'My Damage Claims', to: '/damage-claims' },
     ],
   },
 ];
@@ -62,6 +60,11 @@ export default function Footer() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const { data: categories = [] } = useCategories();
+  const collectionLinks = sortByMenuOrder(categories).slice(0, 6).map((c) => ({ label: c.name, to: categoryLink(c) }));
+  const columns = collectionLinks.length > 0
+    ? [{ title: 'Collections', links: collectionLinks }, ...STATIC_COLUMNS]
+    : STATIC_COLUMNS;
 
   function handleTrackOrder() {
     if (user) { navigate('/orders'); }
@@ -104,7 +107,7 @@ export default function Footer() {
 
       {/* Main columns */}
       <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-12 lg:py-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
           {/* Brand column */}
           <div className="col-span-2 lg:col-span-1">
             <div className="mb-4">
@@ -128,7 +131,7 @@ export default function Footer() {
           </div>
 
           {/* Link columns */}
-          {COLUMNS.map((col) => (
+          {columns.map((col) => (
             <div key={col.title}>
               <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C6A15E] mb-4">{col.title}</h4>
               <ul className="space-y-2.5">
@@ -139,12 +142,19 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
-                {col.title === 'Company' && (
-                  <li>
-                    <button onClick={handleTrackOrder} className="text-sm text-white/50 hover:text-white transition-colors text-left">
-                      Track Order
-                    </button>
-                  </li>
+                {col.title === 'Help' && (
+                  <>
+                    <li>
+                      <button onClick={handleTrackOrder} className="text-sm text-white/50 hover:text-white transition-colors text-left">
+                        Track Order
+                      </button>
+                    </li>
+                    <li>
+                      <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="text-sm text-white/50 hover:text-white transition-colors">
+                        Contact Us on WhatsApp
+                      </a>
+                    </li>
+                  </>
                 )}
               </ul>
             </div>

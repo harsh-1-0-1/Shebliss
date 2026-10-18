@@ -335,6 +335,7 @@ export default function ProductsPage() {
 
   return (
     <div ref={topRef} style={{ backgroundColor: '#F9F8F6' }}>
+      <title>{`${pageTitle} | Shebliss`}</title>
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 py-6 sm:py-10">
 
         {/* Page header */}

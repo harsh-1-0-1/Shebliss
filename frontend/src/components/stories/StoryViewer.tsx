@@ -4,6 +4,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import type { Story } from '@/types';
 import toast from 'react-hot-toast';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 interface StoryViewerProps {
   stories: Story[];
@@ -109,8 +110,10 @@ export function StoryViewer({ stories, startIndex, onClose }: StoryViewerProps) 
             onClick={(e) => e.stopPropagation()}
           >
             {story.linked_product.thumbnail && (
-              <img 
-                src={story.linked_product.thumbnail} 
+              <OptimizedImage
+                src={story.linked_product.thumbnail}
+                widths={[400]}
+                sizes="56px"
                 className="w-14 h-14 rounded-xl object-cover shrink-0 bg-gray-100" 
                 alt={story.linked_product.name}
               />

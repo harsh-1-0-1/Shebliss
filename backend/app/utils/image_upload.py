@@ -53,8 +53,7 @@ def resolve_image_url(key: str | None) -> str | None:
     if key.startswith(("http://", "https://", "/")):
         return key
 
-    is_prod = settings.ENVIRONMENT.lower() == "production"
-    if is_prod and settings.CDN_BASE_URL:
+    if settings.CDN_BASE_URL:
         return f"{settings.CDN_BASE_URL.rstrip('/')}/{key.lstrip('/')}"
 
     return f"{settings.BACKEND_PUBLIC_URL.rstrip('/')}/static/{key.lstrip('/')}"
@@ -211,6 +210,10 @@ async def upload_image_file(
         raise ImageStorageUnavailableError(
             "Missing AWS S3 credentials in production environment"
         )
+    if s3_enabled and not settings.CDN_BASE_URL:
+        raise ImageStorageUnavailableError(
+            "CDN_BASE_URL must be set when S3/R2 storage is configured"
+        )
 
     contents = await file.read()
 
@@ -222,7 +225,7 @@ async def upload_image_file(
         processed = process_image_upload(contents)
         if processed is not None:
             key = generate_image_key(folder, entity_id, file.filename or "", ext_override=".webp")
-            if is_prod and s3_enabled:
+            if s3_enabled:
                 await run_in_threadpool(
                     _upload_to_s3_sync,
                     processed.base_bytes, key, "image/webp", CACHE_CONTROL_IMMUTABLE,
@@ -249,7 +252,7 @@ async def upload_image_file(
     # Store as-is (video, or image Pillow couldn't process)
     key = generate_image_key(folder, entity_id, file.filename or "")
     content_type = file.content_type or "application/octet-stream"
-    if is_prod and s3_enabled:
+    if s3_enabled:
         await run_in_threadpool(_upload_to_s3_sync, contents, key, content_type, CACHE_CONTROL_IMMUTABLE)
         logger.info("File uploaded to S3: {}", key)
         return key
@@ -272,7 +275,7 @@ async def delete_image_file(key: str | None) -> None:
     keys_to_delete = [relative_key]
     keys_to_delete.extend(get_variant_key(relative_key, w) for w in VARIANT_WIDTHS)
 
-    if settings.ENVIRONMENT.lower() == "production" and _s3_enabled():
+    if _s3_enabled():
         for del_key in keys_to_delete:
             try:
                 await run_in_threadpool(_delete_from_s3_sync, del_key)

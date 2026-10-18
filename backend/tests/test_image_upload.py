@@ -132,3 +132,64 @@ def test_response_serializers_resolve_keys(monkeypatch):
          "image_url": "store/categories/2/a.jpg", "is_active": True, "sort_order": 0}
     )
     assert category.model_dump()["image_url"].startswith("https://cdn.test/")
+
+
+def test_url_resolution_follows_cdn_setting_not_environment(monkeypatch):
+    key = "store/products/1/image.webp"
+    monkeypatch.setattr(settings, "ENVIRONMENT", "development")
+    monkeypatch.setattr(settings, "CDN_BASE_URL", "https://cdn.test")
+    assert image_upload.resolve_image_url(key) == f"https://cdn.test/{key}"
+
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "CDN_BASE_URL", "")
+    monkeypatch.setattr(settings, "BACKEND_PUBLIC_URL", "https://api.test")
+    assert image_upload.resolve_image_url(key) == f"https://api.test/static/{key}"
+
+
+@pytest.mark.asyncio
+async def test_s3_without_cdn_refuses_upload(monkeypatch):
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "AWS_ACCESS_KEY_ID", "key")
+    monkeypatch.setattr(settings, "AWS_SECRET_ACCESS_KEY", "secret")
+    monkeypatch.setattr(settings, "AWS_S3_BUCKET", "bucket")
+    monkeypatch.setattr(settings, "CDN_BASE_URL", "")
+    upload = UploadFile(filename="earring.png", file=__import__("io").BytesIO(b"image"))
+
+    with pytest.raises(image_upload.ImageStorageUnavailableError, match="CDN_BASE_URL"):
+        await image_upload.upload_image_file(upload, "products", 9)
+
+
+@pytest.mark.asyncio
+async def test_s3_upload_used_whenever_credentials_set(monkeypatch):
+    monkeypatch.setattr(settings, "ENVIRONMENT", "development")
+    monkeypatch.setattr(settings, "AWS_ACCESS_KEY_ID", "key")
+    monkeypatch.setattr(settings, "AWS_SECRET_ACCESS_KEY", "secret")
+    monkeypatch.setattr(settings, "AWS_S3_BUCKET", "bucket")
+    monkeypatch.setattr(settings, "CDN_BASE_URL", "https://cdn.test")
+    calls = []
+    monkeypatch.setattr(image_upload, "_upload_to_s3_sync", lambda *a: calls.append(a))
+    upload = UploadFile(filename="clip.mp4", file=__import__("io").BytesIO(b"video"))
+
+    key = await image_upload.upload_image_file(upload, "stories/video", 3)
+    assert calls and calls[0][1] == key
+
+
+@pytest.mark.asyncio
+async def test_static_media_is_not_gzipped(tmp_path: Path):
+    from httpx import ASGITransport, AsyncClient
+
+    from main import app
+
+    target = Path("static/store/test-gzip")
+    target.mkdir(parents=True, exist_ok=True)
+    image = target / "big.webp"
+    image.write_bytes(b"\0" * 5000)
+    try:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+            resp = await c.get("/static/store/test-gzip/big.webp", headers={"Accept-Encoding": "gzip"})
+        assert resp.status_code == 200
+        assert "content-encoding" not in resp.headers
+        assert resp.headers["cache-control"] == image_upload.CACHE_CONTROL_IMMUTABLE
+    finally:
+        image.unlink()
+        target.rmdir()

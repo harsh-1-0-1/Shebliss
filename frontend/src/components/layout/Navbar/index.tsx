@@ -14,11 +14,13 @@ import { useWishlistStore } from '@/store/wishlistStore';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useBanners } from '@/hooks/useBanners';
+import { useCategories } from '@/hooks/useCategories';
 import type { ProductListResponse } from '@/types';
-import { NAV_ITEMS, WHATSAPP_NUMBER } from './navData';
+import { categoryLink, sortByMenuOrder, useNavItems, WHATSAPP_NUMBER } from './navData';
 import type { NavItemDef } from './navData';
 import { APP_NAME } from '@/lib/branding';
 import { useCurrencyStore } from '@/store/currencyStore';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 // ── Logo wordmark ─────────────────────────────────────────────────────────────
 function Logo({ onClick }: { onClick?: () => void }) {
@@ -39,18 +41,6 @@ function Logo({ onClick }: { onClick?: () => void }) {
     </Link>
   );
 }
-
-const FALLBACK_MOBILE_ITEMS = [
-  { label: 'New Arrival', href: '/products?category=new-arrival', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
-  { label: 'Necklaces Sets', href: '/products?category=necklaces-sets', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
-  { label: 'Ear Ring', href: '/products?category=ear-ring', img: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=80&h=80&fit=crop&q=80' },
-  { label: 'Bangles', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=80&h=80&fit=crop&q=80' },
-  { label: 'Wedding Jewells', href: '/products?category=wedding-jewells', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=80&h=80&fit=crop&q=80' },
-  { label: 'Chains', href: '/products?category=chains', img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=80&h=80&fit=crop&q=80' },
-  { label: 'Corporate Gifts', href: '/corporate-gifting', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=80&h=80&fit=crop&q=80' },
-  { label: 'Sale', href: '/products?tags=offers', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=80&h=80&fit=crop&q=80' },
-  { label: 'Blog', href: '/blog', img: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=80&h=80&fit=crop&q=80' },
-];
 
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -80,9 +70,11 @@ export default function Navbar() {
   const { data: mobilePromoBanners = [] } = useBanners('mobile_promo');
   const { data: menuBanners = [] } = useBanners('menu_banner');
   const mobilePromoBanner = mobilePromoBanners[0];
+  const { data: categories = [] } = useCategories();
+  const navItems = useNavItems();
   const mobileMenuItems = menuBanners.length > 0
     ? menuBanners.map((b) => ({ label: b.title, href: b.cta_link || '/products', img: b.image_url || '' }))
-    : FALLBACK_MOBILE_ITEMS;
+    : sortByMenuOrder(categories).map((c) => ({ label: c.name, href: categoryLink(c), img: c.image_url || '' }));
 
   useBodyScrollLock(drawerOpen);
   useEffect(() => () => clearTimeout(hoverTimeoutRef.current), []);
@@ -147,7 +139,7 @@ export default function Navbar() {
 
   function getSubcategories(label: string) {
     const clean = label.toLowerCase().trim();
-    const navItem = NAV_ITEMS.find((item) => item.label.toLowerCase().trim() === clean);
+    const navItem = navItems.find((item) => item.label.toLowerCase().trim() === clean);
     if (navItem?.groups) {
       const links: { label: string; href: string }[] = [{ label: `All ${label}`, href: navItem.href }];
       navItem.groups.forEach((col) => col.forEach((grp) => grp.links.forEach((lk) => {
@@ -155,11 +147,6 @@ export default function Navbar() {
       })));
       return links;
     }
-    if (clean === 'gift sets' || clean === 'gifts') return [
-      { label: 'All Gift Sets', href: '/products?tags=combo' },
-      { label: 'Bundle Deals', href: '/products?tags=bundle' },
-      { label: 'Corporate Gifting', href: '/corporate-gifting' },
-    ];
     return null;
   }
 
@@ -174,6 +161,7 @@ export default function Navbar() {
     if (!item.href.startsWith('/products') && location.pathname === item.href.split('?')[0]) return true;
     if (item.groups) {
       for (const col of item.groups) for (const grp of col) for (const lk of grp.links) {
+        if (location.pathname === lk.href) return true;
         const lp = new URLSearchParams(lk.href.split('?')[1] || '');
         if (lp.get('category') === curCat && curCat) return true;
       }
@@ -313,7 +301,7 @@ export default function Navbar() {
       {/* ── Desktop category nav row ── */}
       {!isAdminPath && (
         <nav className="hidden lg:flex flex-wrap justify-center items-center gap-0 border-t border-[#EFECE6] px-4 sm:px-6 lg:px-10 xl:px-16">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const hasDD = !!(item.groups?.length);
             const isOpen = activeDropdown === item.label;
             const active = isNavActive(item);
@@ -407,7 +395,7 @@ export default function Navbar() {
                 <Link key={p.id} to={`/products/${p.slug}`} onClick={() => { setSearchOpen(false); setSearchFocused(false); setSearchQuery(''); }}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-[#EFECE6] transition-colors border-b border-[#EFECE6] last:border-0"
                 >
-                  <img src={p.images?.[0]} alt="" className="w-10 h-10 object-cover shrink-0 bg-[#EFECE6]" />
+                  <OptimizedImage src={p.images?.[0] ?? ''} widths={[400]} sizes="40px" alt="" className="w-10 h-10 object-cover shrink-0 bg-[#EFECE6]" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#1A1A1A] truncate">{p.name}</p>
                     <p className="text-xs text-[#C6A15E] font-semibold mt-0.5">{format(p.price)}</p>
@@ -453,7 +441,7 @@ export default function Navbar() {
                     className="flex items-center gap-3 p-3 bg-[#EFECE6] group transition active:scale-[0.98]"
                   >
                     {mobilePromoBanner.image_url && (
-                      <img src={mobilePromoBanner.image_url} alt="" className="w-11 h-11 object-cover shrink-0" />
+                      <OptimizedImage src={mobilePromoBanner.image_url} widths={[400]} sizes="44px" alt="" className="w-11 h-11 object-cover shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-bold text-[#C6A15E] uppercase tracking-wider">{mobilePromoBanner.badge_text || 'Limited Offer'}</p>
@@ -499,7 +487,11 @@ export default function Navbar() {
                         className="flex items-center justify-between px-3 py-3 hover:bg-[#EFECE6] transition-colors group"
                       >
                         <div className="flex items-center gap-3">
-                          <img src={item.img} alt="" className="w-8 h-8 object-cover rounded-full border border-[#EFECE6] shrink-0" loading="lazy" />
+                          {item.img ? (
+                            <OptimizedImage src={item.img} widths={[400]} sizes="32px" alt="" className="w-8 h-8 object-cover rounded-full border border-[#EFECE6] shrink-0" loading="lazy" />
+                          ) : (
+                            <span className="w-8 h-8 rounded-full border border-[#EFECE6] bg-[#EFECE6] shrink-0" />
+                          )}
                           <span className="text-[14px] font-medium text-[#2B2421] group-hover:text-[#1A1A1A]">{item.label}</span>
                         </div>
                         {subs && <ChevronRight size={13} className="text-[#767676]" />}
