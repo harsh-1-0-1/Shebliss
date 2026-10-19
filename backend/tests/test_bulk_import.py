@@ -253,7 +253,7 @@ async def test_import_creates_then_updates_with_blank_cell_semantics(
     first = _csv("Blue Jhumka,Earrings,499,699,25,Cotton jhumka,New Arrival,gold|festive,\n")
     resp = await _post(client, admin_token, IMPORT_URL, first)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": [], "total": 1, "next_row": 1}
 
     listing = await client.get("/api/v1/products")
     product = listing.json()["items"][0]
@@ -262,7 +262,7 @@ async def test_import_creates_then_updates_with_blank_cell_semantics(
     second = _csv("Blue Jhumka,Earrings,549,,,,,,,\n")
     resp = await _post(client, admin_token, IMPORT_URL, second)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": []}
+    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": [], "total": 1, "next_row": 1}
 
     detail = await client.get(f"/api/v1/products/{product['slug']}")
     data = detail.json()
@@ -290,7 +290,7 @@ async def test_import_matches_existing_product_by_name(client: AsyncClient, admi
     # Normalized name differs from the stored one, but the slug matches.
     resp = await _post(client, admin_token, IMPORT_URL, _csv("Legacy Jhumka,Earrings,150,,,,,,,\n"))
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": []}
+    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": [], "total": 1, "next_row": 1}
 
     listing = await client.get("/api/v1/products")
     assert listing.json()["total"] == 1
@@ -330,6 +330,39 @@ async def test_import_row_failure_leaves_earlier_rows_committed(
 
 
 @pytest.mark.asyncio
+async def test_import_in_batches_keeps_file_row_numbers(client: AsyncClient, admin_token: str):
+    await _seed_category(client, admin_token, "Earrings")
+    csv_bytes = _csv(
+        "Alpha Earring,Earrings,100,,,,,,\n"
+        "Beta Earring,Earrings,200,,,,,,\n"
+        "Gamma Earring,Earrings,abc,,,,,,\n"
+        "Alpha Earring,Earrings,300,,,,,,\n"
+    )
+
+    async def batch(start: int, limit: int):
+        resp = await client.post(
+            IMPORT_URL,
+            files=_files(csv_bytes),
+            data={"row_start": str(start), "row_limit": str(limit)},
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        assert resp.status_code == 200, resp.text
+        return resp.json()
+
+    first = await batch(0, 2)
+    assert (first["created"], first["errors"], first["total"], first["next_row"]) == (2, [], 4, 2)
+
+    second = await batch(2, 2)
+    assert second["created"] == 0
+    assert second["next_row"] == 4
+    assert [e["row"] for e in second["errors"]] == [3, 4]
+    assert "Duplicate product name" in second["errors"][1]["error"]
+
+    listing = await client.get("/api/v1/products")
+    assert listing.json()["total"] == 2
+
+
+@pytest.mark.asyncio
 async def test_import_with_zip_rehosts_images(client: AsyncClient, admin_token: str, monkeypatch):
     await _seed_category(client, admin_token, "Earrings")
     zip_bytes = _zip_with({"images/BlueFront.png": _png_bytes()})
@@ -345,7 +378,7 @@ async def test_import_with_zip_rehosts_images(client: AsyncClient, admin_token: 
     csv_bytes = _csv("Zip Jhumka,Earrings,100,,,,,,bluefront.png\n")
     resp = await _post(client, admin_token, IMPORT_URL, csv_bytes, zip_bytes)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": [], "total": 1, "next_row": 1}
     assert uploaded == [("bluefront.png", 1)]
 
     listing = await client.get("/api/v1/products")
@@ -420,7 +453,7 @@ async def test_xlsx_import_rehosts_embedded_images(client: AsyncClient, admin_to
     )
     resp = await _post_xlsx(client, admin_token, IMPORT_URL, xlsx)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": [], "total": 1, "next_row": 1}
     assert uploaded == ["xlsx-jhumka-1.png", "xlsx-jhumka-2.png"]
 
     listing = await client.get("/api/v1/products")

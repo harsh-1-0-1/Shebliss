@@ -1,4 +1,6 @@
+import asyncio
 import uuid
+from functools import cache
 from pathlib import Path
 
 import boto3
@@ -30,6 +32,7 @@ def _s3_enabled() -> bool:
     )
 
 
+@cache
 def _get_s3_client():
     """Get S3 client configured for AWS S3 or Cloudflare R2."""
     client_kwargs = {
@@ -222,20 +225,18 @@ async def upload_image_file(
     is_image = file.content_type is not None and file.content_type.startswith("image/")
 
     if is_image:
-        processed = process_image_upload(contents)
+        processed = await run_in_threadpool(process_image_upload, contents)
         if processed is not None:
             key = generate_image_key(folder, entity_id, file.filename or "", ext_override=".webp")
             if s3_enabled:
-                await run_in_threadpool(
-                    _upload_to_s3_sync,
-                    processed.base_bytes, key, "image/webp", CACHE_CONTROL_IMMUTABLE,
-                )
-                for width, variant_bytes in processed.variants.items():
-                    v_key = get_variant_key(key, width)
-                    await run_in_threadpool(
-                        _upload_to_s3_sync,
-                        variant_bytes, v_key, "image/webp", CACHE_CONTROL_IMMUTABLE,
-                    )
+                objects = [(key, processed.base_bytes)] + [
+                    (get_variant_key(key, width), variant_bytes)
+                    for width, variant_bytes in processed.variants.items()
+                ]
+                await asyncio.gather(*(
+                    run_in_threadpool(_upload_to_s3_sync, body, obj_key, "image/webp", CACHE_CONTROL_IMMUTABLE)
+                    for obj_key, body in objects
+                ))
                 logger.info("Image uploaded to S3 (WebP + {} variants): {}", len(processed.variants), key)
             else:
                 base_path = STATIC_ROOT / key
@@ -276,12 +277,14 @@ async def delete_image_file(key: str | None) -> None:
     keys_to_delete.extend(get_variant_key(relative_key, w) for w in VARIANT_WIDTHS)
 
     if _s3_enabled():
-        for del_key in keys_to_delete:
+        async def delete_one(del_key: str) -> None:
             try:
                 await run_in_threadpool(_delete_from_s3_sync, del_key)
             except ClientError as e:
                 # Variant might not exist (legacy image without variants) — ignore.
                 logger.debug("S3 delete skipped for {}: {}", del_key, e)
+
+        await asyncio.gather(*(delete_one(del_key) for del_key in keys_to_delete))
         logger.info("Deleted S3 object + variants: {}", relative_key)
     else:
         static_root = STATIC_ROOT.resolve()

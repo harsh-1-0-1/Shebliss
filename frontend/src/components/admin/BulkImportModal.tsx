@@ -35,7 +35,11 @@ interface ImportReport {
   updated: number;
   errors: { row: number; name?: string; error: string }[];
   warnings?: string[];
+  total: number;
+  next_row: number;
 }
+
+const IMPORT_BATCH_SIZE = 5;
 
 export default function BulkImportModal({ onClose }: { onClose: () => void }) {
   useBodyScrollLock(true);
@@ -45,6 +49,7 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
   const [zipFile, setZipFile] = useState<File | null>(null);
   const [phase, setPhase] = useState<Phase>('files');
   const [busy, setBusy] = useState<'validate' | 'import' | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [report, setReport] = useState<ValidateReport | null>(null);
   const [result, setResult] = useState<ImportReport | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -105,8 +110,23 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
   async function handleImport() {
     setError(null);
     setBusy('import');
+    const data: ImportReport = { created: 0, updated: 0, errors: [], warnings: [], total: 0, next_row: 0 };
     try {
-      const { data } = await api.post<ImportReport>('/products/bulk-import', buildForm());
+      let start = 0;
+      do {
+        const form = buildForm();
+        form.append('row_start', String(start));
+        form.append('row_limit', String(IMPORT_BATCH_SIZE));
+        const { data: batch } = await api.post<ImportReport>('/products/bulk-import', form);
+        data.created += batch.created;
+        data.updated += batch.updated;
+        data.errors.push(...batch.errors);
+        data.warnings!.push(...(batch.warnings ?? []));
+        data.total = batch.total;
+        data.next_row = batch.next_row;
+        start = batch.next_row;
+        setProgress({ done: start, total: batch.total });
+      } while (start < data.total);
       setResult(data);
       setPhase('done');
       qc.invalidateQueries({ queryKey: ['products'] });
@@ -116,9 +136,16 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
         toast(`${data.created} created, ${data.updated} updated, ${data.errors.length} failed`);
       }
     } catch (err) {
-      setError(getApiErrorDetail(err, 'Import failed'));
+      const detail = getApiErrorDetail(err, 'Import failed');
+      setError(
+        data.next_row > 0
+          ? `${detail}. Rows 1–${data.next_row} were already imported (${data.created} created, ${data.updated} updated); importing the file again updates them instead of duplicating.`
+          : detail,
+      );
+      qc.invalidateQueries({ queryKey: ['products'] });
     } finally {
       setBusy(null);
+      setProgress(null);
     }
   }
 
@@ -400,7 +427,9 @@ export default function BulkImportModal({ onClose }: { onClose: () => void }) {
               >
                 {busy === 'import' ? <Loader2 size={15} className="animate-spin" /> : null}
                 {busy === 'import'
-                  ? 'Importing...'
+                  ? progress
+                    ? `Importing ${progress.done} of ${progress.total}...`
+                    : 'Importing...'
                   : errorCount === report.rows.length
                   ? 'No importable rows'
                   : `Import ${report.rows.length - errorCount} row${report.rows.length - errorCount === 1 ? '' : 's'}`}

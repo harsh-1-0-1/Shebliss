@@ -243,23 +243,26 @@ async def bulk_import_validate(
 
 
 @router.post("/bulk-import")
-@limiter.limit("10/hour")
+@limiter.limit("120/hour")
 async def bulk_import(
     request: Request,
     source_file: UploadFile = File(..., alias="csv_file"),
     images_zip: UploadFile | None = File(None),
+    row_start: int = Form(0, ge=0),
+    row_limit: int | None = Form(None, ge=1),
     db: AsyncSession = Depends(get_db),
     _admin=Depends(require_admin),
 ):
     """Create/update products from a CSV or XLSX, one transaction per row.
 
     Failing rows are reported and rolled back individually; rows committed
-    before a failure survive.
+    before a failure survive. row_start/row_limit import one batch of rows.
     """
     data, zip_bytes, is_xlsx = await _read_bulk_inputs(source_file, images_zip)
     rows, zf, name_map, cat_map, ambiguous, embedded = await _bulk_context(db, data, zip_bytes, is_xlsx)
     return await bulk_import_service.run_import(
         db, rows, zf, name_map, cat_map, ambiguous, embedded_by_row=embedded,
+        row_start=row_start, row_limit=row_limit,
     )
 
 

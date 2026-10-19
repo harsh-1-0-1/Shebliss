@@ -772,15 +772,22 @@ async def import_row(
         old_keys = list(product.images or []) if not created else []
         new_keys: list[str] = []
         if imgs:
-            try:
-                for img_data, content_type, filename in imgs:
-                    new_keys.append(
-                        await upload_image_file(
-                            _as_upload(img_data, filename, content_type),
-                            folder="products",
-                            entity_id=product.id,
-                        )
+            results = await asyncio.gather(
+                *(
+                    upload_image_file(
+                        _as_upload(img_data, filename, content_type),
+                        folder="products",
+                        entity_id=product.id,
                     )
+                    for img_data, content_type, filename in imgs
+                ),
+                return_exceptions=True,
+            )
+            new_keys = [key for key in results if isinstance(key, str)]
+            try:
+                failure = next((r for r in results if isinstance(r, BaseException)), None)
+                if failure is not None:
+                    raise failure
                 product.images = new_keys
                 await db.commit()
             except Exception:
@@ -828,8 +835,14 @@ async def run_import(
     cat_map: dict[str, CategoryRef],
     ambiguous: list[str],
     embedded_by_row: dict[int, list[bytes]] | None = None,
+    row_start: int = 0,
+    row_limit: int | None = None,
 ) -> dict:
-    """Import every row with per-row commits; collect row errors instead of failing."""
+    """Import rows with per-row commits; collect row errors instead of failing.
+
+    row_start/row_limit select a slice so the admin UI can import in small
+    batches that each finish well inside the proxy timeout.
+    """
     created = 0
     updated = 0
     errors: list[dict] = []
@@ -839,7 +852,11 @@ async def run_import(
     touched_slugs: list[str] = []
     embedded_by_row = embedded_by_row or {}
 
-    for index, row in enumerate(rows, start=1):
+    row_end = len(rows) if row_limit is None else row_start + row_limit
+    seen.update(
+        name for name in (row.get("name", "").strip().lower() for row in rows[:row_start]) if name
+    )
+    for index, row in enumerate(rows[row_start:row_end], start=row_start + 1):
         try:
             data = build_row_data(
                 row,
@@ -879,7 +896,14 @@ async def run_import(
     if touched_slugs:
         await cache_delete_pattern("products:*")
 
-    return {"created": created, "updated": updated, "errors": errors, "warnings": warnings}
+    return {
+        "created": created,
+        "updated": updated,
+        "errors": errors,
+        "warnings": warnings,
+        "total": len(rows),
+        "next_row": min(row_end, len(rows)),
+    }
 
 
 # ---------------------------------------------------------------------------
