@@ -133,7 +133,7 @@ async def test_validate_reports_row_errors(client: AsyncClient, admin_token: str
     resp = await _post(client, admin_token, VALIDATE_URL, csv_bytes)
     assert resp.status_code == 200, resp.text
     rows = resp.json()["rows"]
-    assert [r["status"] for r in rows] == ["ok", "error", "error", "error", "error", "error", "error", "error"]
+    assert [r["status"] for r in rows] == ["ok", "ok", "error", "error", "error", "error", "error", "error"]
     assert rows[6]["errors"][0].startswith("Missing price")
     assert "Duplicate product name" in rows[7]["errors"][0]
 
@@ -155,7 +155,9 @@ async def test_validate_handles_semicolon_delimiter(client: AsyncClient, admin_t
 
 
 @pytest.mark.asyncio
-async def test_validate_flags_unknown_and_ambiguous_categories(client: AsyncClient, admin_token: str):
+async def test_validate_warns_and_falls_back_for_unknown_and_ambiguous_categories(
+    client: AsyncClient, admin_token: str,
+):
     await _seed_category(client, admin_token, "Earrings")
     # A case-only name collision with a different slug (possible for legacy rows).
     from app.db.models import Category
@@ -165,12 +167,50 @@ async def test_validate_flags_unknown_and_ambiguous_categories(client: AsyncClie
         db.add(Category(name="earrings", slug="earrings-legacy"))
         await db.commit()
 
-    csv_bytes = _csv("Item,NoSuchCat,100,,,,,,\nItem2,Earrings,100,,,,,,\n")
+    csv_bytes = _csv("Item,NoSuchCat,100,,,,,,\nItem2,Earrings,100,,,,,,\nItem3,,100,,,,,,\n")
     resp = await _post(client, admin_token, VALIDATE_URL, csv_bytes)
-    rows = resp.json()["rows"]
-    assert rows[0]["status"] == "error"
-    assert "Unknown category" in rows[0]["errors"][0]
-    assert "ambiguous" in rows[1]["errors"][0]
+    body = resp.json()
+    assert [r["status"] for r in body["rows"]] == ["ok", "ok", "ok"]
+    warnings = " ".join(body["warnings"])
+    assert "Unknown category 'NoSuchCat'" in warnings
+    assert "ambiguous" in warnings
+    assert "No category given" in warnings
+    assert "Uncategorized" in warnings
+
+
+@pytest.mark.asyncio
+async def test_import_puts_unknown_category_in_uncategorized(client: AsyncClient, admin_token: str):
+    cat = await _seed_category(client, admin_token, "Earrings")
+    csv_bytes = _csv("Lost Item,NoSuchCat,100,,,,,,\nBlank Cat,,120,,,,,,\nKnown,Earrings,90,,,,,,\n")
+    resp = await _post(client, admin_token, IMPORT_URL, csv_bytes)
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["created"] == 3
+    assert body["errors"] == []
+    assert len(body["warnings"]) == 2
+
+    from sqlalchemy import select
+
+    from app.db.models import Category, Product
+    from tests.conftest import test_session_factory
+
+    async with test_session_factory() as db:
+        fallback = (
+            await db.execute(select(Category).where(Category.slug == "uncategorized"))
+        ).scalar_one()
+        assert fallback.is_active is False
+        products = {p.name: p for p in (await db.execute(select(Product))).scalars()}
+    assert products["Lost Item"].category_id == fallback.id
+    assert products["Blank Cat"].category_id == fallback.id
+    assert products["Known"].category_id == cat["id"]
+
+    # Re-importing with a bad category keeps an existing product's category.
+    resp = await _post(client, admin_token, IMPORT_URL, _csv("Known,NoSuchCat,95,,,,,,\n"))
+    assert resp.json()["updated"] == 1
+    async with test_session_factory() as db:
+        known = (await db.execute(select(Product).where(Product.name == "Known"))).scalar_one()
+    assert known.category_id == cat["id"]
+    assert known.price == 95
 
 
 @pytest.mark.asyncio
@@ -213,7 +253,7 @@ async def test_import_creates_then_updates_with_blank_cell_semantics(
     first = _csv("Blue Jhumka,Earrings,499,699,25,Cotton jhumka,New Arrival,gold|festive,\n")
     resp = await _post(client, admin_token, IMPORT_URL, first)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
 
     listing = await client.get("/api/v1/products")
     product = listing.json()["items"][0]
@@ -222,7 +262,7 @@ async def test_import_creates_then_updates_with_blank_cell_semantics(
     second = _csv("Blue Jhumka,Earrings,549,,,,,,,\n")
     resp = await _post(client, admin_token, IMPORT_URL, second)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 0, "updated": 1, "errors": []}
+    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": []}
 
     detail = await client.get(f"/api/v1/products/{product['slug']}")
     data = detail.json()
@@ -250,7 +290,7 @@ async def test_import_matches_existing_product_by_name(client: AsyncClient, admi
     # Normalized name differs from the stored one, but the slug matches.
     resp = await _post(client, admin_token, IMPORT_URL, _csv("Legacy Jhumka,Earrings,150,,,,,,,\n"))
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 0, "updated": 1, "errors": []}
+    assert resp.json() == {"created": 0, "updated": 1, "errors": [], "warnings": []}
 
     listing = await client.get("/api/v1/products")
     assert listing.json()["total"] == 1
@@ -305,7 +345,7 @@ async def test_import_with_zip_rehosts_images(client: AsyncClient, admin_token: 
     csv_bytes = _csv("Zip Jhumka,Earrings,100,,,,,,bluefront.png\n")
     resp = await _post(client, admin_token, IMPORT_URL, csv_bytes, zip_bytes)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
     assert uploaded == [("bluefront.png", 1)]
 
     listing = await client.get("/api/v1/products")
@@ -380,7 +420,7 @@ async def test_xlsx_import_rehosts_embedded_images(client: AsyncClient, admin_to
     )
     resp = await _post_xlsx(client, admin_token, IMPORT_URL, xlsx)
     assert resp.status_code == 200, resp.text
-    assert resp.json() == {"created": 1, "updated": 0, "errors": []}
+    assert resp.json() == {"created": 1, "updated": 0, "errors": [], "warnings": []}
     assert uploaded == ["xlsx-jhumka-1.png", "xlsx-jhumka-2.png"]
 
     listing = await client.get("/api/v1/products")

@@ -19,7 +19,7 @@ import ProductSpecification from '@/components/product/ProductSpecification';
 import CustomerPhotos from '@/components/product/CustomerPhotos';
 import ProductFaq from '@/components/product/ProductFaq';
 import { useBanners } from '@/hooks/useBanners';
-import { STORE_LEGAL } from '@/lib/branding';
+import { PLACEHOLDER_IMAGE, STORE_LEGAL } from '@/lib/branding';
 import Spinner from '@/components/ui/Spinner';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import type { Banner, Category, VariantOption } from '@/types';
@@ -27,7 +27,7 @@ import { useStories } from '@/hooks/useStories';
 import { StoriesCarousel } from '@/components/stories/StoriesCarousel';
 import { getApiErrorDetail } from '@/lib/apiError';
 import { buildComboRows } from '@/lib/variants';
-import { getVariantUrl, MAX_BASE_WIDTH } from '@/utils/image';
+
 
 
 function findCategoryName(categories: Category[] | undefined, categoryId: number): string {
@@ -191,7 +191,7 @@ function MobileGallery({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
+  const list = images.length ? images : [PLACEHOLDER_IMAGE];
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   const EASING = 'transform 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
@@ -361,6 +361,8 @@ function MobileGallery({
               alt={`Product image ${i + 1}`}
               className="w-full aspect-square object-cover"
               sizes="100vw"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
               onClick={() => setLightboxSrc(img)}
             />
           </div>
@@ -416,7 +418,7 @@ function DesktopGallery({
   activeIndex: number;
   onActiveChange: (i: number) => void;
 }) {
-  const list = images.length ? images : ['https://placehold.co/600x600?text=Jewellery'];
+  const list = images.length ? images : [PLACEHOLDER_IMAGE];
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   return (
@@ -445,7 +447,7 @@ function DesktopGallery({
               onClick={() => onActiveChange(i)}
               className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition ${i === activeIndex ? 'border-primary' : 'border-transparent'}`}
             >
-              <OptimizedImage src={img} alt="" className="w-full h-full object-cover" widths={[200]} sizes="64px" />
+              <OptimizedImage src={img} alt="" className="w-full h-full object-cover" widths={[400]} sizes="64px" />
             </button>
           ))}
         </div>
@@ -465,8 +467,9 @@ function InlineBanner({ banner: b, fallbackImg, naturalSize = false }: {
 }) {
   const inner = (
     <>
-      <img
+      <OptimizedImage
         src={fallbackImg}
+        sizes="100vw"
         alt=""
         className={
           naturalSize
@@ -624,7 +627,7 @@ export default function ProductDetailPage() {
   //
   // Priority chain:
   //   1. image_map[optId1__optId2__...] — exact combo match (set in admin combinations table)
-  //   2. Colour option's per-option images — fallback when only colour distinguishes the photo
+  //   2. Selected option's per-option images — fallback when an option has specific photos
   //   3. default_image — catch-all variant fallback
   //   4. product.images — plain product gallery
   //
@@ -648,12 +651,13 @@ export default function ProductDetailPage() {
   const imageMap: Record<string, string[]> = product.variants?.image_map ?? {};
   const comboImages: string[] = (imageMap[comboKey] ?? []).filter(Boolean);
 
-  // Colour fallback: images on any selected option that belongs to a colour group
-  const colourFallbackImages: string[] = variantGroups
-    .filter((g) => /colou?r/i.test(g.label))
+  // Option fallback: images on any selected option (colour groups and others)
+  const optionFallbackImages: string[] = variantGroups
     .flatMap((g) => {
       const optId = selectedOptions[g.id];
-      return optId ? (optionById[optId]?.images ?? []).filter(Boolean) : [];
+      if (!optId) return [];
+      const imgs = optionById[optId]?.images ?? [];
+      return imgs.filter(Boolean);
     });
 
   const defaultVariantImage: string = product.variants?.default_image ?? '';
@@ -665,10 +669,10 @@ export default function ProductDetailPage() {
       ...comboImages,
       ...(product.images ?? []).filter((img) => !comboImages.includes(img)),
     ];
-  } else if (colourFallbackImages.length > 0) {
+  } else if (optionFallbackImages.length > 0) {
     galleryImages = [
-      ...colourFallbackImages,
-      ...(product.images ?? []).filter((img) => !colourFallbackImages.includes(img)),
+      ...optionFallbackImages,
+      ...(product.images ?? []).filter((img) => !optionFallbackImages.includes(img)),
     ];
   } else if (defaultVariantImage) {
     galleryImages = [defaultVariantImage, ...(product.images ?? [])];
@@ -731,14 +735,14 @@ export default function ProductDetailPage() {
     { label: 'Manufactured by', value: STORE_LEGAL.manufacturedBy },
   ];
 
-  function renderInlineBannerItem(banner: Banner | null, fallbackImg: string) {
-    if (!banner) return null;
-    const img = banner.image_url || fallbackImg;
-    return <InlineBanner banner={banner} fallbackImg={img} naturalSize />;
+  function renderInlineBannerItem(banner: Banner | null) {
+    if (!banner?.image_url) return null;
+    return <InlineBanner banner={banner} fallbackImg={banner.image_url} naturalSize />;
   }
 
   return (
     <div ref={galleryRef} className="pb-32 md:pb-0 scroll-mt-[100px] sm:scroll-mt-[110px] lg:scroll-mt-[120px]">
+      <title>{`${product.name} | Shebliss`}</title>
       {/* Mobile image gallery */}
       <div className="md:hidden">
         <MobileGallery images={galleryImages} activeIndex={galleryActive} onActiveChange={setGalleryActive} />
@@ -880,7 +884,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {renderInlineBannerItem(productSpecBanner, 'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=1400&q=80')}
+        {renderInlineBannerItem(productSpecBanner)}
 
         <ProductSpecification specs={productSpecs} />
 
@@ -907,7 +911,7 @@ export default function ProductDetailPage() {
         <ProductReviews productId={product.id} />
 
         {/* Product detail page ad banner — admin controlled via Banners › Product Detail Page Banner */}
-        {renderInlineBannerItem(productDetailBanner, 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=1400&q=80')}
+        {renderInlineBannerItem(productDetailBanner)}
 
         <ProductFaq faqs={product.faqs} />
       </div>

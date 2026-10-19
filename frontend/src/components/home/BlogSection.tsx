@@ -1,30 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useBlogPosts } from '@/hooks/useBlog';
-
-const FALLBACK_POSTS = [
-  {
-    id: 1, slug: 'how-to-style-statement-earrings',
-    title: 'How to Style Statement Earrings for Every Occasion',
-    excerpt: 'From boardroom to brunch — a guide to wearing bold jewellery with confidence.',
-    cover_image_url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=400&fit=crop&q=80',
-    category: 'GUIDES', published_at: '2026-07-15',
-  },
-  {
-    id: 2, slug: 'care-guide-gold-plated-jewellery',
-    title: 'The Ultimate Care Guide for Gold Plated Jewellery',
-    excerpt: 'Keep your pieces looking pristine with these simple care rituals.',
-    cover_image_url: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=400&fit=crop&q=80',
-    category: 'GUIDES', published_at: '2026-07-01',
-  },
-  {
-    id: 3, slug: 'bridal-jewellery-trends-2026',
-    title: 'Bridal Jewellery Trends to Watch in 2026',
-    excerpt: 'Kundan revival, layered sets and minimalist mangalsutras are taking centre stage.',
-    cover_image_url: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=400&fit=crop&q=80',
-    category: 'TIPS', published_at: '2026-06-20',
-  },
-];
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 function formatDate(d?: string | null) {
   if (!d) return '';
@@ -33,7 +10,9 @@ function formatDate(d?: string | null) {
 
 export default function BlogSection() {
   const { data } = useBlogPosts({ limit: 3 });
-  const posts = (data?.items.length ? data.items : FALLBACK_POSTS).slice(0, 3);
+  const posts = (data?.items ?? []).slice(0, 3);
+
+  if (posts.length === 0) return null;
 
   return (
     <section className="w-full py-10 sm:py-16" style={{ backgroundColor: '#EFECE6' }}>
@@ -61,12 +40,15 @@ export default function BlogSection() {
               className="group flex flex-col bg-[#F9F8F6] overflow-hidden"
             >
               <div className="relative overflow-hidden" style={{ aspectRatio: '3/2' }}>
-                <img
-                  src={post.cover_image_url || ''}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                />
+                {post.cover_image_url && (
+                  <OptimizedImage
+                    src={post.cover_image_url}
+                    sizes="(min-width: 640px) 33vw, 100vw"
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                  />
+                )}
               </div>
               <div className="flex flex-col flex-1 p-4 sm:p-5 gap-2">
                 {post.category && (

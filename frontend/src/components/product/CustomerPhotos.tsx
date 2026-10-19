@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 import { useBanners } from '@/hooks/useBanners';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 export default function CustomerPhotos({ fallbackImages }: { fallbackImages: string[] }) {
   const { data: banners = [] } = useBanners('customer_photos');
@@ -68,8 +69,9 @@ export default function CustomerPhotos({ fallbackImages }: { fallbackImages: str
             key={`${image.src}-${index}`}
             className="relative aspect-[4/5] w-[68vw] max-w-[280px] shrink-0 overflow-hidden rounded-2xl bg-[#EFECE6] snap-start"
           >
-            <img
+            <OptimizedImage
               src={image.src}
+              sizes="280px"
               alt={image.alt}
               className="h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
               loading="lazy"

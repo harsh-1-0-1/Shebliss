@@ -7,6 +7,8 @@ import { useCartStore } from '@/store/cartStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import { getRecommendedProducts } from '@/lib/recommendations';
 import type { Product, CartItem } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
+import { PLACEHOLDER_IMAGE } from '@/lib/branding';
 
 interface RecommendationBarProps {
   lastAddedProduct: Product;
@@ -72,8 +74,10 @@ export default function RecommendationBar({ lastAddedProduct, cartItems }: Recom
           >
             {/* Image */}
             <div className="relative w-full aspect-square overflow-hidden bg-gray-50">
-              <img
-                src={product.images?.[0] || 'https://placehold.co/120x120?text=Product'}
+              <OptimizedImage
+                src={product.images?.[0] || PLACEHOLDER_IMAGE}
+                widths={[400]}
+                sizes="115px"
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"

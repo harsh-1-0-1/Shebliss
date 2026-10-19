@@ -1,6 +1,7 @@
 import { ArrowDown, Building2, CheckCircle2, Gift, Package, PackageCheck, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import CorporateGiftInquiryForm from '@/components/corporate/CorporateGiftInquiryForm';
 import { useBanners } from '@/hooks/useBanners';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 const TRUST_POINTS = [
   { icon: Truck, title: 'Last Mile Delivery', text: 'Coordinated dispatches for offices, events, and distributed teams.' },
@@ -26,6 +27,9 @@ const PROCESS = [
 
 export default function CorporateGiftingPage() {
   const { data: corporateBanners = [] } = useBanners('corporate_gifting');
+  const bannerImages = corporateBanners.map((b) => b.image_url).filter((u): u is string => !!u);
+  const heroImage = bannerImages[0];
+  const secondaryImage = bannerImages[1] ?? bannerImages[0];
 
   return (
     <div className="overflow-hidden bg-[#f8f4ec]">
@@ -42,8 +46,9 @@ export default function CorporateGiftingPage() {
               >
                 <div className="relative min-h-[150px] sm:min-h-[190px]">
                   {banner.image_url ? (
-                    <img
+                    <OptimizedImage
                       src={banner.image_url}
+                      sizes="(min-width: 768px) 50vw, 100vw"
                       alt=""
                       className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
                       loading="lazy"
@@ -96,13 +101,18 @@ export default function CorporateGiftingPage() {
           </div>
 
           <div className="relative animate-corporate-fade-up animation-delay-150">
-            <div className="aspect-[4/3] overflow-hidden rounded-[32px] shadow-[0_30px_80px_rgba(27,67,50,0.22)] ring-1 ring-white/80">
-              <img
-                src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1200&q=85&auto=format&fit=crop"
-                alt="Premium jewellery arranged for corporate gifting"
-                className="h-full w-full object-cover"
-              />
-            </div>
+            {heroImage ? (
+              <div className="aspect-[4/3] overflow-hidden rounded-[32px] shadow-[0_30px_80px_rgba(27,67,50,0.22)] ring-1 ring-white/80">
+                <OptimizedImage
+                  src={heroImage}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  alt="Premium jewellery arranged for corporate gifting"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="aspect-[4/3] rounded-[32px] bg-white/60 ring-1 ring-white/80" />
+            )}
             <div className="absolute -bottom-5 left-5 right-5 rounded-3xl bg-white/95 p-4 shadow-[0_18px_50px_rgba(27,67,50,0.18)] backdrop-blur sm:left-auto sm:right-6 sm:w-72">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light/15 text-primary">
@@ -152,13 +162,16 @@ export default function CorporateGiftingPage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(27,67,50,0.1)]">
-            <img
-              src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=900&q=85&auto=format&fit=crop"
-              alt="Curated corporate gift boxes"
-              className="h-72 w-full object-cover sm:h-full"
-            />
-          </div>
+          {secondaryImage && (
+            <div className="overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(27,67,50,0.1)]">
+              <OptimizedImage
+                src={secondaryImage}
+                sizes="(min-width: 640px) 50vw, 100vw"
+                alt="Curated corporate gift boxes"
+                className="h-72 w-full object-cover sm:h-full"
+              />
+            </div>
+          )}
           <div className="space-y-4">
             <div className="rounded-[28px] bg-[#0a3b2c] p-6 text-white shadow-[0_16px_44px_rgba(27,67,50,0.18)]">
               <Building2 size={28} className="mb-8 text-green-200" />

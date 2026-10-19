@@ -17,6 +17,7 @@ from app.api.v1 import (
     payments,
     products,
     reviews,
+    seo,
     settings,
     stories,
     testimonials,
@@ -43,3 +44,4 @@ api_router.include_router(banners.router)
 api_router.include_router(stories.router)
 api_router.include_router(testimonials.router)
 api_router.include_router(settings.router)
+api_router.include_router(seo.router)

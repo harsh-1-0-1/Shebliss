@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBlogPosts } from '@/hooks/useBlog';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 const CATEGORIES = [
   { label: 'All', value: '' },
@@ -21,6 +22,7 @@ export default function BlogListPage() {
 
   return (
     <div style={{ backgroundColor: '#F9F8F6' }}>
+      <title>Journal | Shebliss</title>
       {/* Header */}
       <div className="border-b border-[#EFECE6] py-12 sm:py-16 text-center px-4">
         <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C6A15E] mb-3">Journal</p>
@@ -74,12 +76,15 @@ export default function BlogListPage() {
                 className="group flex flex-col overflow-hidden border border-[#EFECE6] hover:border-[#C6A15E] transition-colors"
               >
                 <div className="overflow-hidden" style={{ aspectRatio: '3/2' }}>
-                  <img
-                    src={post.cover_image_url || 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=400&fit=crop&q=75'}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    loading={i < 3 ? 'eager' : 'lazy'}
-                  />
+                  {post.cover_image_url && (
+                    <OptimizedImage
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      src={post.cover_image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading={i < 3 ? 'eager' : 'lazy'}
+                    />
+                  )}
                 </div>
                 <div className="flex flex-col flex-1 p-4 sm:p-5 gap-2" style={{ backgroundColor: '#EFECE6' }}>
                   {post.category && (

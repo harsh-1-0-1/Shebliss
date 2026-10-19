@@ -101,8 +101,8 @@ export default function ProductCard({ product }: { product: Product }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image — strict 3:4 aspect ratio, object-fit:cover */}
-      <div className="relative overflow-hidden bg-[#EFECE6]" style={{ aspectRatio: '3/4' }}>
+      {/* Image — square 1:1 aspect ratio, object-fit:cover */}
+      <div className="relative overflow-hidden bg-[#EFECE6]" style={{ aspectRatio: '1/1' }}>
         {/* Primary image - responsive WebP with srcset */}
         <OptimizedImage
           src={product.images?.[0] || PLACEHOLDER_IMAGE}
@@ -122,19 +122,14 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         )}
 
-        {/* Badge stack — named tag, discount, product badge */}
+        {/* Badge stack — named tag, product badge */}
         <div className="absolute top-2 left-2 z-10 flex flex-col items-start gap-1">
           {namedBadge && (
             <span className={`text-[9px] font-bold px-2 py-1 tracking-[0.14em] uppercase ${namedBadge.className}`}>
               {namedBadge.label}
             </span>
           )}
-          {discount !== null && discount > 0 && (
-            <span className="bg-rust text-bone text-[9px] font-bold px-2 py-1 tracking-[0.12em] uppercase rounded-sm">
-              Flat {discount}% Off
-            </span>
-          )}
-          {product.badge && !discount && (
+          {product.badge && !namedBadge && (
             <span className="bg-gold text-ink text-[9px] font-bold px-2 py-1 tracking-wider uppercase">
               {product.badge}
             </span>
@@ -158,30 +153,30 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         </button>
 
-        {/* Quick view — always visible on mobile, hover reveal on desktop */}
+        {/* Quick view icon — mobile only; desktop uses the hover bar */}
         <button
           onClick={handleQuickView}
           aria-label="Quick view"
-          className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 flex items-center justify-center bg-[#F9F8F6]/90 backdrop-blur-sm border border-[#EFECE6] text-[#1A1A1A] hover:text-gold transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+          className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 flex items-center justify-center bg-[#F9F8F6]/90 backdrop-blur-sm border border-[#EFECE6] text-[#1A1A1A] hover:text-gold transition-all duration-200 sm:hidden"
         >
           <Eye size={16} strokeWidth={1.5} />
         </button>
 
-        {/* Quick add — appears on hover */}
-        <div className={`absolute bottom-0 left-0 right-0 z-10 transition-transform duration-300 ease-out ${hovered ? 'translate-y-0' : 'translate-y-full'}`}>
-          {product.stock_qty === 0 ? (
-            <div className="w-full py-2.5 bg-[#EFECE6] text-[#767676] text-[11px] font-bold tracking-[0.14em] uppercase text-center">
-              Out of Stock
-            </div>
-          ) : (
-            <button
-              onClick={handleAdd}
-              className="w-full py-2.5 bg-rust text-bone text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#a84326] transition-colors"
-            >
-              {hasVariants ? 'Choose Options' : 'Add to Bag'}
-            </button>
-          )}
+        {/* Quick view bar — appears on hover (desktop) */}
+        <div className={`hidden sm:block absolute bottom-0 left-0 right-0 z-10 transition-transform duration-300 ease-out ${hovered ? 'translate-y-0' : 'translate-y-full'}`}>
+          <button
+            onClick={handleQuickView}
+            className="w-full py-2.5 bg-forest text-bone text-[11px] font-bold tracking-[0.14em] uppercase hover:bg-[#0e261f] transition-colors"
+          >
+            Quick View
+          </button>
         </div>
+
+        {product.stock_qty === 0 && (
+          <div className="absolute top-2 right-11 z-10 bg-[#EFECE6] text-[#767676] text-[9px] font-bold px-2 py-1 tracking-[0.12em] uppercase">
+            Sold Out
+          </div>
+        )}
       </div>
 
       {/* Text content */}
@@ -204,18 +199,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Sub-label (category/finish) */}
-        {product.tags?.length > 0 && (
-          <p
-            className="text-[#767676] uppercase leading-none font-body"
-            style={{ fontSize: '9px', letterSpacing: '0.1em', fontWeight: 600 }}
-          >
-            {product.tags.slice(0, 2).map((t) =>
-              t.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-            ).join(' · ')}
-          </p>
-        )}
-
         {/* Product name */}
         <h3
           className="text-[15px] sm:text-[16px] leading-snug text-[#1A1A1A] line-clamp-2 group-hover:text-[#C6A15E] transition-colors duration-200 font-body"
@@ -225,7 +208,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </h3>
 
         {/* Price row */}
-        <div className="flex items-baseline gap-2 mt-0.5">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mt-0.5">
           <span className="text-[14px] font-semibold text-[#1A1A1A] font-body">
             {hasVariants && <span className="text-[12px] font-normal text-[#767676] mr-0.5">from </span>}
             {format(product.price)}
@@ -235,11 +218,24 @@ export default function ProductCard({ product }: { product: Product }) {
               {format(product.original_price)}
             </span>
           )}
+          {discount !== null && discount > 0 && (
+            <span className="text-[12px] font-bold text-rust font-body">{discount}% Off</span>
+          )}
         </div>
 
         {/* Stock warning */}
         {product.stock_qty > 0 && product.stock_qty <= 5 && (
           <p className="text-[11px] text-[#C6A15E] font-semibold">Only {product.stock_qty} left</p>
+        )}
+
+        {/* Add to bag — mobile only; desktop uses Quick View on hover */}
+        {product.stock_qty > 0 && (
+          <button
+            onClick={handleAdd}
+            className="sm:hidden mt-1.5 w-full py-2 bg-rust text-bone text-[10px] font-bold tracking-[0.14em] uppercase active:bg-[#a84326] transition-colors"
+          >
+            {hasVariants ? 'Choose Options' : 'Add to Bag'}
+          </button>
         )}
       </div>
     </Link>

@@ -1,6 +1,7 @@
 import { buildComboRows } from '@/lib/variants';
 import { useCurrencyStore } from '@/store/currencyStore';
 import type { VariantGroup, VariantOption } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 interface VariantPickerProps {
   groups: VariantGroup[];
@@ -152,8 +153,10 @@ export default function VariantPicker({ groups, stockMap, selectedOptions, onSel
                       >
                         <div className="h-14 w-14 rounded-lg overflow-hidden bg-gray-50 mb-1.5 shrink-0">
                           {opt.images?.[0] ? (
-                            <img
+                            <OptimizedImage
                               src={opt.images[0]}
+                              widths={[400]}
+                              sizes="72px"
                               alt={opt.name}
                               className="h-full w-full object-cover"
                               loading="lazy"

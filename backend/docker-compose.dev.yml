@@ -26,7 +26,7 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
-      - "6379:6379"   # matches REDIS_URL in .env
+      - "6380:6379"   # host 6380 → container 6379 (6379 is used by other containers; matches REDIS_URL)
     volumes:
       - redis_dev_data:/data
     healthcheck:

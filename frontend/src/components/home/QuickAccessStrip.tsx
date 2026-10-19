@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { useBanners } from '@/hooks/useBanners';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 interface Tile {
   id: number;
@@ -87,8 +88,9 @@ function CategoryTile({ tile }: { tile: Tile }) {
       to={tile.link}
       className="group shrink-0 lg:shrink lg:flex-1 w-[140px] sm:w-[160px] lg:w-auto aspect-square rounded-2xl overflow-hidden relative shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
     >
-      <img
-        src={tile.image}
+      <OptimizedImage
+        src={tile.image ?? ''}
+        sizes="(min-width: 1024px) 15vw, 160px"
         alt={tile.label}
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         loading="lazy"

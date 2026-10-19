@@ -80,8 +80,8 @@ const PLACEMENTS = [
   {
     key: 'home_collection',
     label: '🛍️ Homepage Collection Block',
-    description: 'A full-width banner ad followed by a sliding product bar on the homepage. Each banner = one repeated block (banner + products).',
-    helpText: 'Recommended size: 1600x640px. Set "Products Tag" to choose which products appear in the sliding bar. Title = the block heading shown above the products.',
+    description: 'A full-width banner ad followed by a sliding product bar on the homepage. Each banner = one repeated block (banner + products). Skip the image to show only the heading and the product bar.',
+    helpText: 'Recommended size: 1600x640px (optional). Set "Products Tag" to choose which products appear in the sliding bar. Title = the block heading shown above the products. Button Link = where "View all N products" goes (defaults to the tag).',
   },
   {
     key: 'editorial',

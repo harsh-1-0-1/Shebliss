@@ -33,6 +33,7 @@ import httpx
 from fastapi import UploadFile
 from loguru import logger
 from PIL import Image
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.datastructures import Headers
 
@@ -57,6 +58,8 @@ MAX_BADGE_LEN = 100
 MAX_XLSX_BYTES = 40 * 1024 * 1024
 
 REQUIRED_HEADERS = ("name", "category", "price")
+FALLBACK_CATEGORY_NAME = "Uncategorized"
+FALLBACK_CATEGORY_SLUG = "uncategorized"
 OPTIONAL_HEADERS = ("original_price", "stock_qty", "description", "badge", "tags", "image_files")
 
 PICTURE_COLUMNS = tuple(f"PICTURE {n}" for n in range(1, MAX_IMAGES_PER_ROW + 1))
@@ -78,7 +81,7 @@ TEMPLATE_INSTRUCTIONS = (
     "",
     "1. Fill one product per row on the 'Products' sheet.",
     "2. Columns marked * are required: name, category, price.",
-    "3. category must exactly match a category that already exists in the store.",
+    "3. category should match an existing category; blank or unknown ones go into 'Uncategorized' for the admin to fix later.",
     "4. original_price must be greater than or equal to price.",
     "5. stock_qty must be a whole number (leave blank = 0 for new products).",
     "6. tags are separated by a pipe: antique|festive.",
@@ -113,7 +116,7 @@ class CategoryRef:
 @dataclass
 class RowData:
     name: str
-    category_id: int
+    category_id: int | None
     price: float
     original_price: float | None = None
     stock_qty: int | None = None
@@ -122,6 +125,7 @@ class RowData:
     tags: list[str] | None = None
     image_refs: list[str] | None = None
     embedded: list[bytes] | None = None
+    category_note: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -357,6 +361,27 @@ def parse_xlsx(data: bytes) -> tuple[list[dict[str, str]], dict[int, list[bytes]
     return rows, images_by_row
 
 
+def _fallback_warning(index: int, note: str) -> str:
+    return f"Row {index}: {note}; a new product goes into '{FALLBACK_CATEGORY_NAME}' (change it later in admin)"
+
+
+async def ensure_fallback_category(db: AsyncSession) -> int:
+    """Return the id of the 'Uncategorized' category, creating it (hidden from the menu) if needed."""
+    result = await db.execute(select(Category).where(Category.slug == FALLBACK_CATEGORY_SLUG))
+    category = result.scalar_one_or_none()
+    if category is None:
+        category = Category(
+            name=FALLBACK_CATEGORY_NAME,
+            slug=FALLBACK_CATEGORY_SLUG,
+            is_active=False,
+            sort_order=999,
+        )
+        db.add(category)
+        await db.commit()
+        await cache_delete("cats:all")
+    return category.id
+
+
 def build_category_map(categories: list[Category]) -> tuple[dict[str, CategoryRef], list[str]]:
     """lowercased category name -> id, plus the names that collide after lowering."""
     mapping: dict[str, CategoryRef] = {}
@@ -400,14 +425,17 @@ def build_row_data(
         raise RowError("Missing product name")
 
     category_raw = row.get("category", "").strip()
-    if not category_raw:
-        raise RowError("Missing category")
     category_key = category_raw.lower()
-    if category_key in ambiguous:
-        raise RowError(f"Category '{category_raw}' is ambiguous (several categories differ only by case)")
-    category = cat_map.get(category_key)
-    if category is None:
-        raise RowError(f"Unknown category '{category_raw}'")
+    category: CategoryRef | None = None
+    category_note: str | None = None
+    if not category_raw:
+        category_note = "No category given"
+    elif category_key in ambiguous:
+        category_note = f"Category '{category_raw}' is ambiguous (several categories differ only by case)"
+    else:
+        category = cat_map.get(category_key)
+        if category is None:
+            category_note = f"Unknown category '{category_raw}'"
 
     price_raw = row.get("price", "").strip()
     if not price_raw:
@@ -464,7 +492,7 @@ def build_row_data(
 
     return RowData(
         name=name,
-        category_id=category.id,
+        category_id=category.id if category else None,
         price=price,
         original_price=original_price,
         stock_qty=stock_qty,
@@ -473,6 +501,7 @@ def build_row_data(
         tags=tags,
         image_refs=image_refs or None,
         embedded=embedded or None,
+        category_note=category_note,
     )
 
 
@@ -513,6 +542,8 @@ async def validate_rows(
                         for i, blob in enumerate(embedded, start=1)
                     )
                 )
+            if data.category_note:
+                warnings.append(_fallback_warning(index, data.category_note))
             category = cat_map.get(row.get("category", "").strip().lower())
             if category and not category.is_active:
                 warnings.append(f"Row {index}: category '{category.name}' is inactive")
@@ -673,7 +704,9 @@ async def _validate_embedded(blobs: list[bytes], name: str) -> list[tuple[bytes,
 
 def _update_payload(data: RowData) -> ProductUpdate:
     """Blank CSV cells are omitted so existing values stay unchanged."""
-    payload: dict = {"name": data.name, "category_id": data.category_id, "price": data.price}
+    payload: dict = {"name": data.name, "price": data.price}
+    if data.category_note is None:
+        payload["category_id"] = data.category_id
     if data.original_price is not None:
         payload["original_price"] = data.original_price
     if data.stock_qty is not None:
@@ -800,6 +833,8 @@ async def run_import(
     created = 0
     updated = 0
     errors: list[dict] = []
+    warnings: list[str] = []
+    fallback_id: int | None = None
     seen: set[str] = set()
     touched_slugs: list[str] = []
     embedded_by_row = embedded_by_row or {}
@@ -817,11 +852,19 @@ async def run_import(
             if normalized in seen:
                 raise RowError(f"Duplicate product name: '{data.name}'")
             seen.add(normalized)
+            if data.category_id is None:
+                if fallback_id is None:
+                    fallback_id = await ensure_fallback_category(db)
+                data.category_id = fallback_id
             product, was_created = await import_row(db, data, zf, name_map)
             if was_created:
                 created += 1
             else:
                 updated += 1
+            if data.category_note and was_created:
+                warnings.append(_fallback_warning(index, data.category_note))
+            elif data.category_note:
+                warnings.append(f"Row {index}: {data.category_note}; existing product kept its current category")
             touched_slugs.append(product.slug)
         except Exception as exc:
             await db.rollback()
@@ -836,7 +879,7 @@ async def run_import(
     if touched_slugs:
         await cache_delete_pattern("products:*")
 
-    return {"created": created, "updated": updated, "errors": errors}
+    return {"created": created, "updated": updated, "errors": errors, "warnings": warnings}
 
 
 # ---------------------------------------------------------------------------

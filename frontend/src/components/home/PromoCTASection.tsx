@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import { useBanners } from '@/hooks/useBanners';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 const FALLBACK_CARDS = [
   {
@@ -44,8 +45,9 @@ export default function PromoCTASection() {
               style={{ backgroundColor: card.bg_color || '#0a3b2c' }}
             >
               {card.image_url && (
-                <img
+                <OptimizedImage
                   src={card.image_url}
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"

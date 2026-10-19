@@ -4,23 +4,19 @@ import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useSuggestionTiles } from '@/hooks/useSuggestionTiles';
 import { formatSelectedOptions } from '@/lib/variantDisplay';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 function optLabel(item: ReturnType<typeof useCartStore.getState>['items'][number]) {
   if (!item.selected_options) return null;
   return formatSelectedOptions(item.selected_options, item.product.variants) || null;
 }
 
-const SUGGESTIONS = [
-  { title: 'Ear Ring', href: '/products?category=ear-ring', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=120&h=120&fit=crop&q=75' },
-  { title: 'Necklaces Sets', href: '/products?category=necklaces-sets', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=120&h=120&fit=crop&q=75' },
-  { title: 'Bridal Sets', href: '/products?category=bridal-sets', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=120&h=120&fit=crop&q=75' },
-  { title: 'Bangles', href: '/products?category=bangles', img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=120&h=120&fit=crop&q=75' },
-];
-
 export default function CartDrawer() {
   const { isDrawerOpen, closeDrawer, items, total, itemCount, updateItem, removeItem } = useCartStore();
   const { format } = useCurrencyStore();
+  const suggestions = useSuggestionTiles(4);
   useBodyScrollLock(isDrawerOpen);
   if (!isDrawerOpen) return null;
 
@@ -77,27 +73,31 @@ export default function CartDrawer() {
                 className="px-6 py-2.5 bg-[#1A1A1A] text-[#F9F8F6] text-[12px] font-bold tracking-[0.14em] uppercase hover:bg-[#2B2421] transition-colors">
                 Continue Shopping
               </button>
+              {suggestions.length > 0 && (
               <div className="w-full pt-4 border-t border-[#EFECE6]">
                 <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#767676] mb-3">You might like</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <Link key={s.title} to={s.href} onClick={closeDrawer}
+                  {suggestions.map((s) => (
+                    <Link key={s.link} to={s.link} onClick={closeDrawer}
                       className="group overflow-hidden border border-[#EFECE6] hover:border-[#C6A15E] transition-colors">
                       <div className="aspect-square overflow-hidden">
-                        <img src={s.img} alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        <OptimizedImage src={s.image} widths={[400]} sizes="180px" alt={s.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                       </div>
                       <p className="text-[12px] font-semibold text-[#1A1A1A] px-2 py-2 font-body">{s.title}</p>
                     </Link>
                   ))}
                 </div>
               </div>
+              )}
             </div>
           ) : (
             <div className="p-4 space-y-3">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 p-3 border border-[#EFECE6]" style={{ backgroundColor: '#EFECE6' }}>
                   <Link to={`/products/${item.product.slug}`} onClick={closeDrawer} className="shrink-0">
-                    <img src={item.resolved_image_url || item.product.images?.[0]}
+                    <OptimizedImage src={item.resolved_image_url || item.product.images?.[0] || ''}
+                      widths={[400]}
+                      sizes="72px"
                       alt={item.product.name}
                       className="w-18 h-18 object-cover bg-[#F9F8F6]"
                       style={{ width: 72, height: 72 }}

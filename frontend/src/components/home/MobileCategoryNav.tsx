@@ -1,49 +1,45 @@
 import { Link } from 'react-router-dom';
 import { useBanners } from '@/hooks/useBanners';
-import { categoryUrl } from '@/lib/urls';
-
-const FALLBACK_BUBBLES = [
-  { label: 'New Arrival', href: categoryUrl('new-arrival'), img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=240&h=240&fit=crop&q=75' },
-  { label: 'Ear Ring', href: categoryUrl('ear-ring'), img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=240&h=240&fit=crop&q=75' },
-  { label: 'Jumkas', href: categoryUrl('jumkas'), img: 'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?w=240&h=240&fit=crop&q=75' },
-  { label: 'Necklaces Sets', href: categoryUrl('necklaces-sets'), img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
-  { label: 'Bangles', href: categoryUrl('bangles'), img: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=240&h=240&fit=crop&q=75' },
-  { label: 'Wedding Jewells', href: categoryUrl('wedding-jewells'), img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=240&h=240&fit=crop&q=75' },
-  { label: 'Chains', href: categoryUrl('chains'), img: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=240&h=240&fit=crop&q=75' },
-  { label: 'Finger Rings', href: categoryUrl('finger-rings'), img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=240&h=240&fit=crop&q=75' },
-  { label: 'Gifting', href: categoryUrl('gifting'), img: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=240&h=240&fit=crop&q=75' },
-  { label: 'Sale', href: '/products?tags=offers', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=240&h=240&fit=crop&q=75' },
-];
+import OptimizedImage from '@/components/common/OptimizedImage';
+import { useCategories } from '@/hooks/useCategories';
+import { categoryLink, sortByMenuOrder } from '@/components/layout/Navbar/navData';
 
 export default function MobileCategoryNav() {
   const { data: banners = [] } = useBanners('menu_banner');
+  const { data: categories = [] } = useCategories();
   const bubbles = banners.length > 0
     ? banners.map((b) => ({ label: b.title, href: b.cta_link || '/products', img: b.image_url || '' }))
-    : FALLBACK_BUBBLES;
+    : sortByMenuOrder(categories).map((c) => ({ label: c.name, href: categoryLink(c), img: c.image_url || '' }));
+
+  if (bubbles.length === 0) return null;
 
   return (
     <section
-      className="w-full py-6 lg:py-10 overflow-x-auto scrollbar-none"
+      className="w-full py-5 lg:py-6 overflow-x-auto scrollbar-none"
       style={{ backgroundColor: '#F9F8F6' }}
       aria-label="Category shortcuts"
     >
-      <div className="flex gap-5 sm:gap-7 px-4 sm:px-6 lg:px-10 xl:px-16 w-max lg:w-full lg:mx-auto lg:flex-wrap lg:justify-center">
+      <div className="flex gap-5 sm:gap-6 lg:gap-8 px-4 sm:px-6 lg:px-10 xl:px-16 w-max min-w-full lg:justify-center">
         {bubbles.map((b) => (
           <Link
             key={b.label}
             to={b.href}
-            className="flex flex-col items-center gap-2.5 sm:gap-3 group shrink-0"
+            className="flex flex-col items-center gap-2 group shrink-0"
           >
             {/* Circle image */}
-            <div className="relative w-16 h-16 sm:w-24 sm:h-24 lg:w-[116px] lg:h-[116px] xl:w-[124px] xl:h-[124px] rounded-full overflow-hidden border-2 border-[#EFECE6] group-hover:border-[#C6A15E] transition-colors duration-300 shadow-sm">
-              <img
-                src={b.img}
-                alt={b.label}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-[88px] lg:h-[88px] rounded-full overflow-hidden border-2 border-[#EFECE6] group-hover:border-[#C6A15E] transition-colors duration-300 shadow-sm">
+              {b.img && (
+                <OptimizedImage
+                  src={b.img}
+                  widths={[400]}
+                  sizes="88px"
+                  alt={b.label}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
+              )}
             </div>
-            <span className="text-[13px] sm:text-[15px] lg:text-[16px] font-medium text-[#2B2421] text-center tracking-wide leading-tight max-w-[72px] sm:max-w-[110px] lg:max-w-[130px] font-body">
+            <span className="text-[12px] sm:text-[13px] lg:text-[14px] font-medium text-[#2B2421] text-center tracking-wide leading-tight max-w-[72px] sm:max-w-[96px] lg:max-w-[110px] font-body">
               {b.label}
             </span>
           </Link>

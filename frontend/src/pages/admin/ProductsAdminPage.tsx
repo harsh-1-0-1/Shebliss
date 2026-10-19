@@ -22,6 +22,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useDeleteProduct } from '@/hooks/useAdmin';
 import api from '@/lib/api';
 import { getApiErrorDetail } from '@/lib/apiError';
+import { PLACEHOLDER_IMAGE } from '@/lib/branding';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import BulkImportModal from '@/components/admin/BulkImportModal';
@@ -1611,7 +1612,7 @@ export default function ProductsAdminPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={p.images?.[0] || 'https://placehold.co/60x60?text=P'}
+                        src={p.images?.[0] || PLACEHOLDER_IMAGE}
                         alt={p.name}
                         className="w-10 h-10 rounded-lg object-cover bg-gray-100 shrink-0 border"
                       />
@@ -1674,7 +1675,7 @@ export default function ProductsAdminPage() {
           displayedItems.map((p) => (
             <div key={p.id} className="bg-white rounded-xl border p-3 flex gap-3 shadow-sm">
               <img
-                src={p.images?.[0] || 'https://placehold.co/60x60?text=P'}
+                src={p.images?.[0] || PLACEHOLDER_IMAGE}
                 alt={p.name}
                 className="w-12 h-12 rounded-lg object-cover shrink-0 border bg-gray-50"
                 loading="lazy"

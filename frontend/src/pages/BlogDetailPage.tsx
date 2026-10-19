@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useBlogPost, useBlogPosts } from '@/hooks/useBlog';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 function formatDate(d?: string | null) {
   if (!d) return '';
@@ -43,15 +44,20 @@ export default function BlogDetailPage() {
 
   return (
     <article style={{ backgroundColor: '#F9F8F6' }}>
+      <title>{`${post.title} | Shebliss`}</title>
       {/* Hero image */}
-      <div className="w-full overflow-hidden" style={{ height: 'clamp(280px, 45vw, 520px)' }}>
-        <img
-          src={post.cover_image_url || 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1400&h=600&fit=crop&q=80'}
-          alt={post.title}
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
-      </div>
+      {post.cover_image_url && (
+        <div className="w-full overflow-hidden" style={{ height: 'clamp(280px, 45vw, 520px)' }}>
+          <OptimizedImage
+            sizes="100vw"
+            fetchPriority="high"
+            src={post.cover_image_url}
+            alt={post.title}
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )}
 
       {/* Article body */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
@@ -115,7 +121,7 @@ export default function BlogDetailPage() {
                   className="group flex flex-col overflow-hidden border border-[#F9F8F6] hover:border-[#C6A15E] transition-colors"
                 >
                   <div className="overflow-hidden" style={{ aspectRatio: '3/2' }}>
-                    <img src={rp.cover_image_url || ''} alt={rp.title}
+                    <OptimizedImage src={rp.cover_image_url || ''} sizes="(min-width: 640px) 33vw, 100vw" alt={rp.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
                   </div>
                   <div className="p-4" style={{ backgroundColor: '#F9F8F6' }}>

@@ -11,6 +11,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { APP_NAME } from '@/lib/branding';
 import { formatSelectedOptions } from '@/lib/variantDisplay';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 declare global {
   interface Window {
@@ -134,7 +135,7 @@ function OrderSummary({
         {items.map((item) => (
           <div key={`${item.product_id}-${JSON.stringify(item.selected_options)}`} className="flex gap-3 items-center">
             <div className="relative h-12 w-12 shrink-0 rounded-lg border border-gray-200 bg-white">
-              <img src={item.resolved_image_url || item.product.images?.[0]} alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
+              <OptimizedImage src={item.resolved_image_url || item.product.images?.[0] || ''} widths={[400]} sizes="48px" alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
               <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[11px] font-bold text-white">{item.quantity}</span>
             </div>
             <div className="min-w-0 flex-1">
@@ -202,7 +203,7 @@ function DesktopSummary({ items, subtotal, shipping, total, discount, couponCode
         {items.map((item) => (
           <div key={`${item.product_id}-${JSON.stringify(item.selected_options)}`} className="flex gap-3 items-center">
             <div className="relative h-12 w-12 shrink-0 rounded-lg border border-gray-200 bg-white">
-              <img src={item.resolved_image_url || item.product.images?.[0]} alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
+              <OptimizedImage src={item.resolved_image_url || item.product.images?.[0] || ''} widths={[400]} sizes="48px" alt={item.product.name} className="h-full w-full rounded-lg object-cover" />
               <span className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-gray-950 text-[11px] font-bold text-white">{item.quantity}</span>
             </div>
             <div className="min-w-0 flex-1">

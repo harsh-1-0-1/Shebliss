@@ -6,6 +6,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import ProductTagBadges from '@/components/product/ProductTagBadges';
 import type { Product } from '@/types';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 const SECONDARY = '#a34a2f';
 
@@ -46,7 +47,8 @@ function ProductTile({ product }: { product: Product }) {
       className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
     >
       <div className="relative aspect-square overflow-hidden bg-gray-50">
-        <img
+        <OptimizedImage
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           src={
             product.images?.[0] ||
             'https://placehold.co/400x400?text=Product'

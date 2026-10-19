@@ -4,22 +4,18 @@ import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import { useCurrencyStore } from '@/store/currencyStore';
 import { formatSelectedOptions } from '@/lib/variantDisplay';
+import { useSuggestionTiles } from '@/hooks/useSuggestionTiles';
+import OptimizedImage from '@/components/common/OptimizedImage';
 
 function optLabel(item: ReturnType<typeof useCartStore.getState>['items'][number]) {
   if (!item.selected_options) return null;
   return formatSelectedOptions(item.selected_options, item.product.variants) || null;
 }
 
-const EMPTY_COLLECTIONS = [
-  { title: 'Ear Ring', sub: 'Jumkas & studs', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=ear-ring' },
-  { title: 'Necklaces Sets', sub: 'Choker sets & chains', img: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&q=75', href: '/products?category=necklaces-sets' },
-  { title: 'Wedding Jewells', sub: 'Complete looks', img: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&q=75', href: '/products?category=wedding-jewells' },
-  { title: 'Sale', sub: 'Up to 50% off', img: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&h=300&fit=crop&q=75', href: '/products?tags=offers' },
-];
-
 export default function CartPage() {
   const { items, total, itemCount, updateItem, removeItem } = useCartStore();
   const { format } = useCurrencyStore();
+  const suggestions = useSuggestionTiles(4);
 
   async function handleUpdate(id: number, qty: number) {
     try { if (qty <= 0) await removeItem(id); else await updateItem(id, qty); }
@@ -47,21 +43,25 @@ export default function CartPage() {
             Explore Collection
           </Link>
         </div>
-        <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#767676] mb-5 text-center">You might love</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          {EMPTY_COLLECTIONS.map((c) => (
-            <Link key={c.title} to={c.href}
-              className="group overflow-hidden border border-[#EFECE6] hover:border-[#C6A15E] transition-colors">
-              <div className="overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                <img src={c.img} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600" loading="lazy" />
-              </div>
-              <div className="p-3">
-                <p className="text-[14px] font-medium text-[#1A1A1A] font-body">{c.title}</p>
-                <p className="text-[11px] text-[#C6A15E] font-semibold mt-0.5 font-body">{c.sub}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {suggestions.length > 0 && (
+          <>
+            <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#767676] mb-5 text-center">You might love</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              {suggestions.map((c) => (
+                <Link key={c.link} to={c.link}
+                  className="group overflow-hidden border border-[#EFECE6] hover:border-[#C6A15E] transition-colors">
+                  <div className="overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                    <OptimizedImage src={c.image} sizes="(min-width: 768px) 25vw, 50vw" alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-600" loading="lazy" />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-[14px] font-medium text-[#1A1A1A] font-body">{c.title}</p>
+                    <p className="text-[11px] text-[#C6A15E] font-semibold mt-0.5 font-body">{c.subtitle}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -86,7 +86,9 @@ export default function CartPage() {
           {items.map((item) => (
             <div key={item.id} className="flex gap-4 p-4 border border-[#EFECE6]" style={{ backgroundColor: '#EFECE6' }}>
               <Link to={`/products/${item.product.slug}`} className="shrink-0">
-                <img src={item.resolved_image_url || item.product.images?.[0]}
+                <OptimizedImage src={item.resolved_image_url || item.product.images?.[0] || ''}
+                  widths={[400]}
+                  sizes="96px"
                   alt={item.product.name}
                   className="object-cover bg-[#F9F8F6]"
                   style={{ width: 96, height: 96 }}
