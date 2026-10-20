@@ -47,7 +47,7 @@ export function ZoomableImage({
         src={zoomSrc}
         alt={alt}
         draggable={false}
-        className="w-full h-full object-cover transition-transform duration-150 ease-out will-change-transform"
+        className="w-full h-full object-cover transition-transform duration-150 ease-out"
         style={{ transform: hovering ? `scale(${zoom})` : 'scale(1)' }}
       />
     </div>
