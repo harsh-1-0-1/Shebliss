@@ -2,7 +2,7 @@
  * Frontend helpers for responsive WebP images.
  *
  * The backend generates responsive variants at upload time:
- *   base:     store/products/42/abc.webp  (up to 1600px wide)
+ *   base:     store/products/42/abc.webp  (up to 2400px wide for products, 1600px otherwise)
  *   variants: store/products/42/abc_400w.webp, _800w.webp, _1200w.webp
  *
  * These helpers derive variant URLs from the base URL the API returns so the
@@ -14,6 +14,13 @@ export const IMAGE_VARIANT_WIDTHS = [400, 800, 1200] as const;
 
 /** Max base image width the backend produces (used as the largest srcset entry). */
 export const MAX_BASE_WIDTH = 1600;
+
+/** Product photos are stored larger so zoom stays sharp on phones. */
+export const PRODUCT_MAX_BASE_WIDTH = 2400;
+
+function baseWidth(url: string): number {
+  return /\/store\/product(s|-variants)\//.test(url) ? PRODUCT_MAX_BASE_WIDTH : MAX_BASE_WIDTH;
+}
 
 /**
  * Construct a responsive variant URL from a base image URL.
@@ -37,7 +44,7 @@ export function buildSrcset(
   widths: readonly number[] = IMAGE_VARIANT_WIDTHS,
 ): string {
   const entries = widths.map((w) => `${getVariantUrl(baseUrl, w)} ${w}w`);
-  entries.push(`${baseUrl} ${MAX_BASE_WIDTH}w`);
+  entries.push(`${baseUrl} ${baseWidth(baseUrl)}w`);
   return entries.join(", ");
 }
 

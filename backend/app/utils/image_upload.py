@@ -10,7 +10,12 @@ from fastapi.concurrency import run_in_threadpool
 from loguru import logger
 
 from app.core.config import settings
-from app.utils.image_processing import VARIANT_WIDTHS, process_image_upload
+from app.utils.image_processing import (
+    PRODUCT_BASE_QUALITY,
+    PRODUCT_MAX_BASE_WIDTH,
+    VARIANT_WIDTHS,
+    process_image_upload,
+)
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".mp4", ".webm"}
 STATIC_ROOT = Path("static")
@@ -225,7 +230,12 @@ async def upload_image_file(
     is_image = file.content_type is not None and file.content_type.startswith("image/")
 
     if is_image:
-        processed = await run_in_threadpool(process_image_upload, contents)
+        if folder.removeprefix("store/").strip("/") in {"products", "product-variants"}:
+            processed = await run_in_threadpool(
+                process_image_upload, contents, PRODUCT_MAX_BASE_WIDTH, PRODUCT_BASE_QUALITY,
+            )
+        else:
+            processed = await run_in_threadpool(process_image_upload, contents)
         if processed is not None:
             key = generate_image_key(folder, entity_id, file.filename or "", ext_override=".webp")
             if s3_enabled:

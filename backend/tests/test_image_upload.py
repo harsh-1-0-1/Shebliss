@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from fastapi import UploadFile
+from starlette.datastructures import Headers
 
 from app.core.config import settings
 from app.schemas.category import CategoryResponse
@@ -172,6 +173,30 @@ async def test_s3_upload_used_whenever_credentials_set(monkeypatch):
 
     key = await image_upload.upload_image_file(upload, "stories/video", 3)
     assert calls and calls[0][1] == key
+
+
+@pytest.mark.asyncio
+async def test_product_photos_keep_larger_base(tmp_path: Path, monkeypatch):
+    from PIL import Image
+
+    monkeypatch.setattr(settings, "ENVIRONMENT", "development")
+    monkeypatch.setattr(settings, "AWS_ACCESS_KEY_ID", "")
+    monkeypatch.setattr(image_upload, "STATIC_ROOT", tmp_path)
+    buf = __import__("io").BytesIO()
+    Image.new("RGB", (3000, 3000), "white").save(buf, format="PNG")
+
+    def upload():
+        return UploadFile(
+            filename="big.png",
+            file=__import__("io").BytesIO(buf.getvalue()),
+            headers=Headers({"content-type": "image/png"}),
+        )
+
+    product_key = await image_upload.upload_image_file(upload(), "products", 1)
+    banner_key = await image_upload.upload_image_file(upload(), "banners", 1)
+    assert Image.open(tmp_path / product_key).width == 2400
+    assert Image.open(tmp_path / banner_key).width == 1600
+    assert Image.open(tmp_path / image_upload.get_variant_key(product_key, 1200)).width == 1200
 
 
 @pytest.mark.asyncio

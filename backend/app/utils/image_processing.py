@@ -2,7 +2,8 @@
 
 When a product image is uploaded it is:
 1. Converted to WebP (25-50% smaller than JPEG/PNG at equivalent quality).
-2. Downscaled to a maximum width (1600px) for the "base" image.
+2. Downscaled to a maximum width for the "base" image (1600px; 2400px for
+   product photos so zoom stays sharp on high-density phone screens).
 3. Thumbnail variants generated at 400, 800, and 1200px widths.
 
 Variant files are named by convention so the frontend can derive them from the
@@ -24,6 +25,10 @@ from PIL import Image, ImageOps
 
 # Maximum width for the base (full-size) image. Larger originals are downscaled.
 MAX_BASE_WIDTH = 1600
+
+# Product photos keep more detail for the zoom and fullscreen viewer.
+PRODUCT_MAX_BASE_WIDTH = 2400
+PRODUCT_BASE_QUALITY = 85
 
 # Responsive thumbnail widths in pixels. These match the srcset descriptors
 # the frontend uses. Variants are only downscaled, never upscaled.
@@ -60,7 +65,11 @@ def _resize_to_width(img: Image.Image, target_width: int) -> Image.Image:
     return img.resize((target_width, new_height), Image.LANCZOS)
 
 
-def process_image_upload(image_bytes: bytes) -> ProcessedImage | None:
+def process_image_upload(
+    image_bytes: bytes,
+    max_base_width: int = MAX_BASE_WIDTH,
+    base_quality: int = WEBP_QUALITY,
+) -> ProcessedImage | None:
     """Convert an uploaded image to WebP and generate responsive variants.
 
     Returns ``ProcessedImage`` with base + variant bytes, or ``None`` if the
@@ -81,9 +90,9 @@ def process_image_upload(image_bytes: bytes) -> ProcessedImage | None:
     )
     img = img.convert("RGBA" if has_alpha else "RGB")
 
-    # Base image (capped at MAX_BASE_WIDTH)
-    base_img = _resize_to_width(img, MAX_BASE_WIDTH)
-    base_bytes = _save_webp(base_img)
+    # Base image (capped at max_base_width)
+    base_img = _resize_to_width(img, max_base_width)
+    base_bytes = _save_webp(base_img, base_quality)
 
     # Responsive variants
     variants: dict[int, bytes] = {}
