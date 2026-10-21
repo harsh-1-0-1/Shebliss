@@ -337,6 +337,7 @@ export default function CheckoutPage() {
       theme: { color: '#a34a2f' },
       handler: () => {
         clearDirectCheckoutSession();
+        if (!isBuyNow) cart.clearLocal();
         toast.success('Payment completed');
         navigate(`/orders/${response.order_id}`);
       },
@@ -429,10 +430,7 @@ export default function CheckoutPage() {
           coupon_code: appliedCoupon?.code ?? null,
         });
         if (paymentMethod === 'cod') completeCodOrder(data.order_id);
-        else {
-          cart.clearLocal();
-          await openRazorpay(data);
-        }
+        else await openRazorpay(data);
       }
     } catch (err: unknown) {
       toast.error((err as { response?: { data?: { detail?: string } }; message?: string })?.response?.data?.detail || (err as { message?: string })?.message || 'Checkout failed');

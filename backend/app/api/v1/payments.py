@@ -98,7 +98,10 @@ async def razorpay_webhook(
         refund_id = ""
 
         if event == "payment.captured":
-            order = await order_service.mark_paid(db, order_id, payment_id, amount_paid_paise)
+            order = await order_service.mark_paid(
+                db, order_id, payment_id, amount_paid_paise,
+                clear_cart=notes.get("source") == "cart",
+            )
             if not order:
                 raise HTTPException(status_code=404, detail="Order not found")
 

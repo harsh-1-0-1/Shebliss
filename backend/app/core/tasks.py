@@ -8,7 +8,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 import uuid
 
-from app.db.models import Order, OrderItem, OrderStatus
+from app.db.models import Order, OrderItem, OrderStatus, PaymentStatus
 from app.db.session import async_session_factory
 from app.utils.redis import redis_client
 
@@ -82,6 +82,8 @@ async def cleanup_abandoned_orders():
                             select(Order)
                             .where(
                                 Order.status == OrderStatus.PENDING,
+                                Order.payment_method != "cod",
+                                Order.payment_status != PaymentStatus.PAID,
                                 Order.created_at < cutoff_time,
                             )
                             .options(selectinload(Order.items).selectinload(OrderItem.product))

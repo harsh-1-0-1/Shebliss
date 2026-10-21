@@ -19,11 +19,13 @@ from app.db.models import (
     Refund,
 )
 from app.schemas.order import DirectCheckoutItem
-from app.services.cart_service import resolve_variant_details
+from app.services.cart_service import options_key, resolve_variant_details
 from app.services.coupon_service import apply_coupon
 
 
-async def _create_razorpay_order(order: Order, email: str, full_name: str, phone: str) -> dict:
+async def _create_razorpay_order(
+    order: Order, email: str, full_name: str, phone: str, source: str,
+) -> dict:
     amount_paise = int(round(order.total_amount * 100))
     data = {
         "key_id": settings.RAZORPAY_KEY_ID,
@@ -33,7 +35,7 @@ async def _create_razorpay_order(order: Order, email: str, full_name: str, phone
         "name": settings.APP_NAME,
         "description": f"{settings.APP_NAME} order #{order.id}",
         "prefill": {"name": full_name, "email": email, "contact": phone or ""},
-        "notes": {"order_id": str(order.id), "source": "direct_checkout"},
+        "notes": {"order_id": str(order.id), "source": source},
     }
     if not settings.RAZORPAY_KEY_ID or not settings.RAZORPAY_KEY_SECRET:
         logger.warning("Razorpay credentials missing; returning local checkout metadata for order_id={}", order.id)
@@ -164,7 +166,7 @@ async def checkout(
     1. Validate cart + stock
     2. Create order & order items (snapshot prices)
     3. Decrement stock with row-level locking
-    4. Clear cart
+    4. Clear cart (COD only; Razorpay clears it once the payment is captured)
     5. Create Razorpay order
     """
     address = await db.execute(
@@ -222,14 +224,15 @@ async def checkout(
         db.add(OrderItem(order_id=order.id, **oi_data))
     await db.flush()
 
-    for ci in list(cart.items):
-        await db.delete(ci)
-    await db.flush()
+    if payment_method == "cod":
+        for ci in list(cart.items):
+            await db.delete(ci)
+        await db.flush()
 
     razorpay_data = None
     if payment_method == "razorpay":
         try:
-            razorpay_data = await _create_razorpay_order(order, email, full_name, phone)
+            razorpay_data = await _create_razorpay_order(order, email, full_name, phone, "cart")
         except Exception as e:
             logger.error("Razorpay order creation failed during checkout for order {}: {}", order.id, e)
             await db.rollback()
@@ -298,7 +301,7 @@ async def direct_checkout(
     razorpay_data = None
     if payment_method == "razorpay":
         try:
-            razorpay_data = await _create_razorpay_order(order, email, full_name, phone)
+            razorpay_data = await _create_razorpay_order(order, email, full_name, phone, "direct_checkout")
         except Exception as e:
             logger.error("Razorpay order creation failed during direct checkout for order {}: {}", order.id, e)
             await db.rollback()
@@ -342,7 +345,35 @@ async def get_order(db: AsyncSession, order_id: int, user_id: int) -> Order | No
     return result.scalar_one_or_none()
 
 
-async def mark_paid(db: AsyncSession, order_id: int, payment_id: str, amount_paid_paise: int) -> Order | None:
+def _order_item_options_key(selected_options: dict | list | None) -> str:
+    if isinstance(selected_options, dict) and "option_ids" in selected_options:
+        selected_options = selected_options.get("option_ids") or []
+    return options_key(selected_options)
+
+
+async def _remove_ordered_items_from_cart(db: AsyncSession, order: Order) -> None:
+    if not order.user_id:
+        return
+    cart_result = await db.execute(
+        select(Cart).where(Cart.user_id == order.user_id).options(selectinload(Cart.items))
+    )
+    cart = cart_result.scalar_one_or_none()
+    if not cart:
+        return
+    items_result = await db.execute(select(OrderItem).where(OrderItem.order_id == order.id))
+    ordered = {
+        (oi.product_id, _order_item_options_key(oi.selected_options))
+        for oi in items_result.scalars().all()
+    }
+    for ci in list(cart.items):
+        if (ci.product_id, options_key(ci.selected_options)) in ordered:
+            await db.delete(ci)
+    await db.flush()
+
+
+async def mark_paid(
+    db: AsyncSession, order_id: int, payment_id: str, amount_paid_paise: int, clear_cart: bool = False,
+) -> Order | None:
     """Mark order as paid from Razorpay webhook, with amount verification and idempotency."""
     result = await db.execute(select(Order).where(Order.id == order_id))
     order = result.scalar_one_or_none()
@@ -365,6 +396,8 @@ async def mark_paid(db: AsyncSession, order_id: int, payment_id: str, amount_pai
     order.status = OrderStatus.CONFIRMED
     order.payment_id = payment_id
     await db.flush()
+    if clear_cart:
+        await _remove_ordered_items_from_cart(db, order)
     logger.info("Order {} marked PAID, payment_id={}", order_id, payment_id)
     return order
 
@@ -375,11 +408,10 @@ async def mark_failed(db: AsyncSession, order_id: int) -> Order | None:
     if not order:
         return None
 
-    if order.status == OrderStatus.CANCELLED:
+    if order.status != OrderStatus.PENDING or order.payment_status == PaymentStatus.PAID:
         return order
 
     order.payment_status = PaymentStatus.FAILED
-    order.status = OrderStatus.CANCELLED
     await db.flush()
     logger.info("Order {} marked FAILED", order_id)
     return order
